@@ -17,5 +17,12 @@ export const messageApi = {
           ...setHeader(),
         },
       });
+    },
+    getMessagesByEmail: async (email) => {
+      return await axiosClient.get(`${ENDPOINT}/private/${email}`, {
+        headers: {
+          ...setHeader(),
+        },
+      });
     }
 };

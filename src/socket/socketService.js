@@ -2,37 +2,34 @@ import SockJS from 'sockjs-client'
 import { Client } from '@stomp/stompjs'
 
 let stompClient = null
+let currentSubscription = null
 let urlSocket = 'http://localhost:8000/ws'
 
-export const connectSocket = (token, onMessageCallback, onConnectSuccess, onDisconnect, onError) => {
+export const connectSocket = (token, onConnectSuccess, onDisconnect, onError) => {
   return new Promise((resolve, reject) => {
-    const socket = new SockJS(urlSocket + `?token=${token}`)
+    const socket = new SockJS(`${urlSocket}?token=${token}`)
     stompClient = new Client({
       webSocketFactory: () => socket,
       connectHeaders: {
         Authorization: `Bearer ${token}`,
       },
       onConnect: () => {
-        console.log('WebSocket connected');
-        onConnectSuccess();
-        stompClient.subscribe('/topic/messages/1', (message) => {
-          const parsed = JSON.parse(message.body)
-          onMessageCallback(parsed)
-        })
+        console.log('WebSocket connected')
+        onConnectSuccess?.()
         resolve()
       },
       onStompError: (error) => {
-        console.log('STOMP error: ', error)
-        if (onError) onError(error)
+        console.error('STOMP error: ', error)
+        onError?.(error)
         reject(error)
       },
       onWebSocketClose: () => {
         console.log('WebSocket connection closed')
-        if (onDisconnect) onDisconnect()
+        onDisconnect?.()
       },
       onWebSocketError: (error) => {
-        console.log('WebSocket error: ', error)
-        if (onError) onError(error)
+        console.error('WebSocket error: ', error)
+        onError?.(error)
       },
       reconnectDelay: 5000,
     })
@@ -40,9 +37,35 @@ export const connectSocket = (token, onMessageCallback, onConnectSuccess, onDisc
   })
 }
 
+export const subscribeSocket = (urlSubcribe, onMessageCallback) => {
+  if (!stompClient || !stompClient.connected) {
+    console.warn('Cannot subscribe because socket is not connected')
+    return
+  }
+
+  // Hủy subscription cũ nếu có
+  if (currentSubscription) {
+    currentSubscription.unsubscribe()
+  }
+
+  // Tạo subscription mới
+  currentSubscription = stompClient.subscribe(urlSubcribe, (message) => {
+    const parsed = JSON.parse(message.body)
+    onMessageCallback(parsed)
+  })
+
+  console.log(`Subscribed to ${urlSubcribe}`)
+}
+
 export const disconnectSocket = () => {
+  if (currentSubscription) {
+    currentSubscription.unsubscribe()
+    currentSubscription = null
+  }
+
   if (stompClient) {
     stompClient.deactivate()
+    stompClient = null
   }
 }
 

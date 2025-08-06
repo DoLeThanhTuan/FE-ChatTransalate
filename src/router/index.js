@@ -42,7 +42,7 @@ const routes = [
     meta: { requiresAuth: true, requiresStreamer: true }
   },
   {
-    path: '/chat-view',
+    path: '/chat-view/:chatId',
     name: 'chat-view',
     component: () => import('../views/ChatView.vue'),
     meta: { requiresAuth: true}

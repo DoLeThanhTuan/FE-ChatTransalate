@@ -3,7 +3,7 @@
 </template>
 
 <script setup>
-// Không import Sidebar nữa
+
 </script>
 
 <style>
@@ -12,5 +12,6 @@ body, #app {
   padding: 0;
   height: 100vh;
   width: 100vw;
+  transition: background-color 0.3s ease, color 0.3s ease;
 }
 </style>

@@ -5,19 +5,7 @@ import router from './router';
 import { createPinia } from 'pinia';
 import Toastify from 'vue3-toastify'
 import 'vue3-toastify/dist/index.css';
-
-import {
-  library
-} from '@fortawesome/fontawesome-svg-core'
-import {
-  FontAwesomeIcon
-} from '@fortawesome/vue-fontawesome'
-import {
-  faGlobe,
-  faLock
-} from '@fortawesome/free-solid-svg-icons'
-
-library.add(faGlobe, faLock)
+import { FontAwesomeIcon } from './plugins/fontawesome'
 
 const app = createApp(App)
 const pinia = createPinia()
@@ -28,4 +16,11 @@ app.use(Toastify, {
     position: "top-right"
 })
 app.component('font-awesome-icon', FontAwesomeIcon)
+
 app.mount('#app')
+
+// Initialize theme store after app is mounted
+import { useThemeStore } from './stores/themeStore'
+const themeStore = useThemeStore()
+themeStore.initTheme()
+themeStore.watchSystemTheme()

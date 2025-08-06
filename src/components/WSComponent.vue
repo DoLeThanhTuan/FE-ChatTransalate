@@ -21,7 +21,7 @@
         <div
           v-for="(msg, index) in messages"
           :key="index"
-          :class="['message-row', msg.email === message.email ? 'own-message' : '']"
+          :class="['message-row', msg.email === message.email ? 'own-message' : null]"
         >
           <img
             class="avatar"

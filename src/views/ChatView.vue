@@ -10,9 +10,9 @@
         <button class="menu-btn" @click="toggleSidebar">
           <span class="menu-icon">☰</span>
         </button>
-        <ChannelHeader />
+        <ChannelHeader/>
       </div>
-      <ChannelHeader v-else />
+      <ChannelHeader v-if="!isMobile" />
       <MessageList />
       <MessageInput />
     </div>
@@ -20,14 +20,18 @@
 </template>
 
 <script setup>
-import { ref, onMounted, onUnmounted } from 'vue'
+import { ref, onMounted, onUnmounted, watch, computed } from 'vue'
+import { useRoute } from 'vue-router'
 import Sidebar from '../components/Sidebar.vue'
 import ChannelHeader from '../components/ChannelHeader.vue'
 import MessageList from '../components/MessageList.vue'
 import MessageInput from '../components/MessageInput.vue'
+import { useChannelStore } from '@/stores/channelStore'
 
+const route = useRoute()
 const isSidebarVisible = ref(false)
 const isMobile = ref(false)
+const channelStore = useChannelStore()
 
 const checkMobile = () => {
   isMobile.value = window.innerWidth <= 768
@@ -37,8 +41,24 @@ const toggleSidebar = () => {
   isSidebarVisible.value = !isSidebarVisible.value
 }
 
+const fetchChannel = async () => {
+  try {
+    const response = await channelStore.fetchChannelById(route.params.chatId);
+  } catch (e) {
+    console.error('Error fetching channel:', e);
+  }
+}
+
+watch(
+  () => route.params.chatId,
+  (newChatId) => {
+    fetchChannel();
+  },
+  { immediate: true }
+)
+
 onMounted(() => {
-  checkMobile()
+  checkMobile();
   window.addEventListener('resize', checkMobile)
 })
 
@@ -52,9 +72,10 @@ onUnmounted(() => {
   display: flex;
   height: 100dvh;
   height: -webkit-fill-available;
-  background: #f3f4f8;
+  background: var(--bg-tertiary);
   position: relative;
   overflow: hidden;
+  transition: background-color 0.3s ease;
 }
 
 .chat-view {
@@ -63,19 +84,25 @@ onUnmounted(() => {
   flex-direction: column;
   height: 100dvh;
   height: -webkit-fill-available;
-  background: #f7fafd;
+  background: var(--bg-secondary);
   position: relative;
+  transition: background-color 0.3s ease;
 }
 
 .mobile-header {
   display: flex;
   align-items: center;
   padding: 0.3rem;
-  background: #fff;
-  border-bottom: 1px solid #e0e0e0;
+  background: var(--border-primary);
+  border-bottom: 1px solid var(--border-primary);
   position: sticky;
   top: 0;
   z-index: 10;
+  transition: all 0.3s ease;
+}
+
+.mobile-header .channel-header {
+  flex-grow: 1;
 }
 
 .menu-btn {
@@ -85,13 +112,14 @@ onUnmounted(() => {
   margin-right: 0.3rem;
   cursor: pointer;
   font-size: 1.3rem;
-  color: #23272f;
+  color: var(--text-primary);
   display: flex;
   align-items: center;
   justify-content: center;
   min-width: 32px;
   height: 32px;
   touch-action: manipulation;
+  transition: color 0.3s ease;
 }
 
 .menu-icon {
@@ -120,6 +148,7 @@ onUnmounted(() => {
 @media (max-width: 768px) {
   .chat-layout {
     position: relative;
+    display: block;
   }
 
   .sidebar {
