@@ -27,9 +27,24 @@
         v-model="message.content" 
         placeholder="Message..." 
         @keydown="handleKeyDown"
+        @input="onInput"
         rows="1"
         ref="textareaRef"
       ></textarea>
+      <div v-if="showUserDropdown && filteredMembers.length > 0" class="mention-dropdown">
+        <div
+          v-for="user in filteredMembers"
+          :key="user.id"
+          class="mention-item"
+          @click="selectUser(user)"
+        >
+          <img :src="getURLAvatar(user.avatar)" class="mention-avatar" />
+          <div class="mention-item_info">
+            <span>{{ user.name }}</span>
+            <span class="mention-email">{{ user.email }}</span>
+          </div>
+        </div>
+      </div>
       <div class="msg-actions">
         <div class="emoji-picker-container">
           <button class="action-btn" @click="toggleEmojiPicker">😊</button>
@@ -80,9 +95,12 @@
 </template>
 
 <script setup>
-import { ref, onMounted, watch, nextTick, computed } from 'vue';
+import { ref, watch, nextTick, computed } from 'vue';
 import { send } from '@/socket/socketService';
 import { fileApi } from '@/axios/api-services/fileApi';
+import { useChannelStore } from '@/stores/channelStore';
+import { getURLAvatar } from '@/utils/image';
+import { removeVietnameseTones } from '@/utils/string';
 
 const message = ref({
   content: "",
@@ -92,6 +110,18 @@ const showEmojiPicker = ref(false);
 const selectedFiles = ref([]);
 const currentCategory = ref('emotions');
 const searchQuery = ref('');
+const channelStore = useChannelStore();
+const showUserDropdown = ref(false);
+const mentionQuery = ref('');
+const caretPosition = ref(0);
+const members = computed(() => channelStore.channelCurrent?.members || []);
+console.log('members', members.value);
+const filteredMembers = computed(() =>
+  members.value.filter(m =>
+    removeVietnameseTones(m.name.toLowerCase()).includes(removeVietnameseTones(mentionQuery.value.toLowerCase())) ||
+    removeVietnameseTones(m.email.toLowerCase()).includes(removeVietnameseTones(mentionQuery.value.toLowerCase()))
+  )
+);
 
 const MAX_FILES = 5;
 
@@ -205,17 +235,14 @@ const sendMessage = async () => {
       isLoading.value = true;
       uploadError.value = null;
 
-      let uploadedFiles = [];
-      if (selectedFiles.value.length > 0) {
-        uploadedFiles = await uploadFiles(selectedFiles.value);
-      }
-
-      const messageData = {
+      showUserDropdown.value = false
+      channelStore.sendMessage({
         content: message.value.content,
-        files: uploadedFiles
-      };
-      
-      send("/app/chat/send/1", messageData);
+        files: selectedFiles.value,
+        channelId: channelStore.channelCurrent.id,
+        uploadFiles: uploadFiles
+      })
+      // send(`/app/chat/send/${channelStore.channelCurrent?.id}`, messageData);
       message.value.content = ""; // Clear input after sending
       selectedFiles.value = []; // Clear selected files
     } catch (error) {
@@ -238,19 +265,54 @@ watch(() => message.value.content, () => {
   nextTick(adjustTextareaHeight);
 });
 
+function onInput(e) {
+  const value = e.target.value;
+  const pos = e.target.selectionStart;
+  caretPosition.value = pos;
+  const lastAt = value.lastIndexOf('@', pos - 1);
+  if (lastAt !== -1 && (lastAt === 0 || /\s/.test(value[lastAt - 1]))) {
+    const query = value.slice(lastAt + 1, pos);
+    if (query.length >= 0) {
+      mentionQuery.value = query;
+      showUserDropdown.value = true;
+      console.log('onInput', {mentionQuery: mentionQuery.value, filteredMembers: filteredMembers.value, showUserDropdown: showUserDropdown.value});
+      return;
+    }
+  }
+  showUserDropdown.value = false;
+  console.log('onInput', {mentionQuery: mentionQuery.value, filteredMembers: filteredMembers.value, showUserDropdown: showUserDropdown.value});
+}
+
+function selectUser(user) {
+  const textarea = textareaRef.value;
+  const value = textarea.value;
+  const pos = caretPosition.value;
+  const lastAt = value.lastIndexOf('@', pos - 1);
+  if (lastAt !== -1) {
+    const before = value.slice(0, lastAt + 1);
+    const after = value.slice(pos);
+    textarea.value = before + user.name + ' ' + after;
+    message.value.content = textarea.value;
+    textarea.focus();
+    showUserDropdown.value = false;
+    mentionQuery.value = '';
+  }
+}
+
 </script>
 
 <style scoped>
 .message-input-bar {
   display: flex;
   flex-direction: column;
-  background: #fff;
+  background: var(--bg-primary, #f4f4f4);
   border-top: 1px solid #e0e0e0;
   padding: 0.7rem 2rem;
   gap: 0.5rem;
 }
 
 .input-container {
+  position: relative;
   display: flex;
   gap: 0.5rem;
   align-items: flex-end;
@@ -666,5 +728,45 @@ watch(() => message.value.content, () => {
 
 .send-btn:disabled:hover {
   background: #cccccc;
+}
+
+.mention-dropdown {
+  position: absolute;
+  background: #fff;
+  border: 1px solid #eee;
+  border-radius: 6px;
+  z-index: 9999;
+  max-height: 200px;
+  overflow-y: auto;
+  width: 250px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+  left: 0;
+  bottom: 100%;
+  margin-bottom: 6px;
+}
+.mention-item {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.4rem 0.7rem;
+  cursor: pointer;
+}
+.mention-item:hover {
+  background: #f3f4f8;
+}
+.mention-avatar {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+}
+.mention-email {
+  color: #888;
+  font-size: 0.9em;
+}
+.mention-item_info {
+  color: #1976d2;;
+  display: flex;
+  gap: 1px;
+  flex-direction: column;
 }
 </style> 

@@ -5,44 +5,58 @@
         {{ connectionStatusMessage }}
       </div>
     </div>
-    <div v-for="msg in messages" :key="msg.id" class="message" :class="{ 'message-own': msg.email === authStore.userInfo.email }">
-      <img v-if="msg.email !== authStore.userInfo.email" class="avatar" :src="getURLAvatar(msg.avatar)" alt="avatar" />
-      <div class="msg-content">
-        <div class="msg-header">
-          <span class="msg-user">{{ msg.email }}</span>
-          <span class="msg-time">{{ formatDate(msg.createdAt) }}</span>
-        </div>
-        <div class="msg-text">{{ msg.content }}</div>
-        <div v-if="msg.files && msg.files.length > 0" class="msg-files">
-          <div v-for="file in msg.files" :key="file.id" class="msg-file">
-            <div class="file-icon">📎</div>
-            <div class="file-info">
-              <a :href="file.path" target="_blank" class="file-name">{{ file.name }}</a>
-              <div class="file-size">{{ formatFileSize(file.size) }}</div>
+    <div v-for="msg in messages" :key="msg.id">
+      <template v-if="msg.type === 'MESSAGE'">
+        <div class="message" :class="{ 'message-own': msg.email === authStore.userInfo.email }">
+          <img v-if="msg.email !== authStore.userInfo.email" class="avatar" :src="getURLAvatar(msg.avatar)" alt="avatar" />
+          <div class="msg-content">
+            <div class="msg-header">
+              <span class="msg-user">{{ msg.name }}</span>
+              <span class="msg-time">{{ formatDate(msg.createdAt) }}</span>
+            </div>
+            <div class="msg-text" v-html="highlightMentions(msg.content)"></div>
+            <div v-if="msg.files && msg.files.length > 0" class="msg-files">
+              <div v-for="file in msg.files" :key="file.id" class="msg-file">
+                <div class="file-icon">📎</div>
+                <div class="file-info">
+                  <a :href="file.path" target="_blank" class="file-name">{{ file.name }}</a>
+                  <div class="file-size">{{ formatFileSize(file.size) }}</div>
+                </div>
+              </div>
+            </div>
+            <div class="msg-reactions">
+              <span v-for="r in msg.reactions" :key="r.emoji" class="reaction">
+                {{ r.emoji }} {{ r.count }}
+              </span>
             </div>
           </div>
+          <img v-if="msg.email === authStore.userInfo.email" class="avatar" :src="getURLAvatar(msg.avatar)" alt="avatar" />
         </div>
-        <div class="msg-reactions">
-          <span v-for="r in msg.reactions" :key="r.emoji" class="reaction">
-            {{ r.emoji }} {{ r.count }}
-          </span>
+      </template>
+      <template v-else>
+        <div class="system-message">
+          <img :src="getURLAvatar(msg.avatar)" class="system-avatar" />
+          <span class="system-name">{{ channelStore.getUserName(msg.email) }}</span>
+          <span class="system-content">{{ convertMessageMultilanguage(msg) }}</span>
         </div>
-      </div>
-      <img v-if="msg.email === authStore.userInfo.email" class="avatar" :src="getURLAvatar(msg.avatar)" alt="avatar" />
+      </template>
     </div>
   </div>
 </template>
 
 <script setup>
-import { ref, onMounted, onUnmounted, computed, nextTick } from 'vue'
+import { ref, onMounted, onUnmounted, computed, nextTick, watch } from 'vue'
 import { messageApi } from '@/axios/api-services/messageApi'
 import { formatDate } from '@/utils/date'
-import { connectSocket, disconnectSocket, send } from '@/socket/socketService'
+import { connectSocket, disconnectSocket, subscribeSocket } from '@/socket/socketService'
 import { useAuthStore } from '@/stores/authStore'
 import { getURLAvatar } from '@/utils/image'
+import { useChannelStore } from '@/stores/channelStore'
+import { removeVietnameseTones, convertMessageMultilanguage } from '@/utils/string'
+import { URLMessage } from '@/config/enum'
 
 const authStore = useAuthStore()
-
+const channelStore = useChannelStore()
 const messages = ref([])
 const loading = ref(true)
 const error = ref(null)
@@ -53,7 +67,7 @@ const reconnectTimeout = ref(null)
 
 const connectionStatusMessage = computed(() => {
   if (!isConnected.value) {
-    return 'Mất kết nối với máy chủ. Đang kết nối lại...'
+    return 'Đang kết nối...'
   }
   return ''
 })
@@ -81,6 +95,7 @@ const handleConnectSuccess = () => {
 
 const handleReconnect = () => {
   // Clear any existing timeout
+  isConnected.value = false
   if (reconnectTimeout.value) {
     clearTimeout(reconnectTimeout.value)
   }
@@ -96,25 +111,27 @@ const handleConnectionError = (error) => {
   handleDisconnect()
 }
 
-const connectWS = () => {
-  connectSocket(
+const handleReceiveMessage = (message) => {
+  messages.value.push(message);
+  scrollToBottom();
+}
+
+const connectWS = async () => {
+  await connectSocket(
     authStore.token,
-    (message) => {
-      messages.value.push(message)
-      scrollToBottom()
-    },
     handleConnectSuccess,
     handleDisconnect,
     handleConnectionError
   )
+  subscribeSocket(`${URLMessage.RECEIVE_CHANNEL_MESSAGE}/${channelStore.channelCurrent?.id}`,(message) => handleReceiveMessage(message))
 }
 
 const fetchMessages = async () => {
   loading.value = true
   try {
-    const res = await messageApi.getMessagesByChannelId(1)
-    console.log(res.data)
+    const res = await messageApi.getMessagesByChannelId(channelStore.channelCurrent?.id)
     messages.value = res.data
+    scrollToBottom()
   } catch (err) {
     error.value = 'Không thể tải tin nhắn'
   } finally {
@@ -130,9 +147,18 @@ const formatFileSize = (size) => {
   return parseFloat((size / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
 };
 
-onMounted(() => {
-  connectWS()
-})
+function highlightMentions(text) {
+  if (!text) return '';
+  const members = channelStore.channelCurrent?.members || [];
+  let result = text;
+  members.forEach(member => {
+    const name = member.name;
+    const nameNoSign = removeVietnameseTones(name).replace(/([.*+?^=!:${}()|\[\]\/\\])/g, '\\$1');
+    const regex = new RegExp(`@(${name}|${nameNoSign})\\b`, 'gi');
+    result = result.replace(regex, `<span class=\"mention\">@$1</span>`);
+  });
+  return result;
+}
 
 onUnmounted(() => {
   if (reconnectTimeout.value) {
@@ -140,13 +166,26 @@ onUnmounted(() => {
   }
   disconnectSocket()
 })
+
+watch(
+  () => channelStore.channelCurrent?.id,
+  async () => {
+    messages.value = []
+    if(isConnected.value == true){
+      subscribeSocket(`${URLMessage.RECEIVE_CHANNEL_MESSAGE}/${channelStore.channelCurrent?.id}`,(message) => handleReceiveMessage(message))
+      await fetchMessages();
+    }else{
+      handleReconnect()
+    }
+  }
+)
 </script>
 
-<style scoped>
+<style>
 .message-list {
   flex: 1;
   overflow-y: auto;
-  background: #f7fafd;
+  background: var(--bg-primary,#f4f4f4);
   padding: 1.5rem 2.5rem;
   display: flex;
   flex-direction: column;
@@ -169,10 +208,14 @@ onUnmounted(() => {
 .message-own {
   margin-left: auto;
   background: #e3f2fd;
-  flex-direction: row-reverse;
+}
+
+.message-own .avatar {
+  order: 2;
 }
 
 .message-own .msg-content {
+  order: 1;
   align-items: flex-end;
 }
 
@@ -306,8 +349,7 @@ onUnmounted(() => {
 .connection-status {
   position: sticky;
   top: 0;
-  z-index: 100;
-  padding: 0.5rem;
+  z-index: 2;
   text-align: center;
   background: rgba(255, 255, 255, 0.9);
   backdrop-filter: blur(5px);
@@ -324,6 +366,45 @@ onUnmounted(() => {
 .status-message.error {
   background: #f8d7da;
   color: #721c24;
+}
+
+.mention {
+  color: #1976d2;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.system-message {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #ffffff;
+  border-radius: 10px;
+  padding: 0.6rem 2rem;
+  margin: 0.7rem auto;
+  width: fit-content;
+  font-size: 1rem;
+  font-weight: 500;
+  color: #444;
+}
+.system-avatar {
+  margin-right: 0.5rem;
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+.system-name {
+  font-weight: bold;
+  color: #222;
+  margin-right: 0.25rem;
+}
+html.dark .system-message {
+  background: #23293a;
+  color: #eee;
+}
+html.dark .system-name {
+  color: #fff;
 }
 
 @media (max-width: 768px) {
