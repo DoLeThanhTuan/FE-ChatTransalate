@@ -6,32 +6,51 @@
     <div v-if="selectedFiles.length > 0" class="files-preview">
       <div class="files-header">
         <span>{{ selectedFiles.length }} file(s)</span>
-        <button class="remove-all-files" @click="removeAllFiles">Xóa tất cả</button>
+        <button class="remove-all-files" @click="removeAllFiles">
+          Xóa tất cả
+        </button>
       </div>
       <div class="files-list">
-        <div v-for="(file, index) in selectedFiles" 
-             :key="index" 
-             class="file-item">
+        <div
+          v-for="(file, index) in selectedFiles"
+          :key="index"
+          class="file-item"
+        >
           <div class="file-info">
             <span class="file-icon">📎</span>
             <span class="file-name">{{ file.name }}</span>
             <span class="file-size">{{ formatFileSize(file.size) }}</span>
           </div>
-          <button class="remove-file" @click="removeFile(index)" title="Xóa file">×</button>
+          <button
+            class="remove-file"
+            @click="removeFile(index)"
+            title="Xóa file"
+          >
+            ×
+          </button>
         </div>
       </div>
     </div>
     <div class="input-container">
-      <textarea 
-        class="msg-input" 
-        v-model="message.content" 
-        placeholder="Message..." 
+      <button
+        class="border-2 btn-translate cursor-pointer"
+        @click="showTranslateModal = true"
+      >
+        Dịch
+      </button>
+      <textarea
+        class="msg-input"
+        v-model="message.content"
+        placeholder="Message..."
         @keydown="handleKeyDown"
         @input="onInput"
         rows="1"
         ref="textareaRef"
       ></textarea>
-      <div v-if="showUserDropdown && filteredMembers.length > 0" class="mention-dropdown">
+      <div
+        v-if="showUserDropdown && filteredMembers.length > 0"
+        class="mention-dropdown"
+      >
         <div
           v-for="user in filteredMembers"
           :key="user.id"
@@ -50,17 +69,20 @@
           <button class="action-btn" @click="toggleEmojiPicker">😊</button>
           <div v-if="showEmojiPicker" class="emoji-picker">
             <div class="emoji-picker-header">
-              <input 
-                type="text" 
-                v-model="searchQuery" 
-                placeholder="Tìm emoji..." 
+              <input
+                type="text"
+                v-model="searchQuery"
+                placeholder="Tìm emoji..."
                 class="emoji-search"
-              >
+              />
               <div class="emoji-categories">
-                <button 
-                  v-for="(emojis, category) in emojiCategories" 
+                <button
+                  v-for="(emojis, category) in emojiCategories"
                   :key="category"
-                  :class="['category-btn', { active: currentCategory === category }]"
+                  :class="[
+                    'category-btn',
+                    { active: currentCategory === category },
+                  ]"
                   @click="currentCategory = category"
                 >
                   {{ emojis[0] }}
@@ -68,10 +90,12 @@
               </div>
             </div>
             <div class="emoji-grid">
-              <div v-for="emoji in filteredEmojis" 
-                   :key="emoji" 
-                   class="emoji" 
-                   @click="addEmoji(emoji)">
+              <div
+                v-for="emoji in filteredEmojis"
+                :key="emoji"
+                class="emoji"
+                @click="addEmoji(emoji)"
+              >
                 {{ emoji }}
               </div>
             </div>
@@ -79,226 +103,351 @@
         </div>
         <label class="action-btn" title="Gửi file">
           📎
-          <input 
-            type="file" 
+          <input
+            type="file"
             multiple
-            @change="handleFileUpload" 
+            @change="handleFileUpload"
             style="display: none"
-          >
+          />
         </label>
         <button @click="sendMessage" class="send-btn" :disabled="isLoading">
           {{ isLoading ? '⌛' : '▶' }}
         </button>
       </div>
     </div>
+    <TranslateModal
+      :visible="showTranslateModal"
+      :content="message.content"
+      @close="showTranslateModal = false"
+      @confirm="handleTranslate"
+    />
   </div>
 </template>
 
 <script setup>
-import { ref, watch, nextTick, computed } from 'vue';
-import { send } from '@/socket/socketService';
-import { fileApi } from '@/axios/api-services/fileApi';
-import { useChannelStore } from '@/stores/channelStore';
-import { getURLAvatar } from '@/utils/image';
-import { removeVietnameseTones } from '@/utils/string';
+import { ref, watch, nextTick, computed } from 'vue'
+import { fileApi } from '@/axios/api-services/fileApi'
+import { useChannelStore } from '@/stores/channelStore'
+import { getURLAvatar } from '@/utils/image'
+import { removeVietnameseTones } from '@/utils/string'
+import { useUserChatStore } from '@/stores/userChatStore'
+import { useUserStore } from '@/stores/userStore'
+import { useRoute } from 'vue-router'
+import { TypeChat, Language } from '@/config/enum'
+import TranslateModal from './TranslateModal.vue'
 
 const message = ref({
-  content: "",
+  content: '',
+  language: 'VI',
 })
-const textareaRef = ref(null);
-const showEmojiPicker = ref(false);
-const selectedFiles = ref([]);
-const currentCategory = ref('emotions');
-const searchQuery = ref('');
-const channelStore = useChannelStore();
-const showUserDropdown = ref(false);
-const mentionQuery = ref('');
-const caretPosition = ref(0);
-const members = computed(() => channelStore.channelCurrent?.members || []);
-console.log('members', members.value);
-const filteredMembers = computed(() =>
-  members.value.filter(m =>
-    removeVietnameseTones(m.name.toLowerCase()).includes(removeVietnameseTones(mentionQuery.value.toLowerCase())) ||
-    removeVietnameseTones(m.email.toLowerCase()).includes(removeVietnameseTones(mentionQuery.value.toLowerCase()))
-  )
-);
+const textareaRef = ref(null)
+const showEmojiPicker = ref(false)
+const selectedFiles = ref([])
+const currentCategory = ref('emotions')
+const searchQuery = ref('')
+const channelStore = useChannelStore()
+const userChatStore = useUserChatStore()
+const userStore = useUserStore()
+const route = useRoute()
+const typeChat = computed(() => route.params.typeChat)
+const showUserDropdown = ref(false)
+const mentionQuery = ref('')
+const caretPosition = ref(0)
+const showTranslateModal = ref(false)
+const members = computed(() =>
+  userStore.getUsersByIds(channelStore.channelCurrent?.members || [])
+)
+console.log('members', members.value)
+console.log(channelStore.channelCurrent)
 
-const MAX_FILES = 5;
+const filteredMembers = computed(() =>
+  members.value.filter(
+    (m) =>
+      removeVietnameseTones(m.name.toLowerCase()).includes(
+        removeVietnameseTones(mentionQuery.value.toLowerCase())
+      ) ||
+      removeVietnameseTones(m.email.toLowerCase()).includes(
+        removeVietnameseTones(mentionQuery.value.toLowerCase())
+      )
+  )
+)
+
+const MAX_FILES = 5
 
 const emojiCategories = {
-  emotions: ['😊', '😂', '😍', '😢', '😡', '😴', '🤔', '😎', '🥳', '😭', '😱', '🤯', '😇', '🥺', '😤'],
-  animals: ['🐶', '🐱', '🦁', '🐼', '🦊', '🦒', '🦘', '🦜', '🦢', '🦋', '🐢', '🐙', '🦈', '🦉', '🦄'],
-  food: ['🍕', '🍔', '🍜', '🍣', '🍱', '🍙', '🍚', '🍘', '🍥', '🥟', '🍤', '🍗', '🍖', '🥩', '🥓'],
-  activities: ['⚽', '🎮', '🎨', '🎭', '🎪', '🎯', '🎲', '🎸', '🎹', '🎺', '🎻', '🎬', '🎭', '🎪', '🎨'],
-  symbols: ['❤️', '⭐', '💯', '✨', '🌟', '💫', '💥', '🔥', '💪', '🙏', '👏', '👍', '🎉', '🏆', '💎']
-};
+  emotions: [
+    '😊',
+    '😂',
+    '😍',
+    '😢',
+    '😡',
+    '😴',
+    '🤔',
+    '😎',
+    '🥳',
+    '😭',
+    '😱',
+    '🤯',
+    '😇',
+    '🥺',
+    '😤',
+  ],
+  animals: [
+    '🐶',
+    '🐱',
+    '🦁',
+    '🐼',
+    '🦊',
+    '🦒',
+    '🦘',
+    '🦜',
+    '🦢',
+    '🦋',
+    '🐢',
+    '🐙',
+    '🦈',
+    '🦉',
+    '🦄',
+  ],
+  food: [
+    '🍕',
+    '🍔',
+    '🍜',
+    '🍣',
+    '🍱',
+    '🍙',
+    '🍚',
+    '🍘',
+    '🍥',
+    '🥟',
+    '🍤',
+    '🍗',
+    '🍖',
+    '🥩',
+    '🥓',
+  ],
+  activities: [
+    '⚽',
+    '🎮',
+    '🎨',
+    '🎭',
+    '🎪',
+    '🎯',
+    '🎲',
+    '🎸',
+    '🎹',
+    '🎺',
+    '🎻',
+    '🎬',
+    '🎭',
+    '🎪',
+    '🎨',
+  ],
+  symbols: [
+    '❤️',
+    '⭐',
+    '💯',
+    '✨',
+    '🌟',
+    '💫',
+    '💥',
+    '🔥',
+    '💪',
+    '🙏',
+    '👏',
+    '👍',
+    '🎉',
+    '🏆',
+    '💎',
+  ],
+}
 
 const filteredEmojis = computed(() => {
   if (!searchQuery.value) {
-    return emojiCategories[currentCategory.value];
+    return emojiCategories[currentCategory.value]
   }
   return Object.values(emojiCategories)
     .flat()
-    .filter(emoji => emoji.includes(searchQuery.value));
-});
+    .filter((emoji) => emoji.includes(searchQuery.value))
+})
 
 const formatFileSize = (bytes) => {
-  if (bytes === 0) return '0 Bytes';
-  const k = 1024;
-  const sizes = ['Bytes', 'KB', 'MB', 'GB'];
-  const i = Math.floor(Math.log(bytes) / Math.log(k));
-  return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
-};
+  if (bytes === 0) return '0 Bytes'
+  const k = 1024
+  const sizes = ['Bytes', 'KB', 'MB', 'GB']
+  const i = Math.floor(Math.log(bytes) / Math.log(k))
+  return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i]
+}
 
 const removeFile = (index) => {
-  selectedFiles.value.splice(index, 1);
-};
+  selectedFiles.value.splice(index, 1)
+}
 
 const removeAllFiles = () => {
-  selectedFiles.value = [];
-};
+  selectedFiles.value = []
+}
 
 const handleFileUpload = (event) => {
-  const files = Array.from(event.target.files);
+  const files = Array.from(event.target.files)
   if (selectedFiles.value.length + files.length > MAX_FILES) {
-    alert(`Chỉ được chọn tối đa ${MAX_FILES} file`);
-    return;
+    alert(`Chỉ được chọn tối đa ${MAX_FILES} file`)
+    return
   }
-  selectedFiles.value.push(...files);
-};
+  selectedFiles.value.push(...files)
+}
 
 const toggleEmojiPicker = () => {
-  showEmojiPicker.value = !showEmojiPicker.value;
+  showEmojiPicker.value = !showEmojiPicker.value
   if (showEmojiPicker.value) {
-    searchQuery.value = '';
+    searchQuery.value = ''
   }
-};
+}
 
 const addEmoji = (emoji) => {
-  const textarea = textareaRef.value;
-  const start = textarea.selectionStart;
-  const end = textarea.selectionEnd;
-  message.value.content = 
-    message.value.content.substring(0, start) + 
-    emoji + 
-    message.value.content.substring(end);
-  
+  const textarea = textareaRef.value
+  const start = textarea.selectionStart
+  const end = textarea.selectionEnd
+  message.value.content =
+    message.value.content.substring(0, start) +
+    emoji +
+    message.value.content.substring(end)
+
   nextTick(() => {
-    textarea.focus();
-    textarea.selectionStart = textarea.selectionEnd = start + emoji.length;
-  });
-  
-  showEmojiPicker.value = false;
-};
+    textarea.focus()
+    textarea.selectionStart = textarea.selectionEnd = start + emoji.length
+  })
+
+  showEmojiPicker.value = false
+}
 
 const handleKeyDown = (event) => {
   if (event.key === 'Enter') {
     if (event.ctrlKey) {
       // Ctrl+Enter: Insert new line
-      const start = event.target.selectionStart;
-      const end = event.target.selectionEnd;
-      message.value.content = message.value.content.substring(0, start) + '\n' + message.value.content.substring(end);
+      const start = event.target.selectionStart
+      const end = event.target.selectionEnd
+      message.value.content =
+        message.value.content.substring(0, start) +
+        '\n' +
+        message.value.content.substring(end)
       // Move cursor after the new line
       nextTick(() => {
-        event.target.selectionStart = event.target.selectionEnd = start + 1;
-      });
+        event.target.selectionStart = event.target.selectionEnd = start + 1
+      })
     } else {
       // Enter: Send message
-      event.preventDefault();
-      sendMessage();
+      event.preventDefault()
+      sendMessage()
     }
   }
 }
 
-const isLoading = ref(false);
-const uploadError = ref(null);
+const isLoading = ref(false)
+const uploadError = ref(null)
 
 const uploadFiles = async (files) => {
   try {
-    const formData = new FormData();
-    files.forEach(file => {
-      formData.append('files', file);
-    });
+    const formData = new FormData()
+    files.forEach((file) => {
+      formData.append('files', file)
+    })
 
-    const response = await fileApi.uploadFile(formData);
+    const response = await fileApi.uploadFile(formData)
 
-    return response.data;
+    return response.data
   } catch (error) {
-    console.error('Error uploading files:', error);
-    uploadError.value = 'Có lỗi trong quá trình upload file.';
+    console.error('Error uploading files:', error)
+    uploadError.value = 'Có lỗi trong quá trình upload file.'
   }
-};
+}
 
 const sendMessage = async () => {
   if (message.value.content.trim() || selectedFiles.value.length > 0) {
     try {
-      isLoading.value = true;
-      uploadError.value = null;
+      isLoading.value = true
+      uploadError.value = null
 
       showUserDropdown.value = false
-      channelStore.sendMessage({
-        content: message.value.content,
-        files: selectedFiles.value,
-        channelId: channelStore.channelCurrent.id,
-        uploadFiles: uploadFiles
-      })
-      // send(`/app/chat/send/${channelStore.channelCurrent?.id}`, messageData);
-      message.value.content = ""; // Clear input after sending
-      selectedFiles.value = []; // Clear selected files
+
+      if (typeChat.value == TypeChat.CHANNEL) {
+        channelStore.sendMessageToChannel({
+          content: message.value.content,
+          files: selectedFiles.value,
+          channelId: channelStore.channelCurrent.id,
+          uploadFiles: uploadFiles,
+        })
+      } else {
+        userChatStore.sendMessageToUser({
+          content: message.value.content,
+          files: selectedFiles.value,
+          userEmail: route.params.chatKey,
+          uploadFiles: uploadFiles,
+        })
+      }
+      message.value.content = '' // Clear input after sending
+      selectedFiles.value = [] // Clear selected files
     } catch (error) {
-      console.error('Error sending message:', error);
+      console.error('Error sending message:', error)
     } finally {
-      isLoading.value = false;
+      isLoading.value = false
     }
   }
 }
 
 const adjustTextareaHeight = () => {
-  const textarea = textareaRef.value;
+  const textarea = textareaRef.value
   if (textarea) {
-    textarea.style.height = 'auto';
-    textarea.style.height = textarea.scrollHeight + 'px';
+    textarea.style.height = 'auto' // reset trước
+
+    // Nếu nội dung cao hơn chiều cao hiện tại (nghĩa là đã wrap xuống dòng)
+    if (textarea.scrollHeight > textarea.clientHeight) {
+      textarea.style.height = textarea.scrollHeight + 'px'
+    }
   }
 }
 
-watch(() => message.value.content, () => {
-  nextTick(adjustTextareaHeight);
-});
+watch(
+  () => message.value.content,
+  () => {
+    nextTick(adjustTextareaHeight)
+  }
+)
 
 function onInput(e) {
-  const value = e.target.value;
-  const pos = e.target.selectionStart;
-  caretPosition.value = pos;
-  const lastAt = value.lastIndexOf('@', pos - 1);
+  const value = e.target.value
+  const pos = e.target.selectionStart
+  caretPosition.value = pos
+  const lastAt = value.lastIndexOf('@', pos - 1)
   if (lastAt !== -1 && (lastAt === 0 || /\s/.test(value[lastAt - 1]))) {
-    const query = value.slice(lastAt + 1, pos);
+    const query = value.slice(lastAt + 1, pos)
     if (query.length >= 0) {
-      mentionQuery.value = query;
-      showUserDropdown.value = true;
-      console.log('onInput', {mentionQuery: mentionQuery.value, filteredMembers: filteredMembers.value, showUserDropdown: showUserDropdown.value});
-      return;
+      mentionQuery.value = query
+      showUserDropdown.value = true
+      return
     }
   }
-  showUserDropdown.value = false;
-  console.log('onInput', {mentionQuery: mentionQuery.value, filteredMembers: filteredMembers.value, showUserDropdown: showUserDropdown.value});
+  showUserDropdown.value = false
 }
 
 function selectUser(user) {
-  const textarea = textareaRef.value;
-  const value = textarea.value;
-  const pos = caretPosition.value;
-  const lastAt = value.lastIndexOf('@', pos - 1);
+  const textarea = textareaRef.value
+  const value = textarea.value
+  const pos = caretPosition.value
+  const lastAt = value.lastIndexOf('@', pos - 1)
   if (lastAt !== -1) {
-    const before = value.slice(0, lastAt + 1);
-    const after = value.slice(pos);
-    textarea.value = before + user.name + ' ' + after;
-    message.value.content = textarea.value;
-    textarea.focus();
-    showUserDropdown.value = false;
-    mentionQuery.value = '';
+    const before = value.slice(0, lastAt + 1)
+    const after = value.slice(pos)
+    textarea.value = before + user.name + ' ' + after
+    message.value.content = textarea.value
+    textarea.focus()
+    showUserDropdown.value = false
+    mentionQuery.value = ''
   }
 }
 
+const handleTranslate = async (translatedText) => {
+  message.value.content = translatedText
+}
 </script>
 
 <style scoped>
@@ -484,7 +633,7 @@ function selectUser(user) {
   border: 1px solid #e0e0e0;
   border-radius: 8px;
   padding: 10px;
-  box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
   z-index: 1000;
   margin-bottom: 10px;
   width: 280px;
@@ -579,57 +728,57 @@ function selectUser(user) {
     padding: 0.5rem 1rem;
     gap: 0.4rem;
   }
-  
+
   .input-container {
     gap: 0.4rem;
     align-items: flex-end;
   }
-  
+
   .files-preview {
     padding: 0.4rem;
   }
-  
+
   .files-header {
     font-size: 0.85rem;
   }
-  
+
   .file-item {
     padding: 0.3rem;
   }
-  
+
   .file-name {
     font-size: 0.85rem;
   }
-  
+
   .file-size {
     font-size: 0.8rem;
   }
-  
+
   .msg-input {
     padding: 0.2rem 0.8rem;
     font-size: 0.95rem;
     min-height: 32px;
   }
-  
+
   .msg-actions {
     gap: 0.25rem;
   }
-  
+
   .action-btn,
   .send-btn {
     width: 32px;
     height: 32px;
     font-size: 1rem;
   }
-  
+
   .emoji-picker {
     width: 260px;
   }
-  
+
   .emoji-grid {
     grid-template-columns: repeat(6, 1fr);
   }
-  
+
   .emoji {
     font-size: 1.1em;
   }
@@ -641,71 +790,71 @@ function selectUser(user) {
     padding: 0.3rem 0.6rem;
     gap: 0.3rem;
   }
-  
+
   .input-container {
     gap: 0.3rem;
     align-items: flex-end;
   }
-  
+
   .files-preview {
     padding: 0.3rem;
     margin: 0.1rem 0;
   }
-  
+
   .files-header {
     font-size: 0.8rem;
     margin-bottom: 0.3rem;
   }
-  
+
   .file-item {
     padding: 0.25rem;
   }
-  
+
   .file-name {
     font-size: 0.8rem;
   }
-  
+
   .file-size {
     font-size: 0.7rem;
   }
-  
+
   .msg-input {
     padding: 0.15rem 0.6rem;
     font-size: 0.9rem;
     min-height: 28px;
   }
-  
+
   .msg-actions {
     gap: 0.2rem;
   }
-  
+
   .action-btn,
   .send-btn {
     width: 28px;
     height: 28px;
     font-size: 0.9rem;
   }
-  
+
   .emoji-picker {
     width: 240px;
     right: -10px;
   }
-  
+
   .emoji-grid {
     grid-template-columns: repeat(5, 1fr);
     gap: 3px;
   }
-  
+
   .emoji {
     font-size: 1em;
     padding: 3px;
   }
-  
+
   .emoji-search {
     padding: 6px;
     font-size: 0.85rem;
   }
-  
+
   .category-btn {
     padding: 4px;
     font-size: 1.1rem;
@@ -739,7 +888,7 @@ function selectUser(user) {
   max-height: 200px;
   overflow-y: auto;
   width: 250px;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
   left: 0;
   bottom: 100%;
   margin-bottom: 6px;
@@ -764,9 +913,30 @@ function selectUser(user) {
   font-size: 0.9em;
 }
 .mention-item_info {
-  color: #1976d2;;
+  color: #1976d2;
   display: flex;
   gap: 1px;
   flex-direction: column;
 }
-</style> 
+.language-select {
+  outline: none;
+  background: #f3f4f8;
+  border: 1px solid #e0e0e0;
+  border-radius: 6px;
+  padding: 0 2px;
+  font-size: 1rem;
+  color: #23272f;
+  cursor: pointer;
+  width: fit-content;
+  height: 34px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.2s;
+}
+.btn-translate {
+  height: 100%;
+  padding: 4px;
+  border-radius: 7px;
+}
+</style>

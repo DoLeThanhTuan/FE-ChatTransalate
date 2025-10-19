@@ -1,62 +1,43 @@
 import { createRouter, createWebHistory } from 'vue-router'
-import LiveStream from '../views/LiveStream.vue'
-import WSComponent from '../components/WSComponent.vue'
 
 const routes = [
   {
     path: '/',
     name: 'Home',
-    component: () => import('../views/Home.vue')
-  },
-  {
-    path: '/stream/:id',
-    name: 'LiveStream',
-    component: LiveStream,
-    props: true
-  },
-  {
-    path: '/chat',
-    name: 'Chat',
-    component: WSComponent
+    component: () => import('../views/Home.vue'),
   },
   {
     path: '/login',
     name: 'Login',
-    component: () => import('../views/Login.vue')
+    component: () => import('../views/Login.vue'),
   },
   {
     path: '/register',
     name: 'Register',
-    component: () => import('../views/Register.vue')
+    component: () => import('../views/Register.vue'),
   },
   {
     path: '/profile',
     name: 'Profile',
     component: () => import('../views/Profile.vue'),
-    meta: { requiresAuth: true }
+    meta: { requiresAuth: true },
   },
   {
-    path: '/dashboard',
-    name: 'Dashboard',
-    component: () => import('../views/Dashboard.vue'),
-    meta: { requiresAuth: true, requiresStreamer: true }
-  },
-  {
-    path: '/chat-view/:chatId',
+    path: '/chat-view/:typeChat/:chatKey',
     name: 'chat-view',
     component: () => import('../views/ChatView.vue'),
-    meta: { requiresAuth: true}
+    meta: { requiresAuth: true },
   },
   {
     path: '/:pathMatch(.*)*',
     name: 'NotFound',
-    component: () => import('../views/NotFound.vue')
-  }
+    component: () => import('../views/NotFound.vue'),
+  },
 ]
 
 const router = createRouter({
   history: createWebHistory(),
-  routes
+  routes,
 })
 
 // Navigation guard
@@ -73,4 +54,4 @@ router.beforeEach((to, from, next) => {
   }
 })
 
-export default router 
+export default router

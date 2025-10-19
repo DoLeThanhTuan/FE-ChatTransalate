@@ -1,22 +1,23 @@
 <template>
-  <div v-if="visible" class="modal-overlay dark">
-    <div class="modal-content dark">
+  <div v-if="visible" class="modal-overlay">
+    <div class="modal-content">
       <div class="modal-header">
         <h2>Create a new channel</h2>
         <span class="close-btn" @click="$emit('close')">×</span>
       </div>
       <div class="modal-body">
         <label class="modal-label">Channel name</label>
-        <input
-          v-model="channelName"
-          :class="['modal-input', 'dark', { 'input-error': showError }]"
-          placeholder="Enter a name for your new channel"
-          @blur="validateName"
-          @input="showError = false"
-        />
-        <div v-if="showError" class="input-error-message">
-          Channel names must have at least 1 character.
+        <div>
+          <input
+            v-model="channelName"
+            :class="['modal-input', { 'input-error': showError }]"
+            placeholder="Enter a name for your new channel"
+          />
+          <div v-if="showError" class="input-error-message">
+            Channel names must have at least 1 character.
+          </div>
         </div>
+
         <div class="modal-url-row">
           <span class="modal-url-label">URL:</span>
           <span v-if="!editingUrl" class="modal-url">{{ url }}</span>
@@ -54,7 +55,7 @@
         >
         <textarea
           v-model="purpose"
-          class="modal-input dark"
+          class="modal-input"
           placeholder="Enter a purpose for this channel (optional)"
           rows="2"
         ></textarea>
@@ -71,6 +72,12 @@
         </button>
       </div>
     </div>
+    <VueLoading
+      v-model:active="isLoading"
+      :can-cancel="false"
+      is-full-page="false"
+      loader="dots"
+    />
   </div>
 </template>
 
@@ -79,6 +86,7 @@ import { ref, watch } from 'vue'
 import { useChannelStore } from '@/stores/channelStore'
 import { toast } from 'vue3-toastify'
 import { useRouter } from 'vue-router'
+import { TypeChat } from '@/config/enum'
 const props = defineProps({
   visible: Boolean,
 })
@@ -92,6 +100,7 @@ const url = ref('https://techchat.techzen.vn/chemgio/channels/')
 const editingUrl = ref(false)
 const urlEdit = ref('')
 const showError = ref(false)
+const isLoading = ref(false)
 
 function toggleEditUrl() {
   if (editingUrl.value) {
@@ -100,10 +109,6 @@ function toggleEditUrl() {
     urlEdit.value = url.value
   }
   editingUrl.value = !editingUrl.value
-}
-
-function validateName() {
-  showError.value = !channelName.value.trim()
 }
 
 const resetForm = () => {
@@ -118,6 +123,7 @@ const handleCreate = async () => {
     showError.value = true
     return
   }
+  isLoading.value = true
   const data = {
     name: channelName.value.trim(),
     isPublic: isPublic.value,
@@ -128,7 +134,7 @@ const handleCreate = async () => {
     const res = await channelStore.createChannel(data)
     if (res) {
       resetForm()
-      await router.push(`/chat-view/${res.id}`)
+      await router.push(`/chat-view/${TypeChat.CHANNEL}/${res.id}`)
       toast.success('Tạo channel thành công!')
       emit('close')
     } else {
@@ -136,6 +142,8 @@ const handleCreate = async () => {
     }
   } catch (e) {
     toast.error('Lỗi trong quá trình tạo')
+  } finally {
+    isLoading.value = false
   }
 }
 watch(
@@ -154,30 +162,36 @@ watch(
 </script>
 
 <style scoped>
-.modal-overlay.dark {
+.modal-overlay {
   position: fixed;
   top: 0;
   left: 0;
   right: 0;
   bottom: 0;
-  background: rgba(10, 14, 22, 0.95);
+  background: rgba(0, 0, 0, 0.5);
   display: flex;
   align-items: center;
   justify-content: center;
   z-index: 2000;
 }
-.modal-content.dark {
-  background: #23293a;
-  color: #fff;
+
+:global(.dark) .modal-overlay {
+  background: rgba(10, 14, 22, 0.95);
+}
+
+.modal-content {
+  background: var(--bg-active);
+  color: var(--text-primary);
   border-radius: 14px;
   width: 100%;
   max-width: 600px;
   margin: 0 auto;
-  box-shadow: 0 2px 24px rgba(0, 0, 0, 0.35);
+  box-shadow: 0 2px 24px var(--shadow);
   display: flex;
   flex-direction: column;
   padding: 0;
 }
+
 .modal-header {
   display: flex;
   align-items: center;
@@ -192,37 +206,40 @@ watch(
 .close-btn {
   font-size: 2rem;
   cursor: pointer;
-  color: #fff;
+  color: var(--text-primary);
   opacity: 0.7;
   transition: opacity 0.2s;
 }
 .close-btn:hover {
   opacity: 1;
 }
+
 .modal-body {
   display: flex;
   flex-direction: column;
-  gap: 1.1rem;
+  gap: 0.5rem;
   padding: 0 2rem 0.5rem 2rem;
 }
+
 .modal-label {
   font-size: 0.98rem;
   font-weight: 600;
   margin-bottom: 0.2rem;
-  color: #e0e6f3;
+  color: var(--text-primary);
   letter-spacing: 0.01em;
 }
 .optional {
-  color: #b0b8d1;
+  color: var(--text-secondary);
   font-weight: 400;
   font-size: 0.95em;
 }
-.modal-input.dark,
+
+.modal-input,
 .modal-url-edit,
-textarea.modal-input.dark {
-  background: #181c27;
-  color: #fff;
-  border: 1.5px solid #2c3144;
+textarea.modal-input {
+  background: var(--bg-tertiary);
+  color: var(--text-primary);
+  border: 1.5px solid var(--border-primary);
   border-radius: 8px;
   padding: 0.7rem 1rem;
   font-size: 1rem;
@@ -231,29 +248,29 @@ textarea.modal-input.dark {
   box-sizing: border-box;
   transition: border 0.2s, box-shadow 0.2s;
 }
-.modal-input.dark:focus,
+.modal-input:focus,
 .modal-url-edit:focus,
-textarea.modal-input.dark:focus {
-  border: 1.5px solid #4fc3f7;
+textarea.modal-input:focus {
+  border: 1.5px solid var(--special-text-color);
   outline: none;
-  box-shadow: 0 0 0 2px #4fc3f733;
+  box-shadow: 0 0 0 2px var(--special-text-color);
 }
+
 .input-error {
   border: 1.5px solid #e74c3c !important;
-  background: #2a1a1a !important;
 }
 .input-error-message {
   color: #e74c3c;
   font-size: 0.93rem;
   margin-bottom: 0.3rem;
-  margin-top: -0.1rem;
   padding-left: 2px;
 }
-textarea.modal-input.dark::placeholder,
-.modal-input.dark::placeholder {
-  color: #b0b8d1;
+textarea.modal-input::placeholder,
+.modal-input::placeholder {
+  color: var(--text-secondary);
   opacity: 1;
 }
+
 .modal-url-row {
   display: flex;
   align-items: center;
@@ -262,24 +279,14 @@ textarea.modal-input.dark::placeholder,
   margin-bottom: 0.2rem;
 }
 .modal-url-label {
-  color: #b0b8d1;
+  color: var(--text-secondary);
 }
 .modal-url {
-  color: #4fc3f7;
+  color: var(--special-text-color);
   word-break: break-all;
 }
-.modal-url-edit {
-  background: #181c27;
-  color: #fff;
-  border: 1.5px solid #2c3144;
-  border-radius: 8px;
-  padding: 0.3rem 0.7rem;
-  font-size: 1rem;
-  width: 100%;
-  box-sizing: border-box;
-}
 .modal-url-edit-btn {
-  color: #4fc3f7;
+  color: var(--special-text-color);
   cursor: pointer;
   font-size: 0.97rem;
   font-weight: 500;
@@ -289,12 +296,14 @@ textarea.modal-input.dark::placeholder,
 .modal-url-edit-btn:hover {
   text-decoration: underline;
 }
+
 .modal-section.modal-public-group {
   display: flex;
   gap: 1rem;
   margin: 1rem 0 0.5rem 0;
   flex-wrap: wrap;
 }
+
 .public-btn,
 .private-btn {
   min-width: 120px;
@@ -302,9 +311,9 @@ textarea.modal-input.dark::placeholder,
   max-width: 48%;
   box-sizing: border-box;
   justify-content: flex-start;
-  background: #181c27;
-  color: #fff;
-  border: 1.5px solid #2c3144;
+  background: var(--bg-tertiary);
+  color: var(--text-primary);
+  border: 1.5px solid var(--border-primary);
   border-radius: 8px;
   padding: 1.1rem 1.2rem;
   display: flex;
@@ -314,54 +323,59 @@ textarea.modal-input.dark::placeholder,
   position: relative;
   transition: border 0.2s, background 0.2s, color 0.2s;
   font-size: 1rem;
+  outline: none;
 }
 .public-btn.active,
 .private-btn.active {
-  border: 2px solid #4fc3f7;
-  background: #232e4a;
-  color: #4fc3f7;
+  border: 2px solid var(--special-text-color, #53ac5a);
+  background: var(--bg-active, #f4f4f4);
+  color: var(--special-text-color, #53ac5a);
 }
 .public-btn:hover,
 .private-btn:hover {
-  border: 2px solid #4fc3f7;
-  background: #232e4a;
-  color: #4fc3f7;
+  border: 2px solid var(--special-text-color, #53ac5a);
+  background: var(--bg-active, #f4f4f4);
+  color: var(--special-text-color, #53ac5a);
 }
+
 .public-title {
   font-weight: 600;
   font-size: 1.05rem;
 }
 .public-desc {
   font-size: 0.93rem;
-  color: #b0b8d1;
+  color: var(--text-secondary, #666);
 }
 .checkmark {
   position: absolute;
   top: 10px;
   right: 10px;
-  color: #4fc3f7;
+  color: var(--special-text-color, #53ac5a);
   font-size: 1.2rem;
 }
 .icon {
   font-size: 1.5rem;
 }
+
 .modal-checkbox-row {
   display: flex;
   align-items: center;
   gap: 0.5rem;
   margin: 0.5rem 0 0.2rem 0;
 }
+
 .info-icon {
-  background: #181c27;
-  color: #4fc3f7;
+  background: var(--bg-tertiary, #f3f4f8);
+  color: var(--special-text-color, #53ac5a);
   border-radius: 50%;
   font-size: 0.95rem;
   padding: 0 0.3rem;
   margin-left: 0.2rem;
   cursor: pointer;
-  border: 1px solid #4fc3f7;
+  border: 1px solid var(--special-text-color, #53ac5a);
   display: inline-block;
 }
+
 .modal-actions {
   display: flex;
   gap: 0.7rem;
@@ -370,8 +384,8 @@ textarea.modal-input.dark::placeholder,
   background: transparent;
 }
 .modal-create-btn {
-  background: #4fc3f7;
-  color: #fff;
+  background: var(--border-secondary);
+  color: var(--text-secondary);
   border: none;
   border-radius: 8px;
   padding: 0.7rem 1.5rem;
@@ -380,17 +394,17 @@ textarea.modal-input.dark::placeholder,
   cursor: pointer;
   transition: background 0.2s;
 }
+.modal-create-btn:hover {
+  filter: brightness(1.15);
+}
 .modal-create-btn:disabled {
-  background: #2c3144;
-  color: #b0b8d1;
+  background: var(--border-secondary);
+  color: var(--text-secondary);
   cursor: not-allowed;
 }
-.modal-create-btn:not(:disabled):hover {
-  background: #1b9edb;
-}
 .modal-cancel-btn {
-  background: #181c27;
-  color: #b0b8d1;
+  background: var(--border-secondary);
+  color: var(--text-secondary);
   border: none;
   border-radius: 8px;
   padding: 0.7rem 1.5rem;
@@ -400,11 +414,11 @@ textarea.modal-input.dark::placeholder,
   transition: background 0.2s, color 0.2s;
 }
 .modal-cancel-btn:hover {
-  background: #232e4a;
-  color: #fff;
+  filter: brightness(1.15);
 }
+
 @media (max-width: 600px) {
-  .modal-content.dark {
+  .modal-content {
     max-width: 98vw;
     min-width: unset;
     border-radius: 10px;
@@ -428,9 +442,9 @@ textarea.modal-input.dark::placeholder,
   }
   .public-btn,
   .private-btn,
-  .modal-input.dark,
+  .modal-input,
   .modal-url-edit,
-  textarea.modal-input.dark {
+  textarea.modal-input {
     font-size: 0.92rem;
   }
   .modal-header,
@@ -476,13 +490,14 @@ textarea.modal-input.dark::placeholder,
   .modal-body {
     gap: 0.7rem;
   }
-  textarea.modal-input.dark,
-  .modal-input.dark,
+  textarea.modal-input,
+  .modal-input,
   .modal-url-edit {
     padding: 0.6rem 0.7rem;
   }
 }
-textarea.modal-input.dark {
+
+textarea.modal-input {
   resize: vertical;
   min-height: 2.8em;
 }

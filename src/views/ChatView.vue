@@ -1,16 +1,18 @@
 <template>
   <div class="chat-layout">
-    <div class="sidebar-overlay" 
-         :class="{ visible: isSidebarVisible }"
-         @click="toggleSidebar"
-         v-if="isMobile"></div>
+    <div
+      class="sidebar-overlay"
+      :class="{ visible: isSidebarVisible }"
+      @click="toggleSidebar"
+      v-if="isMobile"
+    ></div>
     <Sidebar :class="{ visible: isSidebarVisible }" />
     <div class="chat-view">
       <div class="mobile-header" v-if="isMobile">
         <button class="menu-btn" @click="toggleSidebar">
           <span class="menu-icon">☰</span>
         </button>
-        <ChannelHeader/>
+        <ChannelHeader />
       </div>
       <ChannelHeader v-if="!isMobile" />
       <MessageList />
@@ -20,18 +22,23 @@
 </template>
 
 <script setup>
-import { ref, onMounted, onUnmounted, watch, computed } from 'vue'
+import { ref, onBeforeMount, onMounted, onUnmounted, watch } from 'vue'
 import { useRoute } from 'vue-router'
 import Sidebar from '../components/Sidebar.vue'
 import ChannelHeader from '../components/ChannelHeader.vue'
 import MessageList from '../components/MessageList.vue'
 import MessageInput from '../components/MessageInput.vue'
 import { useChannelStore } from '@/stores/channelStore'
+import { useUserChatStore } from '@/stores/userChatStore'
+import { useUserStore } from '@/stores/userStore'
+import { TypeChat } from '@/config/enum'
 
 const route = useRoute()
 const isSidebarVisible = ref(false)
 const isMobile = ref(false)
 const channelStore = useChannelStore()
+const userChatStore = useUserChatStore()
+const userStore = useUserStore()
 
 const checkMobile = () => {
   isMobile.value = window.innerWidth <= 768
@@ -41,24 +48,41 @@ const toggleSidebar = () => {
   isSidebarVisible.value = !isSidebarVisible.value
 }
 
-const fetchChannel = async () => {
+const fetchChannel = async (chatId) => {
   try {
-    const response = await channelStore.fetchChannelById(route.params.chatId);
+    const response = await channelStore.fetchChannelById(chatId)
   } catch (e) {
-    console.error('Error fetching channel:', e);
+    console.error('Error fetching channel:', e)
+  }
+}
+
+const fetchUserChat = async (userId) => {
+  try {
+    const response = await userChatStore.fetchUserByUserId(userId)
+  } catch (e) {
+    console.error('Error fetching channel:', e)
   }
 }
 
 watch(
-  () => route.params.chatId,
-  (newChatId) => {
-    fetchChannel();
+  () => route.params.chatKey,
+  (newChatKey) => {
+    if (route.params.typeChat == TypeChat.CHANNEL) {
+      fetchChannel(newChatKey)
+    } else if (route.params.typeChat == TypeChat.USER) {
+      fetchUserChat(newChatKey)
+    }
   },
   { immediate: true }
 )
 
-onMounted(() => {
-  checkMobile();
+onBeforeMount(async () => {
+  await channelStore.fetchChannel()
+  await userStore.fetchUsers()
+})
+
+onMounted(async () => {
+  checkMobile()
   window.addEventListener('resize', checkMobile)
 })
 
@@ -186,4 +210,4 @@ onUnmounted(() => {
     max-width: 280px;
   }
 }
-</style> 
+</style>

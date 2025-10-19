@@ -1,25 +1,43 @@
 const Status = Object.freeze({
-    MESSAGE: 'MESSAGE',
-    CREATE_CHANNEL: 'CREATE_CHANNEL',
-    LEAVE_CHANNEL: 'LEAVE_CHANNEL',
-    JOIN_CHANNEL: 'JOIN_CHANNEL',
-    ADD_MEMBER: 'ADD_MEMBER',
-    CHANGE_NAME: 'CHANGE_NAME',
-    REMOVE_MEMBER: 'REMOVE_MEMBER',
-});
+  MESSAGE: 'MESSAGE',
+  CREATE_CHANNEL: 'CREATE_CHANNEL',
+  LEAVE_CHANNEL: 'LEAVE_CHANNEL',
+  JOIN_CHANNEL: 'JOIN_CHANNEL',
+  ADD_MEMBER: 'ADD_MEMBER',
+  CHANGE_NAME: 'CHANGE_NAME',
+  REMOVE_MEMBER: 'REMOVE_MEMBER',
+})
 
 const URLMessage = Object.freeze({
-    WS: '/ws',
-    RECEIVE_CHANNEL_MESSAGE: '/topic/messages',
-    CHANNEL: '/app/chat/send/',
-    LEAVE_CHANNEL: 'LEAVE_CHANNEL',
-    JOIN_CHANNEL: 'JOIN_CHANNEL',
-    ADD_MEMBER: 'ADD_MEMBER',
-    CHANGE_NAME: 'CHANGE_NAME',
-    REMOVE_MEMBER: 'REMOVE_MEMBER',
-});
+  WS: '/ws',
+  RECEIVE_CHANNEL_MESSAGE: '/topic/messages',
+  CHANNEL: '/app/chat/send',
+  RECEIVE_USER_MESSAGE: '/user/queue/private',
+  USER: '/app/chat/private',
+})
 
-export {
-    Status,
-    URLMessage
-}
+const Language = Object.freeze([
+  {
+    value: 'VI',
+    name: 'VI',
+  },
+  {
+    value: 'EN',
+    name: 'EN',
+  },
+  {
+    value: 'JP',
+    name: 'JP',
+  },
+  {
+    value: 'CHINESE',
+    name: 'CHINESE',
+  },
+])
+
+const TypeChat = Object.freeze({
+  CHANNEL: 'channel',
+  USER: 'user',
+})
+
+export { Status, URLMessage, TypeChat, Language }
