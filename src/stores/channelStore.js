@@ -3,7 +3,7 @@ import { channelApi } from "@/axios/api-services/channelApi";
 import { ref } from "vue";
 import { toast } from 'vue3-toastify';
 import { send } from "@/socket/socketService";
-import { Status } from "@/config/enum";
+import { Status, URLMessage } from "@/config/enum";
 
 export const useChannelStore = defineStore('channel', () => {
     const channelCurrent = ref({});
@@ -48,7 +48,7 @@ export const useChannelStore = defineStore('channel', () => {
     const leaveChannel = async () => {
         try {
             const res = await channelApi.leaveChannel(channelCurrent.value.id);
-            await sendMessage({
+            await sendMessageToChannel({
                 content: `{${Status.LEAVE_CHANNEL}}`,
                 channelId: channelCurrent.value.id,
                 type: Status.LEAVE_CHANNEL
@@ -65,7 +65,7 @@ export const useChannelStore = defineStore('channel', () => {
             const res = await channelApi.joinChannel(channelId);
             channels.value.push(res.data);
             channelCurrent.value = res.data;
-            sendMessage({
+            sendMessageToChannel({
                 content: `{${Status.JOIN_CHANNEL}}`,
                 channelId: channelId,
                 type: Status.JOIN_CHANNEL
@@ -90,8 +90,7 @@ export const useChannelStore = defineStore('channel', () => {
         return found ? found.name : email;
     }
 
-    // Gửi tin nhắn (có thể tái sử dụng ở nhiều component)
-    const sendMessage = async ({ content, files = [], channelId, uploadFiles, type = Status.MESSAGE }) => {
+    const sendMessageToChannel = async ({ content, files = [], channelId, uploadFiles, type = Status.MESSAGE }) => {
         if (content.trim() || files.length > 0) {
             try {
                 let uploadedFiles = [];
@@ -103,7 +102,7 @@ export const useChannelStore = defineStore('channel', () => {
                     type,
                     files: uploadedFiles
                 };
-                send(`/app/chat/send/${channelId}`, messageData);
+                send(`${URLMessage.CHANNEL}/${channelId}`, messageData);
                 return true;
             } catch (error) {
                 console.error('Error sending message:', error);
@@ -123,6 +122,6 @@ export const useChannelStore = defineStore('channel', () => {
         searchChannel,
         joinChannel,
         getUserName,
-        sendMessage
+        sendMessageToChannel
     };
 })

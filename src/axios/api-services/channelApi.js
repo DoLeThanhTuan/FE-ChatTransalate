@@ -1,37 +1,42 @@
-import axiosClient from "@/axios/axiosClient.js";
-import { setHeader } from "../common";
+import axiosClient from '@/axios/axiosClient.js'
+import { setHeader } from '../common'
 
-const ENDPOINT = "/channels";
+const ENDPOINT = '/channels'
 
 export const channelApi = {
   getChannel: async (params) => {
-    return await axiosClient.get(ENDPOINT + "/all", {
-      headers: { ...setHeader() }
+    return await axiosClient.get(ENDPOINT + '/all', {
+      headers: { ...setHeader() },
     })
   },
   getChannelById: async (channelId) => {
     return await axiosClient.get(ENDPOINT + `/${channelId}`, {
-      headers: { ...setHeader() }
+      headers: { ...setHeader() },
     })
   },
   createChannel: async (params) => {
     return await axiosClient.post(ENDPOINT, params, {
-      headers: { ...setHeader() }
+      headers: { ...setHeader() },
     })
   },
   leaveChannel: async (channelId) => {
     return await axiosClient.get(ENDPOINT + `/leave/${channelId}`, {
-      headers: { ...setHeader() }
+      headers: { ...setHeader() },
     })
   },
   joinChannel: async (channelId) => {
     return await axiosClient.get(ENDPOINT + `/join/${channelId}`, {
-      headers: { ...setHeader() }
+      headers: { ...setHeader() },
     })
   },
   searchChannel: async (params) => {
     return await axiosClient.post(ENDPOINT + `/search`, params, {
-      headers: { ...setHeader() }
+      headers: { ...setHeader() },
     })
   },
-};
+  getChannelDefault: async () => {
+    return await axiosClient.get(ENDPOINT + `/default`, {
+      headers: { ...setHeader() },
+    })
+  },
+}

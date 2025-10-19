@@ -57,7 +57,7 @@
             required
           />
         </div>
-        
+
         <div class="form-group">
           <label for="password">Mật khẩu</label>
           <input
@@ -97,6 +97,7 @@ import { ref } from 'vue'
 import { useRouter } from 'vue-router'
 import defaultAvatar from '@/assets/default-avatar.png'
 import { authApi } from '@/axios/api-services/authApi'
+import { toast } from 'vue3-toastify'
 
 const router = useRouter()
 const loading = ref(false)
@@ -109,13 +110,14 @@ const form = ref({
   phone: '',
   password: '',
   confirmPassword: '',
-  avatar: null
+  avatar: null,
 })
 
 const handleAvatarChange = (event) => {
   const file = event.target.files[0]
   if (file) {
-    if (file.size > 5 * 1024 * 1024) { // 5MB limit
+    if (file.size > 5 * 1024 * 1024) {
+      // 5MB limit
       alert('Kích thước ảnh không được vượt quá 5MB')
       return
     }
@@ -148,19 +150,17 @@ const handleRegister = async () => {
       formData.append('avatar', form.value.avatar)
     }
 
-    const response = await authApi.signup(formData);
+    const response = await authApi.signup(formData)
 
-    const data = await response.json()
-    
-    if (response.ok) {
-      alert('Đăng ký thành công! Vui lòng đăng nhập.')
+    if (response.status == 200) {
+      toast.success('Đăng ký thành công! Vui lòng đăng nhập.')
       router.push('/login')
     } else {
-      alert(data.message || 'Đăng ký thất bại')
+      toast.error('Đăng ký thất bại')
     }
   } catch (error) {
     console.error('Register error:', error)
-    alert('Có lỗi xảy ra khi đăng ký')
+    toast.error('Có lỗi xảy ra khi đăng ký')
   } finally {
     loading.value = false
   }
@@ -289,4 +289,4 @@ input:focus {
 .avatar-label:hover {
   background-color: #6b1515;
 }
-</style> 
+</style>

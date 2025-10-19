@@ -12,18 +12,20 @@
   .btn {
     @apply px-4 py-2 rounded-md transition-colors duration-200;
   }
-  
+
   .btn-primary {
     @apply bg-primary text-white hover:bg-primary/90;
   }
-  
+
   .input {
-    @apply px-4 py-2 border border-border rounded-md focus:outline-none focus:ring-2 focus:ring-primary/50;
+    @apply px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-primary;
   }
 }
 
 /* Reset */
-*, *::before, *::after {
+*,
+*::before,
+*::after {
   box-sizing: border-box;
   margin: 0;
   padding: 0;
@@ -31,7 +33,7 @@
 
 /* Global styles */
 :root {
-  --primary-color: #ff69b4;
+  --primary-color: #f4f4f4;
   --text-color: #333;
   --background-color: #f8f8f8;
   --border-color: #ddd;
@@ -40,10 +42,9 @@
   --bg-tertiary: #f3f4f8;
   --text-primary: #23272f;
   --text-secondary: #666;
-  --border-primary: #e0e0e0;
   --border-secondary: #ddd;
   --shadow: rgba(0, 0, 0, 0.1);
-  --hover-bg: rgb(230, 69, 69);
+  --hover-bg: #f4f4f4;
   --chat-bg: #f3f4f8;
 }
 
@@ -57,8 +58,11 @@ html.light {
   --border-primary: #e0e0e0;
   --border-secondary: #ddd;
   --shadow: rgba(0, 0, 0, 0.1);
-  --hover-bg: rgb(230, 69, 69);
+  --hover-bg: #f4f4f4;
   --chat-bg: #f3f4f8;
+  --special-text-color: #000000;
+  --bg-bar: #ffffff;
+  --bg-active: #f4f4f4;
 }
 
 /* Dark mode variables */
@@ -68,14 +72,18 @@ html.dark {
   --bg-tertiary: #181c22;
   --text-primary: #e5e7eb;
   --text-secondary: #bdbdbd;
-  --border-primary: #333;
+  --border-primary: #726767;
   --border-secondary: #444;
   --shadow: rgba(0, 0, 0, 0.3);
-  --hover-bg: rgb(230, 69, 69);
+  --hover-bg: #2a3950;
   --chat-bg: #1a1a1a;
+  --special-text-color: #53ac5a;
+  --bg-bar: #333;
+  --bg-active: #2a3950;
 }
 
-html, body {
+html,
+body {
   height: 100%;
   width: 100%;
   margin: 0;
@@ -97,13 +105,12 @@ body {
 
 button {
   font: inherit;
-  border: none;
   outline: none;
+  cursor: pointer;
 }
 
 button:focus {
-  outline: 2px solid var(--primary-color);
-  outline-offset: 2px;
+  outline: none;
 }
 
 /* Utility classes */
@@ -156,21 +163,4 @@ a,
     flex-direction: column;
     padding: 0;
   }
-}
-
-/* Debug styles to ensure borders are visible */
-.channel-header {
-  border-bottom: 1px solid var(--border-primary) !important;
-}
-
-.sidebar {
-  border-right: 2px solid var(--border-primary) !important;
-}
-
-.message-input-bar {
-  border-top: 1px solid var(--border-primary) !important;
-}
-
-.message-list {
-  background: var(--chat-bg);
 }

@@ -34,7 +34,7 @@
         </div>
 
         <button type="submit" class="login-button" :disabled="loading">
-          {{ loading ? "Đang đăng nhập..." : "Đăng nhập" }}
+          {{ loading ? 'Đang đăng nhập...' : 'Đăng nhập' }}
         </button>
 
         <div class="register-link">
@@ -47,43 +47,47 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from "vue";
-import { useRouter } from "vue-router";
-import { authApi } from "@/axios/api-services/authApi";
-import { toast } from "vue3-toastify";
-import { useAuthStore } from "@/stores/authStore";
+import { ref, onMounted } from 'vue'
+import { useRouter } from 'vue-router'
+import { authApi } from '@/axios/api-services/authApi'
+import { toast } from 'vue3-toastify'
+import { useAuthStore } from '@/stores/authStore'
+import { TypeChat } from '@/config/enum'
+import { channelApi } from '@/axios/api-services/channelApi'
 
-const router = useRouter();
-const loading = ref(false);
-const authStore = useAuthStore();
+const router = useRouter()
+const loading = ref(false)
+const authStore = useAuthStore()
 
 const form = ref({
-  email: "",
-  password: "",
+  email: '',
+  password: '',
   remember: false,
-  token: authStore.token
-});
+  token: authStore.token,
+})
 
 onMounted(() => {
-  console.log(import.meta.env.VITE_API_URL);
-});
+  console.log(import.meta.env.VITE_API_URL)
+})
 
 const handleLogin = async () => {
   try {
-    loading.value = true;
-    const response = await authApi.login(form.value);
-    authStore.setToken(response.data.accessToken);
-    authStore.setUserInfo(response.data);
-    if(response.status == 200){
-      router.push("/chat");
+    loading.value = true
+    const response = await authApi.login(form.value)
+    authStore.setToken(response.data.accessToken)
+    authStore.setUserInfo(response.data)
+    if (response.status == 200) {
+      const response = await channelApi.getChannelDefault()
+      if (response.status == 200)
+        router.push(`/chat-view/${TypeChat.CHANNEL}/${response.data.id}`)
     }
   } catch (error) {
-    console.error("Login error:", error);
-    toast.error("Có lỗi xảy ra khi đăng nhập");
+    console.error('Login error:', error)
+    toast.error('Có lỗi xảy ra khi đăng nhập')
   } finally {
-    loading.value = false;
+    loading.value = false
   }
-};
+}
 </script>
 
 <style scoped>
@@ -129,8 +133,8 @@ label {
   font-size: 0.9rem;
 }
 
-input[type="text"],
-input[type="password"] {
+input[type='text'],
+input[type='password'] {
   padding: 0.8rem;
   border: 1px solid #ddd;
   border-radius: 4px;
@@ -138,8 +142,8 @@ input[type="password"] {
   transition: border-color 0.3s;
 }
 
-input[type="text"]:focus,
-input[type="password"]:focus {
+input[type='text']:focus,
+input[type='password']:focus {
   border-color: #891c1c;
   outline: none;
 }
