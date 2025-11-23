@@ -6,23 +6,21 @@
       </div>
     </div>
 
-    <!-- Error message -->
     <div v-if="error" class="error-message">
       <span>{{ error }}</span>
       <button @click="retryFetch" class="retry-btn">Thử lại</button>
     </div>
 
-    <!-- Messages list -->
     <div v-if="loading && messages.length > 0" class="load-more-indicator">
       <div class="loading-spinner small"></div>
       <span>Đang tải thêm...</span>
     </div>
     <div v-for="msg in messages" :key="msg.id">
-      <!-- Load more indicator -->
       <template v-if="msg.type === 'MESSAGE'">
         <div
           class="message"
           :class="{ 'message-own': msg.fromUser === authStore.userInfo.id }"
+          @dblclick="editMessage(msg)"
         >
           <img
             v-if="msg.fromUser !== authStore.userInfo.id"
@@ -35,9 +33,40 @@
               <span class="msg-user">{{
                 userStore.usersDict[msg.fromUser].name
               }}</span>
-              <span class="msg-time">{{ formatDate(msg.createdAt) }}</span>
+              <span class="msg-time">
+                {{ formatDate(msg.createdAt) }}
+                <span v-if="msg.isEdit" class="msg-edited">(đã sửa)</span>
+              </span>
             </div>
-            <div class="msg-text" v-html="highlightMentions(msg.content)"></div>
+
+            <template v-if="editingMessageId === msg.id">
+              <textarea
+                v-model="editedContent"
+                @keydown="handleKeyDown"
+                @keyup.esc="cancelEdit"
+                class="msg-edit-input"
+                rows="3"
+              ></textarea>
+              <div class="msg-edit-actions">
+                <button
+                  @click="saveEdit"
+                  class="save-btn"
+                  :disabled="!editedContent.trim()"
+                >
+                  Lưu
+                </button>
+                <button @click="cancelEdit" class="cancel-btn edit-hint">
+                  Hủy
+                </button>
+              </div>
+            </template>
+            <template v-else>
+              <div
+                class="msg-text"
+                v-html="highlightMentions(msg.content)"
+              ></div>
+            </template>
+
             <div v-if="msg.files && msg.files.length > 0" class="msg-files">
               <div v-for="file in msg.files" :key="file.id" class="msg-file">
                 <div class="file-icon">📎</div>
@@ -89,6 +118,7 @@ import {
 } from '@/socket/socketService'
 import { useAuthStore } from '@/stores/authStore'
 import { useChannelStore } from '@/stores/channelStore'
+import { useUserChatStore } from '@/stores/userChatStore'
 import { useUserStore } from '@/stores/userStore'
 import { getURLAvatar } from '@/utils/image'
 import {
@@ -100,6 +130,7 @@ import { useRoute } from 'vue-router'
 
 const authStore = useAuthStore()
 const channelStore = useChannelStore()
+const userChatStore = useUserChatStore()
 const userStore = useUserStore()
 const route = useRoute()
 
@@ -108,6 +139,11 @@ const messages = ref([])
 const loading = ref(false)
 const hasMore = ref(true)
 const error = ref(null)
+const typeChat = computed(() => route.params.typeChat)
+
+// New state for message editing
+const editingMessageId = ref(null)
+const editedContent = ref('')
 
 // Connection state
 const isConnected = ref(false)
@@ -155,6 +191,17 @@ const handleDisconnect = () => {
   handleReconnect()
 }
 
+// Hàm xử lý khi nhận được tin nhắn được cập nhật qua WebSocket
+const handleReceiveMessageUpdate = (updatedMessage) => {
+  const index = messages.value.findIndex((m) => m.id === updatedMessage.id)
+  if (index !== -1) {
+    // Cập nhật nội dung và cờ đã chỉnh sửa
+    messages.value[index].content = updatedMessage.content
+    messages.value[index].isEdited = true // Giả định server gửi lại thông tin này
+    // Bạn có thể thêm logic để cập nhật `updatedAt` nếu có
+  }
+}
+
 const handleConnectSuccess = async () => {
   isConnected.value = true
   clearError()
@@ -194,22 +241,36 @@ const handleConnectionError = (error) => {
 }
 
 const handleReceiveMessage = (message) => {
-  messages.value.push(message)
-  scrollToBottom()
+  const index = messages.value.findIndex((m) => m.id === message.id)
+  if (index !== -1) {
+    messages.value[index].content = message.content
+    messages.value[index].isEdit = true
+  } else {
+    messages.value.push(message)
+    scrollToBottom()
+  }
 }
 
 const subscribeToChannel = () => {
   if (!currentChannelId.value) return
 
-  // Subscribe to new channel
+  // Subscribe to new channel message
   subscribeSocket(
     `${URLMessage.RECEIVE_CHANNEL_MESSAGE}/${currentChannelId.value}`,
     handleReceiveMessage
   )
+  // **ĐĂNG KÝ SỰ KIỆN CẬP NHẬT TIN NHẮN**
+  // subscribeSocket(
+  //   `${URLMessage.RECEIVE_CHANNEL_MESSAGE_UPDATE}/${currentChannelId.value}`, // URL này có thể khác tùy backend của bạn
+  //   handleReceiveMessageUpdate
+  // )
 }
 
 const subscribeToUser = () => {
   subscribeSocket(URLMessage.RECEIVE_USER_MESSAGE, handleReceiveMessage)
+  // **ĐĂNG KÝ SỰ KIỆN CẬP NHẬT TIN NHẮN RIÊNG TƯ**
+  // Bạn có thể cần một URL/Endpoint riêng cho User Message Update
+  // subscribeSocket(URLMessage.RECEIVE_USER_MESSAGE_UPDATE, handleReceiveMessageUpdate)
 }
 
 const connectWS = async () => {
@@ -286,7 +347,7 @@ const fetchMessagesUser = async (isInitial = false) => {
     return
   }
 
-  if (loading.value || (hasMore.value && !isInitial)) return
+  if (loading.value || (!hasMore.value && !isInitial)) return
 
   loading.value = true
   clearError()
@@ -327,6 +388,106 @@ const fetchMessagesUser = async (isInitial = false) => {
     loading.value = false
   }
 }
+
+// --- Message Editing Logic ---
+
+const handleKeyDown = (event) => {
+  if (event.key === 'Enter') {
+    if (event.ctrlKey) {
+      // Ctrl+Enter: Insert new line
+      const start = event.target.selectionStart
+      const end = event.target.selectionEnd
+      editedContent.value =
+        editedContent.value.substring(0, start) +
+        '\n' +
+        editedContent.value.substring(end)
+      // Move cursor after the new line
+      nextTick(() => {
+        event.target.selectionStart = event.target.selectionEnd = start + 1
+      })
+    } else {
+      // Enter: Send message
+      event.preventDefault()
+      saveEdit()
+    }
+  }
+}
+
+const editMessage = (msg) => {
+  // Chỉ cho phép chỉnh sửa tin nhắn của chính mình và không phải tin nhắn hệ thống
+  if (msg.fromUser === authStore.userInfo.id && msg.type === 'MESSAGE') {
+    editingMessageId.value = msg.id
+    editedContent.value = msg.content // Tải nội dung hiện tại
+    nextTick(() => {
+      // Focus vào input chỉnh sửa sau khi DOM cập nhật
+      const input = messageListRef.value.querySelector('.msg-edit-input')
+      if (input) {
+        input.focus()
+      }
+    })
+  }
+}
+
+const cancelEdit = () => {
+  editingMessageId.value = null
+  editedContent.value = ''
+}
+
+const saveEdit = async () => {
+  if (!editingMessageId.value || !editedContent.value.trim()) {
+    return cancelEdit()
+  }
+
+  const messageId = editingMessageId.value
+  const newContent = editedContent.value.trim()
+
+  const originalMessage = messages.value.find((m) => m.id === messageId)
+  if (originalMessage && originalMessage.content.trim() === newContent) {
+    return cancelEdit() // Hủy nếu nội dung không thay đổi
+  }
+
+  clearError()
+
+  try {
+    // **GỌI API CHỈNH SỬA TIN NHẮN**
+    // Bạn cần đảm bảo messageApi.updateMessageContent đã được định nghĩa
+    // await messageApi.updateMessageContent(messageId, newContent)
+    await updateMessage(messageId, newContent)
+
+    cancelEdit()
+  } catch (err) {
+    console.error('Error updating message:', err)
+    error.value = 'Không thể sửa tin nhắn. Vui lòng thử lại.'
+  }
+}
+
+const updateMessage = async (messageId, newContent) => {
+  if (newContent.trim()) {
+    try {
+      if (typeChat.value == TypeChat.CHANNEL) {
+        channelStore.sendMessageToChannel({
+          id: messageId,
+          content: newContent,
+          // files: selectedFiles.value,
+          channelId: channelStore.channelCurrent.id,
+          // uploadFiles: uploadFiles,
+        })
+      } else {
+        userChatStore.sendMessageToUser({
+          id: messageId,
+          content: newContent,
+          // files: selectedFiles.value,
+          userId: route.params.chatKey,
+          // uploadFiles: uploadFiles,
+        })
+      }
+    } catch (error) {
+      console.error('Error sending message:', error)
+    }
+  }
+}
+
+// --- End Message Editing Logic ---
 
 const formatFileSize = (size) => {
   if (!size) return '0 Bytes'
@@ -398,22 +559,8 @@ onUnmounted(() => {
   disconnectSocket()
 })
 
-// // Watchers
-// watch(
-//   () => currentChannelId.value,
-//   async (newChannelId, oldChannelId) => {
-//     if (newChannelId === oldChannelId) return
-
-//     messages.value = []
-//     hasMore.value = true
-//     error.value = null
-
-//     if (isConnected.value && isChannelChat.value) {
-//       subscribeToChannel()
-//       await fetchMessagesChannel(true)
-//     }
-//   }
-// )
+// Watchers
+// ... (Your existing watchers remain unchanged)
 
 watch(
   () => route.params.typeChat,
@@ -423,6 +570,7 @@ watch(
     messages.value = []
     hasMore.value = true
     error.value = null
+    editingMessageId.value = null // Reset edit state
 
     if (isConnected.value) {
       if (newTypeChat === TypeChat.CHANNEL && currentChatKey.value) {
@@ -448,6 +596,7 @@ watch(
     messages.value = []
     hasMore.value = true
     error.value = null
+    editingMessageId.value = null // Reset edit state
 
     if (isConnected.value) {
       if (isChannelChat.value && currentChannelId.value) {
@@ -466,6 +615,77 @@ watch(
 </script>
 
 <style>
+/* --- Styles for Edit Feature --- */
+.msg-edited {
+  font-size: 0.85rem;
+  color: #777;
+  margin-left: 0.5rem;
+  font-weight: 400;
+  font-style: italic;
+}
+
+.msg-edit-input {
+  width: 100%;
+  padding: 0.7rem 0.9rem;
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  margin-top: 0.5rem;
+  font-size: 1.05rem;
+  resize: vertical; /* Cho phép thay đổi kích thước theo chiều dọc */
+  background: var(--bg-primary);
+  color: var(--text-color);
+  box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.05);
+}
+
+.message-own .msg-edit-input {
+  background: #fff;
+}
+
+.msg-edit-actions {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end; /* Căn nút Save/Cancel sang phải */
+  gap: 0.7rem;
+  margin-top: 0.5rem;
+}
+
+.edit-hint {
+  font-size: 0.85rem;
+  color: #888;
+  margin-right: auto; /* Đẩy hint sang trái */
+}
+
+.edit-hint a {
+  color: #1976d2;
+  cursor: pointer;
+  text-decoration: underline;
+}
+
+.save-btn {
+  padding: 0.4rem 1rem;
+  background: #1976d2;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 0.9rem;
+  transition: background-color 0.2s;
+  font-weight: 500;
+}
+
+.save-btn:hover:not(:disabled) {
+  background: #1565c0;
+}
+
+.save-btn:disabled {
+  background: #ccc;
+  cursor: not-allowed;
+}
+
+/* --- End Styles for Edit Feature --- */
+
+/* --- Existing Styles below --- */
+
 .message-list {
   flex: 1;
   overflow-y: auto;
@@ -739,7 +959,7 @@ watch(
   width: fit-content;
   font-size: 1rem;
   font-weight: 500;
-  color: var(#23272f);
+  color: #23272f;
 }
 
 .system-avatar {
@@ -760,6 +980,31 @@ html.dark .system-name {
   color: #fff;
 }
 
+html.dark .system-content {
+  color: #fff;
+}
+
+.cancel-btn {
+  padding: 0.4rem 1rem;
+  background: var(--border-secondary);
+  color: var(--text-secondary);
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 0.9rem;
+  transition: background-color 0.2s;
+  font-weight: 500;
+}
+
+.cancel-btn:hover:not(:disabled) {
+  opacity: 0.9;
+}
+
+.cancel-btn:disabled {
+  background: #ccc;
+  cursor: not-allowed;
+}
+
 @media (max-width: 768px) {
   .message-list {
     padding: 0.5rem;
@@ -772,14 +1017,15 @@ html.dark .system-name {
     max-width: 90%;
   }
 
-  .avatar {
+  .avatar,
+  .system-avatar {
     width: 32px;
     height: 32px;
   }
 
-  .msg-header {
+  .msg-header,
+  .system-message {
     font-size: 0.85rem;
-    gap: 0.4rem;
   }
 
   .msg-time {
@@ -861,9 +1107,9 @@ html.dark .system-name {
     border-width: 1px;
   }
 
-  .msg-header {
+  .msg-header,
+  .system-message {
     font-size: 0.8rem;
-    gap: 0.3rem;
   }
 
   .msg-time {

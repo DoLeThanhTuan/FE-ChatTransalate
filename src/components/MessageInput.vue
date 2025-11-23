@@ -33,7 +33,7 @@
     </div>
     <div class="input-container">
       <button
-        class="border-2 btn-translate cursor-pointer"
+        class="border-2 btn-translate cursor-pointer bg-[#f3f4f8]"
         @click="showTranslateModal = true"
       >
         Dịch
@@ -157,8 +157,6 @@ const showTranslateModal = ref(false)
 const members = computed(() =>
   userStore.getUsersByIds(channelStore.channelCurrent?.members || [])
 )
-console.log('members', members.value)
-console.log(channelStore.channelCurrent)
 
 const filteredMembers = computed(() =>
   members.value.filter(
@@ -380,7 +378,7 @@ const sendMessage = async () => {
         userChatStore.sendMessageToUser({
           content: message.value.content,
           files: selectedFiles.value,
-          userEmail: route.params.chatKey,
+          userId: route.params.chatKey,
           uploadFiles: uploadFiles,
         })
       }

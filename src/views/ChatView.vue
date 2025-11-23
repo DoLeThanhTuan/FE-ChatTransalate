@@ -116,8 +116,6 @@ onUnmounted(() => {
 .mobile-header {
   display: flex;
   align-items: center;
-  padding: 0.3rem;
-  background: var(--border-primary);
   border-bottom: 1px solid var(--border-primary);
   position: sticky;
   top: 0;

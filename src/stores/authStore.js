@@ -11,6 +11,9 @@ export const useAuthStore = defineStore('auth', () => {
     localStorageUtils.remove('userInfo')
     localStorageUtils.remove('token')
     isAuthenticated.value = false
+    userInfo.value = null
+    token.value = null
+    isAuthenticated.value = false
   }
 
   const setUserInfo = (data) => {

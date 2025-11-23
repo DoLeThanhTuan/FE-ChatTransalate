@@ -8,11 +8,12 @@ import 'vue3-toastify/dist/index.css'
 import { FontAwesomeIcon } from './plugins/fontawesome'
 import Loading from 'vue-loading-overlay'
 import 'vue-loading-overlay/dist/css/index.css'
-
+import i18n from './config/i18n.js'
 const app = createApp(App)
 const pinia = createPinia()
 app.use(router)
 app.use(pinia)
+app.use(i18n)
 app.use(Toastify, {
   autoClose: 3000,
   position: 'top-right',
