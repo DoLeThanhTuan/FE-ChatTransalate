@@ -5,7 +5,12 @@ let stompClient = null
 let currentSubscription = null
 let urlSocket = 'http://localhost:8000/ws'
 
-export const connectSocket = (token, onConnectSuccess, onDisconnect, onError) => {
+export const connectSocket = (
+  token,
+  onConnectSuccess,
+  onDisconnect,
+  onError
+) => {
   return new Promise((resolve, reject) => {
     const socket = new SockJS(`${urlSocket}?token=${token}`)
     stompClient = new Client({
@@ -14,7 +19,6 @@ export const connectSocket = (token, onConnectSuccess, onDisconnect, onError) =>
         Authorization: `Bearer ${token}`,
       },
       onConnect: () => {
-        console.log('WebSocket connected')
         onConnectSuccess?.()
         resolve()
       },
@@ -24,7 +28,6 @@ export const connectSocket = (token, onConnectSuccess, onDisconnect, onError) =>
         reject(error)
       },
       onWebSocketClose: () => {
-        console.log('WebSocket connection closed')
         onDisconnect?.()
       },
       onWebSocketError: (error) => {
@@ -53,8 +56,6 @@ export const subscribeSocket = (urlSubcribe, onMessageCallback) => {
     const parsed = JSON.parse(message.body)
     onMessageCallback(parsed)
   })
-
-  console.log(`Subscribed to ${urlSubcribe}`)
 }
 
 export const disconnectSocket = () => {

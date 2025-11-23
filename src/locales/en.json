@@ -1,0 +1,7 @@
+{
+  "hello": "Hello!",
+  "welcome": "Welcome to our application",
+  "language": {
+    "selectLanguage": "Select Language"
+  }
+}

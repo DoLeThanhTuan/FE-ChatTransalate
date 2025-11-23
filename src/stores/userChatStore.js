@@ -19,9 +19,10 @@ export const useUserChatStore = defineStore('userChat', () => {
   }
 
   const sendMessageToUser = async ({
+    id = null,
     content,
     files = [],
-    userEmail,
+    userId,
     uploadFiles,
     type = Status.MESSAGE,
   }) => {
@@ -32,11 +33,12 @@ export const useUserChatStore = defineStore('userChat', () => {
           uploadedFiles = await uploadFiles(files)
         }
         const messageData = {
+          id,
           content,
           type,
           files: uploadedFiles,
         }
-        send(`${URLMessage.USER}/${userEmail}`, messageData)
+        send(`${URLMessage.USER}/${userId}`, messageData)
         return true
       } catch (error) {
         console.error('Error sending message:', error)

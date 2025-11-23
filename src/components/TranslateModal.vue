@@ -48,12 +48,7 @@
       </div>
     </div>
   </div>
-  <VueLoading
-    v-model:active="isLoading"
-    :can-cancel="false"
-    is-full-page="false"
-    loader="dots"
-  />
+  <VueLoading v-model:active="isLoading" :can-cancel="false" loader="dots" />
 </template>
 
 <script setup>

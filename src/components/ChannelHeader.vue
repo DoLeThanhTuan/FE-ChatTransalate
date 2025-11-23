@@ -28,10 +28,17 @@
           </button>
         </div>
       </div>
-      <span class="tag">
+      <span @click="showMembers = true" class="tag">
         <font-awesome-icon :icon="['fas', 'user-tie']" />
         {{ channelStore.channelCurrent?.members?.length }}
       </span>
+      <UsersChannelModal
+        :visible="showMembers"
+        :members="
+          userStore.getUsersByIds(channelStore.channelCurrent?.members || [])
+        "
+        @close="showMembers = false"
+      />
       <span class="location">Huntsville</span>
     </div>
     <div v-if="isUserChat" class="header-left">
@@ -62,10 +69,6 @@
           </button>
         </div>
       </div>
-      <span class="tag">
-        <font-awesome-icon :icon="['fas', 'user-tie']" />
-        {{ channelStore.channelCurrent?.members?.length }}
-      </span>
       <span class="location">Huntsville</span>
     </div>
     <div class="header-right">
@@ -101,16 +104,20 @@ import ThemeToggle from './ThemeToggle.vue'
 import ThemeStatus from './ThemeStatus.vue'
 import { TypeChat } from '@/config/enum'
 import { useRoute } from 'vue-router'
+import { useUserStore } from '@/stores/userStore'
+import UsersChannelModal from './UsersChannelModal.vue'
 
 const route = useRoute()
 const router = useRouter()
 const authStore = useAuthStore()
 const userChatStore = useUserChatStore()
 const channelStore = useChannelStore()
+const userStore = useUserStore()
 const isDropdownOpen = ref(false)
 const menuContainer = ref(null)
 const isChannelChat = computed(() => route.params.typeChat === TypeChat.CHANNEL)
 const isUserChat = computed(() => route.params.typeChat === TypeChat.USER)
+const showMembers = ref(false)
 
 const toggleDropdown = () => {
   isDropdownOpen.value = !isDropdownOpen.value
@@ -250,6 +257,7 @@ onUnmounted(() => {
   font-weight: 600;
   border-radius: 5px;
   padding: 0.2rem 0.7rem;
+  cursor: pointer;
 }
 
 .location {
@@ -315,6 +323,10 @@ onUnmounted(() => {
 
   .header-left {
     gap: 0.5rem;
+  }
+
+  .channel-name {
+    font-size: 1rem;
   }
 }
 

@@ -1,6 +1,7 @@
 <template>
   <aside class="sidebar">
     <div class="sidebar-header">
+      <LanguageSelector />
       <div class="logo">Chat Transalate</div>
       <button class="create-channel-btn" @click="showModal = true">
         + Tạo channel
@@ -77,7 +78,7 @@
             <div class="user-item">
               <img
                 class="avatar"
-                :src="getURLAvatar(authStore.userInfo.avatar)"
+                :src="getURLAvatar(user.avatar)"
                 alt="avatar"
               />
               {{ user.name }}
@@ -94,6 +95,7 @@ import { ref } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import CreateChannelModal from './CreateChannelModal.vue'
 import JoinChannelModal from './JoinChannelModal.vue'
+import LanguageSelector from './LanguageSelector.vue'
 import { useChannelStore } from '@/stores/channelStore'
 import { TypeChat } from '@/config/enum'
 import { useUserStore } from '@/stores/userStore'
@@ -142,7 +144,6 @@ const handleUserClick = (userId) => {
   font-weight: bold;
   color: var(--special-text-color);
   letter-spacing: 1px;
-  margin-left: 0.5rem;
 }
 .search {
   padding: 0.5rem 1rem;
@@ -207,7 +208,6 @@ ul {
   opacity: 0.8;
 }
 .create-channel-btn {
-  margin-left: 8px;
   padding: 0.3rem 0.7rem;
   background: #1ed760;
   color: #fff;

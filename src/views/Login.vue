@@ -4,7 +4,7 @@
       <h2>Đăng nhập</h2>
       <form @submit.prevent="handleLogin" class="login-form">
         <div class="form-group">
-          <label for="email">Tên đăng nhập</label>
+          <label for="email">{{ $t('hello') }}</label>
           <input
             type="text"
             id="email"
@@ -47,7 +47,7 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue'
+import { ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { authApi } from '@/axios/api-services/authApi'
 import { toast } from 'vue3-toastify'
@@ -64,10 +64,6 @@ const form = ref({
   password: '',
   remember: false,
   token: authStore.token,
-})
-
-onMounted(() => {
-  console.log(import.meta.env.VITE_API_URL)
 })
 
 const handleLogin = async () => {
