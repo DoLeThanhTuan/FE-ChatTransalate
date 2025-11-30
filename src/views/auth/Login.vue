@@ -4,7 +4,7 @@
       <h2>Đăng nhập</h2>
       <form @submit.prevent="handleLogin" class="login-form">
         <div class="form-group">
-          <label for="email">{{ $t('hello') }}</label>
+          <label for="email">Tài khoản</label>
           <input
             type="text"
             id="email"

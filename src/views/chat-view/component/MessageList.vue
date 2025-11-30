@@ -20,7 +20,6 @@
         <div
           class="message"
           :class="{ 'message-own': msg.fromUser === authStore.userInfo.id }"
-          @dblclick="editMessage(msg)"
         >
           <img
             v-if="msg.fromUser !== authStore.userInfo.id"
@@ -90,6 +89,13 @@
             :src="getURLAvatar(msg.avatar)"
             alt="avatar"
           />
+          <DropdownMenu
+            v-if="msg.fromUser === authStore.userInfo.id"
+            :data="msg"
+            :can-detail="false"
+            @edit="editMessage"
+            @delete="clickDeleteMessage"
+          />
         </div>
       </template>
       <template v-else>
@@ -104,13 +110,22 @@
         </div>
       </template>
     </div>
+    <ModalConfirmDelete
+      :visible="isShowModalDelete"
+      message="Bạn chắc chắn muốn xóa tin nhắn này không?"
+      @confirm="confirmDeleteMessage"
+      @cancel="cancelDeleteMessage"
+    />
   </div>
 </template>
 
 <script setup>
+import ModalConfirmDelete from '../../../components/common/ModalConfirmDelete.vue'
+import DropdownMenu from '../../../components/common/DropdownMenu.vue'
 import { ref, onMounted, onUnmounted, computed, nextTick, watch } from 'vue'
 import { messageApi } from '@/axios/api-services/messageApi'
 import { formatDate } from '@/utils/date'
+import localStorageUtils from '@/utils/localStorageUtils'
 import {
   connectSocket,
   disconnectSocket,
@@ -125,7 +140,7 @@ import {
   removeVietnameseTones,
   convertMessageMultilanguage,
 } from '@/utils/string'
-import { TypeChat, URLMessage } from '@/config/enum'
+import { Status, TypeChat, URLMessage } from '@/config/enum'
 import { useRoute } from 'vue-router'
 
 const authStore = useAuthStore()
@@ -145,6 +160,10 @@ const typeChat = computed(() => route.params.typeChat)
 const editingMessageId = ref(null)
 const editedContent = ref('')
 
+// New state for message delete
+const isShowModalDelete = ref(false)
+const deleteMessageId = ref(null)
+
 // Connection state
 const isConnected = ref(false)
 const reconnectTimeout = ref(null)
@@ -162,7 +181,7 @@ const connectionStatusMessage = computed(() => {
 
 const isChannelChat = computed(() => route.params.typeChat === TypeChat.CHANNEL)
 const isUserChat = computed(() => route.params.typeChat === TypeChat.USER)
-const currentChannelId = computed(() => channelStore.channelCurrent?.id)
+const currentChannelId = computed(() => route.params.chatKey)
 const currentChatKey = computed(() => route.params.chatKey)
 
 // Methods
@@ -189,17 +208,6 @@ const retryFetch = async () => {
 const handleDisconnect = () => {
   isConnected.value = false
   handleReconnect()
-}
-
-// Hàm xử lý khi nhận được tin nhắn được cập nhật qua WebSocket
-const handleReceiveMessageUpdate = (updatedMessage) => {
-  const index = messages.value.findIndex((m) => m.id === updatedMessage.id)
-  if (index !== -1) {
-    // Cập nhật nội dung và cờ đã chỉnh sửa
-    messages.value[index].content = updatedMessage.content
-    messages.value[index].isEdited = true // Giả định server gửi lại thông tin này
-    // Bạn có thể thêm logic để cập nhật `updatedAt` nếu có
-  }
 }
 
 const handleConnectSuccess = async () => {
@@ -253,30 +261,20 @@ const handleReceiveMessage = (message) => {
 
 const subscribeToChannel = () => {
   if (!currentChannelId.value) return
-
-  // Subscribe to new channel message
   subscribeSocket(
     `${URLMessage.RECEIVE_CHANNEL_MESSAGE}/${currentChannelId.value}`,
     handleReceiveMessage
   )
-  // **ĐĂNG KÝ SỰ KIỆN CẬP NHẬT TIN NHẮN**
-  // subscribeSocket(
-  //   `${URLMessage.RECEIVE_CHANNEL_MESSAGE_UPDATE}/${currentChannelId.value}`, // URL này có thể khác tùy backend của bạn
-  //   handleReceiveMessageUpdate
-  // )
 }
 
 const subscribeToUser = () => {
   subscribeSocket(URLMessage.RECEIVE_USER_MESSAGE, handleReceiveMessage)
-  // **ĐĂNG KÝ SỰ KIỆN CẬP NHẬT TIN NHẮN RIÊNG TƯ**
-  // Bạn có thể cần một URL/Endpoint riêng cho User Message Update
-  // subscribeSocket(URLMessage.RECEIVE_USER_MESSAGE_UPDATE, handleReceiveMessageUpdate)
 }
 
 const connectWS = async () => {
   try {
     await connectSocket(
-      authStore.token,
+      localStorageUtils.get('token'),
       handleConnectSuccess,
       handleDisconnect,
       handleConnectionError
@@ -443,15 +441,12 @@ const saveEdit = async () => {
 
   const originalMessage = messages.value.find((m) => m.id === messageId)
   if (originalMessage && originalMessage.content.trim() === newContent) {
-    return cancelEdit() // Hủy nếu nội dung không thay đổi
+    return cancelEdit()
   }
 
   clearError()
 
   try {
-    // **GỌI API CHỈNH SỬA TIN NHẮN**
-    // Bạn cần đảm bảo messageApi.updateMessageContent đã được định nghĩa
-    // await messageApi.updateMessageContent(messageId, newContent)
     await updateMessage(messageId, newContent)
 
     cancelEdit()
@@ -469,7 +464,7 @@ const updateMessage = async (messageId, newContent) => {
           id: messageId,
           content: newContent,
           // files: selectedFiles.value,
-          channelId: channelStore.channelCurrent.id,
+          channelId: route.params.chatKey,
           // uploadFiles: uploadFiles,
         })
       } else {
@@ -488,6 +483,43 @@ const updateMessage = async (messageId, newContent) => {
 }
 
 // --- End Message Editing Logic ---
+
+// --- Start Message Delete Logic ---
+const clickDeleteMessage = (data) => {
+  isShowModalDelete.value = true
+  deleteMessageId.value = data.id
+}
+
+const cancelDeleteMessage = () => {
+  isShowModalDelete.value = false
+  deleteMessageId.value = null
+}
+
+const confirmDeleteMessage = (msgId) => {
+  if (msgId != null) {
+    try {
+      if (typeChat.value == TypeChat.CHANNEL) {
+        channelStore.sendMessageToChannel({
+          id: msgId,
+          content: '',
+          channelId: route.params.chatKey,
+          type: Status.DELETE_MESSAGE,
+        })
+      } else {
+        userChatStore.sendMessageToUser({
+          id: msgId,
+          content: '',
+          userId: route.params.chatKey,
+          type: Status.DELETE_MESSAGE,
+        })
+      }
+    } catch (error) {
+      console.error('Error delete message:', error)
+    }
+  }
+}
+
+// --- Utils Functions ---
 
 const formatFileSize = (size) => {
   if (!size) return '0 Bytes'
@@ -600,6 +632,7 @@ watch(
 
     if (isConnected.value) {
       if (isChannelChat.value && currentChannelId.value) {
+        subscribeToChannel()
         await fetchMessagesChannel(true)
       } else if (isUserChat.value && newChatKey) {
         subscribeToUser()
@@ -700,7 +733,7 @@ watch(
 
 .message {
   display: flex;
-  align-items: flex-start;
+  align-items: center;
   gap: 1.1rem;
   background: var(--hover-bg);
   border-radius: 10px;

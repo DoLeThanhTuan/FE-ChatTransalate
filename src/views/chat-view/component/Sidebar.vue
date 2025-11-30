@@ -2,12 +2,13 @@
   <aside class="sidebar">
     <div class="sidebar-header">
       <LanguageSelector />
-      <div class="logo">Chat Transalate</div>
+      <div class="logo">Smart Chat</div>
       <button class="create-channel-btn" @click="showModal = true">
-        + Tạo channel
+        + {{ $t('COMPONENT.CHAT_VIEW.SIDE_BAR.BUTTON.CREATE_CHANNEL') }}
       </button>
       <button class="create-channel-btn" @click="showJoinModal = true">
-        <font-awesome-icon :icon="['fas', 'users']" /> Join channel
+        <font-awesome-icon :icon="['fas', 'users']" />
+        {{ $t('COMPONENT.CHAT_VIEW.SIDE_BAR.BUTTON.SEARCH_CHANNEL') }}
       </button>
     </div>
     <Teleport to="body">
@@ -26,7 +27,7 @@
           v-if="isShowChannel"
           icon="fa-solid fa-chevron-down"
         /><font-awesome-icon v-else icon="fa-solid fa-chevron-up" />
-        CHANNELS
+        {{ $t('COMPONENT.CHAT_VIEW.SIDE_BAR.LABEL.CHANNELS') }}
       </div>
       <ul v-if="isShowChannel">
         <template v-for="channel in channelStore.channels">
@@ -61,7 +62,8 @@
         <font-awesome-icon
           v-if="isShowUser"
           icon="fa-solid fa-chevron-down"
-        /><font-awesome-icon v-else icon="fa-solid fa-chevron-up" /> USERS
+        /><font-awesome-icon v-else icon="fa-solid fa-chevron-up" />
+        {{ $t('COMPONENT.CHAT_VIEW.SIDE_BAR.LABEL.USERS') }}
       </div>
       <ul v-if="isShowUser">
         <template v-for="(user, index) in userStore.users" :key="user.email">
@@ -93,9 +95,9 @@
 <script setup>
 import { ref } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
-import CreateChannelModal from './CreateChannelModal.vue'
-import JoinChannelModal from './JoinChannelModal.vue'
-import LanguageSelector from './LanguageSelector.vue'
+import CreateChannelModal from '../../../components/CreateChannelModal.vue'
+import JoinChannelModal from '../../../components/JoinChannelModal.vue'
+import LanguageSelector from '../../../components/LanguageSelector.vue'
 import { useChannelStore } from '@/stores/channelStore'
 import { TypeChat } from '@/config/enum'
 import { useUserStore } from '@/stores/userStore'

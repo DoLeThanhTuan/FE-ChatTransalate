@@ -36,7 +36,7 @@
         class="border-2 btn-translate cursor-pointer bg-[#f3f4f8]"
         @click="showTranslateModal = true"
       >
-        Dịch
+        {{ $t('COMPONENT.CHAT_VIEW.SIDE_BAR.BUTTON.BTN_TRANSLATE') }}
       </button>
       <textarea
         class="msg-input"
@@ -134,7 +134,7 @@ import { useUserChatStore } from '@/stores/userChatStore'
 import { useUserStore } from '@/stores/userStore'
 import { useRoute } from 'vue-router'
 import { TypeChat, Language } from '@/config/enum'
-import TranslateModal from './TranslateModal.vue'
+import TranslateModal from '../../../components/TranslateModal.vue'
 
 const message = ref({
   content: '',
@@ -371,7 +371,7 @@ const sendMessage = async () => {
         channelStore.sendMessageToChannel({
           content: message.value.content,
           files: selectedFiles.value,
-          channelId: channelStore.channelCurrent.id,
+          channelId: route.params.chatKey,
           uploadFiles: uploadFiles,
         })
       } else {

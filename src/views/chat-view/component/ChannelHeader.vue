@@ -5,7 +5,10 @@
         <button @click="toggleDropdown" class="channel-name-button">
           <span
             class="channel-name"
-            :title="channelStore.channelCurrent?.name || 'Loading...'"
+            :title="
+              channelStore.channelCurrent?.name ||
+              $t('COMPONENT.COMMON.MODAL_CONFIRM_DELETE.LABEL.MESSAGE')
+            "
             >{{ channelStore.channelCurrent?.name || 'Loading...' }}</span
           >
           <font-awesome-icon
@@ -72,7 +75,6 @@
       <span class="location">Huntsville</span>
     </div>
     <div class="header-right">
-      <ThemeStatus />
       <ThemeToggle />
       <span class="member-count">{{ authStore.userInfo.name }}</span>
 
@@ -100,12 +102,11 @@ import { ref, onMounted, onUnmounted, computed } from 'vue'
 import { useChannelStore } from '@/stores/channelStore'
 import { useUserChatStore } from '@/stores/userChatStore'
 import { useRouter } from 'vue-router'
-import ThemeToggle from './ThemeToggle.vue'
-import ThemeStatus from './ThemeStatus.vue'
+import ThemeToggle from '../../../components/ThemeToggle.vue'
 import { TypeChat } from '@/config/enum'
 import { useRoute } from 'vue-router'
 import { useUserStore } from '@/stores/userStore'
-import UsersChannelModal from './UsersChannelModal.vue'
+import UsersChannelModal from '../../../components/UsersChannelModal.vue'
 
 const route = useRoute()
 const router = useRouter()

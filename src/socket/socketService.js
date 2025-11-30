@@ -56,6 +56,7 @@ export const subscribeSocket = (urlSubcribe, onMessageCallback) => {
     const parsed = JSON.parse(message.body)
     onMessageCallback(parsed)
   })
+  console.log(urlSubcribe)
 }
 
 export const disconnectSocket = () => {
