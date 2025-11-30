@@ -1,51 +1,47 @@
 <template>
   <div class="language-selector">
-    <button 
-      @click="toggleDropdown" 
+    <button
+      @click="toggleDropdown"
       class="language-btn"
       :title="$t('language.selectLanguage')"
     >
-      <svg 
-        class="language-icon" 
-        fill="none" 
-        stroke="currentColor" 
+      <svg
+        class="language-icon"
+        fill="none"
+        stroke="currentColor"
         viewBox="0 0 24 24"
       >
-        <path 
-          stroke-linecap="round" 
-          stroke-linejoin="round" 
-          stroke-width="2" 
+        <path
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          stroke-width="2"
           d="M3 5h12M9 3v2m1.048 9.5A18.022 18.022 0 016.412 9m6.088 9h7M11 21l5-10 5 10M12.751 5C11.783 10.77 8.07 15.61 3 18.129"
         />
       </svg>
       <span class="current-lang">{{ getCurrentLanguageName() }}</span>
-      <svg 
-        class="dropdown-icon" 
-        :class="{ 'rotated': isDropdownOpen }"
-        fill="none" 
-        stroke="currentColor" 
+      <svg
+        class="dropdown-icon"
+        :class="{ rotated: isDropdownOpen }"
+        fill="none"
+        stroke="currentColor"
         viewBox="0 0 24 24"
       >
-        <path 
-          stroke-linecap="round" 
-          stroke-linejoin="round" 
-          stroke-width="2" 
+        <path
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          stroke-width="2"
           d="M19 9l-7 7-7-7"
         />
       </svg>
     </button>
-    
-    <div 
-      v-if="isDropdownOpen" 
-      class="language-dropdown"
-      @click.stop
-    >
-      <div 
-        v-for="lang in languages" 
+
+    <div v-if="isDropdownOpen" class="language-dropdown" @click.stop>
+      <div
+        v-for="lang in languages"
         :key="lang.code"
         @click="changeLanguage(lang.code)"
         class="language-option"
-        :class="{ 'active': lang.code === currentLocale }"
+        :class="{ active: lang.code === currentLocale }"
       >
         <span class="flag">{{ lang.flag }}</span>
         <span class="name">{{ lang.name }}</span>
@@ -58,24 +54,31 @@
 <script setup>
 import { ref, computed, onMounted, onUnmounted } from 'vue'
 import { useI18n } from 'vue-i18n'
-
+import localStorageUtils from '@/utils/localStorageUtils'
 const { locale } = useI18n()
 const isDropdownOpen = ref(false)
 const currentLocale = computed(() => locale.value)
+
+const defaultLanguage = ref({
+  code: 'vi',
+  name: 'Tiếng Việt',
+  nativeName: 'Tiếng Việt',
+  flag: '🇻🇳',
+})
 
 const languages = [
   {
     code: 'vi',
     name: 'Tiếng Việt',
     nativeName: 'Tiếng Việt',
-    flag: '🇻🇳'
+    flag: '🇻🇳',
   },
   {
     code: 'en',
     name: 'English',
     nativeName: 'English',
-    flag: '🇺🇸'
-  }
+    flag: '🇺🇸',
+  },
 ]
 
 const toggleDropdown = () => {
@@ -84,13 +87,15 @@ const toggleDropdown = () => {
 
 const changeLanguage = (langCode) => {
   locale.value = langCode
-  localStorage.setItem('language', langCode)
+  localStorageUtils.set('language', langCode)
   isDropdownOpen.value = false
 }
 
 const getCurrentLanguageName = () => {
-  const currentLang = languages.find(lang => lang.code === currentLocale.value)
-  return currentLang ? currentLang.nativeName : 'VI'
+  const currentLang = languages.find(
+    (lang) => lang.code === currentLocale.value
+  )
+  return currentLang ? currentLang.nativeName : defaultLanguage.value.code
 }
 
 const closeDropdown = (event) => {
@@ -100,6 +105,9 @@ const closeDropdown = (event) => {
 }
 
 onMounted(() => {
+  if (localStorageUtils.get('language') == null) {
+    localStorageUtils.set('language', defaultLanguage.value.code)
+  }
   document.addEventListener('click', closeDropdown)
 })
 
@@ -216,4 +224,3 @@ onUnmounted(() => {
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
 }
 </style>
-

@@ -2,7 +2,7 @@
   <div v-if="visible" class="modal-overlay">
     <div class="modal-content">
       <div class="modal-header">
-        <h2>Find Channels</h2>
+        <h2>Tìm channel</h2>
         <span class="close-btn" @click="$emit('close')">×</span>
       </div>
       <div class="modal-body">
@@ -10,12 +10,12 @@
           <input
             v-model="search"
             class="modal-input"
-            placeholder="Type to find a channel..."
+            placeholder="Nhập kí tự để tìm"
             @keyup.enter="searchChannelsAPI"
           />
-          <button class="search-btn" @click="searchChannelsAPI">Search</button>
+          <button class="search-btn" @click="searchChannelsAPI">Tìm</button>
         </div>
-        <div class="modal-section-title">RECENT</div>
+        <div v-if="channels.length == 0" class="modal-section-title">Trống</div>
         <ul class="channel-list">
           <li
             v-for="channel in channels"

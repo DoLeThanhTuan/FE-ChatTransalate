@@ -1,7 +1,37 @@
 {
-  "hello": "Xin chào!",
-  "welcome": "Chào mừng bạn đến với ứng dụng của chúng tôi",
-  "language": {
-    "selectLanguage": "Chọn ngôn ngữ"
+  "COMPONENT": {
+    "COMMON": {
+      "DROP_DOWN_MENU": {
+        "BUTTON": {
+          "BTN_EDIT": "Chỉnh sửa",
+          "BTN_DELETE": "Xóa",
+          "BTN_DETAIL": "Chi tiết",
+          "BTN_TRANSLATE": "Dịch"
+        }
+      },
+      "MODAL_CONFIRM_DELETE": {
+        "LABEL": {
+          "HEADER": "Xác nhận xóa",
+          "MESSAGE": "Bạn có chắc muốn xóa không?"
+        },
+        "BUTTON": {
+          "BTN_CANCEL": "Hủy",
+          "BTN_DELETE": "Xóa"
+        }
+      }
+    },
+    "CHAT_VIEW": {
+      "SIDE_BAR": {
+        "LABEL": {
+          "CHANNELS": "Channels",
+          "USERS": "Người dùng"
+        },
+        "BUTTON": {
+          "CREATE_CHANNEL": "Tạo channel",
+          "SEARCH_CHANNEL": "Tham gia channel",
+          "BTN_TRANSLATE": "Dịch"
+        }
+      }
+    }
   }
 }

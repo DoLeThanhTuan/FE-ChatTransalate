@@ -64,8 +64,7 @@ const props = defineProps({
     default: () => [
       { value: 'ENGLISH', label: 'EN' },
       { value: 'VIETNAMESE', label: 'VI' },
-      { value: 'JAPAN', label: 'JA' },
-      { value: 'CHINESE', label: 'CN' },
+      { value: 'JAPAN', label: 'JP' },
     ],
   },
 })
@@ -275,7 +274,7 @@ const confirm = () => {
 
   border-radius: 8px;
 
-  padding: 0.55rem 0.9rem;
+  padding: 0.55rem 0.3rem;
 
   font-size: 0.98rem;
 }

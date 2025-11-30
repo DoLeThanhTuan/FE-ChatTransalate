@@ -23,17 +23,18 @@
 
 <script setup>
 import { ref, onBeforeMount, onMounted, onUnmounted, watch } from 'vue'
-import { useRoute } from 'vue-router'
-import Sidebar from '../components/Sidebar.vue'
-import ChannelHeader from '../components/ChannelHeader.vue'
-import MessageList from '../components/MessageList.vue'
-import MessageInput from '../components/MessageInput.vue'
+import { useRoute, useRouter } from 'vue-router'
+import Sidebar from '../chat-view/component/Sidebar.vue'
+import ChannelHeader from '../chat-view/component/ChannelHeader.vue'
+import MessageList from '../chat-view/component/MessageList.vue'
+import MessageInput from '../chat-view/component/MessageInput.vue'
 import { useChannelStore } from '@/stores/channelStore'
 import { useUserChatStore } from '@/stores/userChatStore'
 import { useUserStore } from '@/stores/userStore'
 import { TypeChat } from '@/config/enum'
 
 const route = useRoute()
+const router = useRouter()
 const isSidebarVisible = ref(false)
 const isMobile = ref(false)
 const channelStore = useChannelStore()
@@ -51,6 +52,7 @@ const toggleSidebar = () => {
 const fetchChannel = async (chatId) => {
   try {
     const response = await channelStore.fetchChannelById(chatId)
+    if (!response) router.push({ name: 'NotFound' })
   } catch (e) {
     console.error('Error fetching channel:', e)
   }

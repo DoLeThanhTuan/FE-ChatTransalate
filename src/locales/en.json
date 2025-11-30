@@ -1,7 +1,37 @@
 {
-  "hello": "Hello!",
-  "welcome": "Welcome to our application",
-  "language": {
-    "selectLanguage": "Select Language"
+  "COMPONENT": {
+    "COMMON": {
+      "DROP_DOWN_MENU": {
+        "BUTTON": {
+          "BTN_EDIT": "Edit",
+          "BTN_DELETE": "Delete",
+          "BTN_DETAIL": "Detail",
+          "BTN_TRANSLATE": "Translate"
+        }
+      },
+      "MODAL_CONFIRM_DELETE": {
+        "LABEL": {
+          "HEADER": "Delete Confirmation",
+          "MESSAGE": "Are you sure you want to delete?"
+        },
+        "BUTTON": {
+          "BTN_CANCEL": "Cancel",
+          "BTN_DELETE": "Delete"
+        }
+      }
+    },
+    "CHAT_VIEW": {
+      "SIDE_BAR": {
+        "LABEL": {
+          "CHANNELS": "Channels",
+          "USERS": "Users"
+        },
+        "BUTTON": {
+          "CREATE_CHANNEL": "Create channel",
+          "SEARCH_CHANNEL": "Join channel",
+          "BTN_TRANSLATE": "Translate"
+        }
+      }
+    }
   }
 }

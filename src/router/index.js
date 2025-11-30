@@ -7,17 +7,17 @@ const routes = [
   {
     path: '/',
     name: 'Home',
-    component: () => import('../views/Login.vue'),
+    component: () => import('../views/auth/Login.vue'),
   },
   {
     path: '/login',
     name: 'Login',
-    component: () => import('../views/Login.vue'),
+    component: () => import('../views/auth/Login.vue'),
   },
   {
     path: '/register',
     name: 'Register',
-    component: () => import('../views/Register.vue'),
+    component: () => import('../views/auth/Register.vue'),
   },
   {
     path: '/profile',
@@ -28,7 +28,7 @@ const routes = [
   {
     path: '/chat-view/:typeChat/:chatKey',
     name: 'chat-view',
-    component: () => import('../views/ChatView.vue'),
+    component: () => import('../views/chat-view/ChatView.vue'),
     meta: { requiresAuth: true },
   },
   {

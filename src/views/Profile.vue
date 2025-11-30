@@ -3,6 +3,26 @@
     <div class="profile-box">
       <h2>Thông tin cá nhân</h2>
       <div class="profile-info">
+        <div class="form-group">
+          <label for="avatar">Ảnh đại diện</label>
+          <div class="avatar-upload">
+            <img
+              :src="avatarPreview || defaultAvatar"
+              class="avatar-preview"
+              alt="Avatar preview"
+            />
+            <input
+              type="file"
+              id="avatar"
+              @change="handleAvatarChange"
+              accept="image/*"
+              class="avatar-input"
+            />
+            <label for="avatar" class="avatar-label">
+              {{ avatarPreview ? 'Thay đổi ảnh' : 'Chọn ảnh' }}
+            </label>
+          </div>
+        </div>
         <div class="info-group">
           <label>Tên đăng nhập</label>
           <p>{{ userInfo.username }}</p>
@@ -12,8 +32,12 @@
           <p>{{ userInfo.email }}</p>
         </div>
         <div class="info-group">
+          <label>Số điện thoại</label>
+          <p>{{ userInfo.phone }}</p>
+        </div>
+        <div class="info-group">
           <label>Vai trò</label>
-          <p>{{ userInfo.isStreamer ? 'Streamer' : 'Người xem' }}</p>
+          <p>{{ userInfo.role }}</p>
         </div>
       </div>
       <button @click="handleLogout" class="logout-button">Đăng xuất</button>
@@ -24,34 +48,15 @@
 <script setup>
 import { ref, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
-
+import { useAuthStore } from '@/stores/authStore'
 const router = useRouter()
+const authStore = useAuthStore()
 const userInfo = ref({
-  username: '',
-  email: '',
-  isStreamer: false
+  username: authStore.userInfo.name,
+  email: authStore.userInfo.email,
+  phone: authStore.userInfo.phone,
+  role: authStore.userInfo.role,
 })
-
-const fetchUserInfo = async () => {
-  try {
-    const token = localStorage.getItem('token')
-    const response = await fetch('http://localhost:8000/api/user/profile', {
-      headers: {
-        'Authorization': `Bearer ${token}`
-      }
-    })
-
-    if (response.ok) {
-      const data = await response.json()
-      userInfo.value = data
-    } else {
-      router.push('/login')
-    }
-  } catch (error) {
-    console.error('Error fetching user info:', error)
-    router.push('/login')
-  }
-}
 
 const handleLogout = () => {
   localStorage.removeItem('token')
@@ -59,9 +64,7 @@ const handleLogout = () => {
   router.push('/login')
 }
 
-onMounted(() => {
-  fetchUserInfo()
-})
+onMounted(() => {})
 </script>
 
 <style scoped>
@@ -131,4 +134,42 @@ p {
 .logout-button:hover {
   background-color: #6b1515;
 }
-</style> 
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.avatar-upload {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+}
+
+.avatar-preview {
+  width: 100px;
+  height: 100px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 2px solid #ddd;
+}
+
+.avatar-input {
+  display: none;
+}
+
+.avatar-label {
+  background-color: #891c1c;
+  color: white;
+  padding: 0.5rem 1rem;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+.avatar-label:hover {
+  background-color: #6b1515;
+}
+</style>

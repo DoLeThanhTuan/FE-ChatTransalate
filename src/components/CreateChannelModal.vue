@@ -2,19 +2,19 @@
   <div v-if="visible" class="modal-overlay">
     <div class="modal-content">
       <div class="modal-header">
-        <h2>Create a new channel</h2>
+        <h2>Tạo mới channel</h2>
         <span class="close-btn" @click="$emit('close')">×</span>
       </div>
       <div class="modal-body">
-        <label class="modal-label">Channel name</label>
+        <label class="modal-label">Tên channel</label>
         <div>
           <input
             v-model="channelName"
             :class="['modal-input', { 'input-error': showError }]"
-            placeholder="Enter a name for your new channel"
+            placeholder="Nhập tên cho channel mới"
           />
           <div v-if="showError" class="input-error-message">
-            Channel names must have at least 1 character.
+            Tên channel phải có ít nhất 1 kí tự.
           </div>
         </div>
 
@@ -33,8 +33,8 @@
           >
             <span class="icon">🌐</span>
             <div>
-              <div class="public-title">Public Channel</div>
-              <div class="public-desc">Anyone can join</div>
+              <div class="public-title">Channel chung</div>
+              <div class="public-desc">Bất kỳ ai đều có thể tham gia</div>
             </div>
             <span v-if="isPublic" class="checkmark">✔</span>
           </button>
@@ -44,31 +44,31 @@
           >
             <span class="icon">🔒</span>
             <div>
-              <div class="public-title">Private Channel</div>
-              <div class="public-desc">Only invited members</div>
+              <div class="public-title">Channel Riêng</div>
+              <div class="public-desc">Chỉ những thành viên được mời</div>
             </div>
             <span v-if="!isPublic" class="checkmark">✔</span>
           </button>
         </div>
         <label class="modal-label" style="margin-top: 0.5rem"
-          >Purpose <span class="optional">(optional)</span></label
+          >Mô tả <span class="optional">(optional)</span></label
         >
         <textarea
           v-model="purpose"
           class="modal-input"
-          placeholder="Enter a purpose for this channel (optional)"
+          placeholder="Nhập mô tả cho channel này"
           rows="2"
         ></textarea>
         <div class="modal-checkbox-row"></div>
       </div>
       <div class="modal-actions">
-        <button class="modal-cancel-btn" @click="$emit('close')">Cancel</button>
+        <button class="modal-cancel-btn" @click="$emit('close')">Hủy</button>
         <button
           class="modal-create-btn"
           :disabled="!channelName.trim()"
           @click="handleCreate"
         >
-          Create channel
+          Tạo
         </button>
       </div>
     </div>
