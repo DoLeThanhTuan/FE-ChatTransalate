@@ -25,4 +25,25 @@ export const userApi = {
       },
     })
   },
+  createUser: async (params) => {
+    return await axiosClient.post(`${ENDPOINT}`, params, {
+      headers: {
+        ...setHeader(),
+      },
+    })
+  },
+  updateUser: async (id, params) => {
+    return await axiosClient.put(`${ENDPOINT}/${id}`, params, {
+      headers: {
+        ...setHeader(),
+      },
+    })
+  },
+  deleteUser: async (id) => {
+    return await axiosClient.delete(`${ENDPOINT}/${id}`, {
+      headers: {
+        ...setHeader(),
+      },
+    })
+  },
 }

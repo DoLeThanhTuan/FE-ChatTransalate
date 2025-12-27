@@ -9,9 +9,9 @@ export const handleErrorNavigation = async (error) => {
   if (error.response?.status === 401) {
     toast.error('Lỗi 401')
   } else if (error.response?.status === 403) {
-    localStorageUtils.remove('userInfo')
-    localStorageUtils.remove('token')
-    router.push('/login')
+    // localStorageUtils.remove('userInfo')
+    // localStorageUtils.remove('token')
+    // window.location.href = '/login'
   } else if (error.response?.status === 500) {
     // await router.push({
     //     name: '50X',

@@ -2,7 +2,8 @@
   <div ref="wrapper" class="relative inline-block">
     <!-- Button mở dropdown -->
     <button
-      class="px-2 rounded-full hover:bg-[#2a3950] hover:text-[#ffff]"
+      class="px-2 rounded-full hover:bg-[#1ed760] hover:text-[#ffff]"
+      :class="isOwn ? 'text-[#000000]' : 'text-[var(--text-primary)]'"
       @click="open = !open"
     >
       ⋯
@@ -11,13 +12,13 @@
     <!-- Dropdown menu -->
     <div
       v-if="open"
-      class="absolute right-0 mt-2 w-44 bg-white rounded-xl shadow-lg border border-gray-100 py-2 z-50"
+      class="absolute right-0 mt-2 w-44 bg-white rounded-xl shadow-lg border border-gray-100 z-50"
     >
       <!-- Edit -->
       <div
         v-if="canEdit"
         @click="handleEdit"
-        class="flex items-center px-3 py-2 hover:bg-gray-100 cursor-pointer gap-2"
+        class="flex items-center px-3 py-2 hover:rounded-[8px] hover:bg-gray-100 cursor-pointer gap-2"
       >
         <span>{{ $t('COMPONENT.COMMON.DROP_DOWN_MENU.BUTTON.BTN_EDIT') }}</span>
       </div>
@@ -26,7 +27,7 @@
       <div
         v-if="canDelete"
         @click="handleDelete"
-        class="flex items-center px-3 py-2 hover:bg-gray-100 cursor-pointer gap-2"
+        class="flex items-center px-3 py-2 hover:rounded-[8px] hover:bg-gray-100 cursor-pointer gap-2"
       >
         <span>{{
           $t('COMPONENT.COMMON.DROP_DOWN_MENU.BUTTON.BTN_DELETE')
@@ -37,7 +38,7 @@
       <div
         v-if="canDetail"
         @click="handleDetail"
-        class="flex items-center px-3 py-2 hover:bg-gray-100 cursor-pointer gap-2"
+        class="flex items-center px-3 py-2 hover:rounded-[8px] hover:bg-gray-100 cursor-pointer gap-2"
       >
         <span>{{
           $t('COMPONENT.COMMON.DROP_DOWN_MENU.BUTTON.BTN_DETAIL')
@@ -48,21 +49,32 @@
       <div
         v-if="canTranslate"
         @click="handleTranslate"
-        class="flex items-center px-3 py-2 hover:bg-gray-100 cursor-pointer gap-2"
+        class="flex items-center px-3 py-2 hover:rounded-[8px] hover:bg-gray-100 cursor-pointer gap-2"
       >
         <span>{{
           $t('COMPONENT.COMMON.DROP_DOWN_MENU.BUTTON.BTN_TRANSLATE')
         }}</span>
       </div>
 
-      <!-- Pin -->
+      <!-- Bản gốc -->
       <div
+        v-if="canReturn"
+        @click="handleReturn"
+        class="flex items-center px-3 py-2 hover:rounded-[8px] hover:bg-gray-100 cursor-pointer gap-2"
+      >
+        <span>{{
+          $t('COMPONENT.COMMON.DROP_DOWN_MENU.BUTTON.BTN_ORIGINAL')
+        }}</span>
+      </div>
+
+      <!-- Pin -->
+      <!-- <div
         v-if="canTranslate"
         @click="handleTranslate"
-        class="flex items-center px-3 py-2 hover:bg-gray-100 cursor-pointer gap-2"
+        class="flex items-center px-3 py-2 hover:rounded-[8px] hover:bg-gray-100 cursor-pointer gap-2"
       >
         <span>Pin</span>
-      </div>
+      </div> -->
     </div>
   </div>
 </template>
@@ -72,11 +84,13 @@ import { ref, onMounted, onBeforeUnmount } from 'vue'
 
 // Props: data, quyền
 const props = defineProps({
+  isOwn: { type: Boolean, default: true },
   data: { type: Object, default: () => ({}) },
   canEdit: { type: Boolean, default: true },
   canDelete: { type: Boolean, default: true },
   canDetail: { type: Boolean, default: true },
   canTranslate: { type: Boolean, default: true },
+  canReturn: { type: Boolean, default: true },
 })
 
 // Emit events
@@ -102,7 +116,10 @@ const handleTranslate = () => {
   emit('translate', props.data)
   open.value = false
 }
-
+const handleReturn = () => {
+  emit('return', props.data)
+  open.value = false
+}
 // Click ngoài dropdown sẽ đóng
 const clickOutside = (e) => {
   if (wrapper.value && !wrapper.value.contains(e.target)) {

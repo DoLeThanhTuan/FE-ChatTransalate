@@ -69,8 +69,8 @@ const defaultLanguage = ref({
 const languages = [
   {
     code: 'vi',
-    name: 'Tiếng Việt',
-    nativeName: 'Tiếng Việt',
+    name: 'Viet Nam',
+    nativeName: 'Viet Nam',
     flag: '🇻🇳',
   },
   {
@@ -78,6 +78,12 @@ const languages = [
     name: 'English',
     nativeName: 'English',
     flag: '🇺🇸',
+  },
+  {
+    code: 'jp',
+    name: 'Japan',
+    nativeName: 'Japan',
+    flag: 'jp',
   },
 ]
 

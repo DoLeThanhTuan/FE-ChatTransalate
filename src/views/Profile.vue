@@ -1,46 +1,49 @@
 <template>
-  <div class="profile-container">
-    <div class="profile-box">
-      <h2>Thông tin cá nhân</h2>
-      <div class="profile-info">
-        <div class="form-group">
-          <label for="avatar">Ảnh đại diện</label>
-          <div class="avatar-upload">
-            <img
-              :src="avatarPreview || defaultAvatar"
-              class="avatar-preview"
-              alt="Avatar preview"
-            />
-            <input
-              type="file"
-              id="avatar"
-              @change="handleAvatarChange"
-              accept="image/*"
-              class="avatar-input"
-            />
-            <label for="avatar" class="avatar-label">
-              {{ avatarPreview ? 'Thay đổi ảnh' : 'Chọn ảnh' }}
-            </label>
+  <div class="profile-wrapper">
+    <AppHeader />
+    <div class="profile-container">
+      <div class="profile-box">
+        <h2>Thông tin cá nhân</h2>
+        <div class="profile-info">
+          <div class="form-group">
+            <label for="avatar">Ảnh đại diện</label>
+            <div class="avatar-upload">
+              <img
+                :src="avatarPreview || defaultAvatar"
+                class="avatar-preview"
+                alt="Avatar preview"
+              />
+              <input
+                type="file"
+                id="avatar"
+                @change="handleAvatarChange"
+                accept="image/*"
+                class="avatar-input"
+              />
+              <label for="avatar" class="avatar-label">
+                {{ avatarPreview ? 'Thay đổi ảnh' : 'Chọn ảnh' }}
+              </label>
+            </div>
+          </div>
+          <div class="info-group">
+            <label>Tên đăng nhập</label>
+            <p>{{ userInfo.username }}</p>
+          </div>
+          <div class="info-group">
+            <label>Email</label>
+            <p>{{ userInfo.email }}</p>
+          </div>
+          <div class="info-group">
+            <label>Số điện thoại</label>
+            <p>{{ userInfo.phone }}</p>
+          </div>
+          <div class="info-group">
+            <label>Vai trò</label>
+            <p>{{ userInfo.role }}</p>
           </div>
         </div>
-        <div class="info-group">
-          <label>Tên đăng nhập</label>
-          <p>{{ userInfo.username }}</p>
-        </div>
-        <div class="info-group">
-          <label>Email</label>
-          <p>{{ userInfo.email }}</p>
-        </div>
-        <div class="info-group">
-          <label>Số điện thoại</label>
-          <p>{{ userInfo.phone }}</p>
-        </div>
-        <div class="info-group">
-          <label>Vai trò</label>
-          <p>{{ userInfo.role }}</p>
-        </div>
+        <button @click="handleLogout" class="logout-button">Đăng xuất</button>
       </div>
-      <button @click="handleLogout" class="logout-button">Đăng xuất</button>
     </div>
   </div>
 </template>
@@ -49,18 +52,18 @@
 import { ref, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { useAuthStore } from '@/stores/authStore'
+import AppHeader from '@/components/common/AppHeader.vue'
 const router = useRouter()
 const authStore = useAuthStore()
 const userInfo = ref({
-  username: authStore.userInfo.name,
-  email: authStore.userInfo.email,
-  phone: authStore.userInfo.phone,
-  role: authStore.userInfo.role,
+  username: authStore.userInfo().name,
+  email: authStore.userInfo().email,
+  phone: authStore.userInfo().phone,
+  role: authStore.userInfo().role,
 })
 
 const handleLogout = () => {
-  localStorage.removeItem('token')
-  localStorage.removeItem('isStreamer')
+  authStore.clearAuth()
   router.push('/login')
 }
 
@@ -68,28 +71,39 @@ onMounted(() => {})
 </script>
 
 <style scoped>
-.profile-container {
+.profile-wrapper {
   min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  background-color: var(--bg-tertiary);
+  transition: background-color 0.3s ease;
+}
+
+.profile-container {
+  flex: 1;
   display: flex;
   align-items: center;
   justify-content: center;
-  background-color: #f5f5f5;
+  background-color: var(--bg-tertiary);
   padding: 20px;
+  transition: background-color 0.3s ease;
 }
 
 .profile-box {
-  background: white;
+  background: var(--bg-primary);
   padding: 2rem;
   border-radius: 8px;
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 2px 10px var(--shadow);
   width: 100%;
   max-width: 400px;
+  transition: background-color 0.3s ease, box-shadow 0.3s ease;
 }
 
 h2 {
   text-align: center;
-  color: #333;
+  color: var(--text-primary);
   margin-bottom: 1.5rem;
+  transition: color 0.3s ease;
 }
 
 .profile-info {
@@ -106,17 +120,19 @@ h2 {
 }
 
 label {
-  color: #666;
+  color: var(--text-secondary);
   font-size: 0.9rem;
+  transition: color 0.3s ease;
 }
 
 p {
-  color: #333;
+  color: var(--text-primary);
   font-size: 1rem;
   margin: 0;
   padding: 0.5rem;
-  background-color: #f8f8f8;
+  background-color: var(--hover-bg);
   border-radius: 4px;
+  transition: all 0.3s ease;
 }
 
 .logout-button {
@@ -153,7 +169,8 @@ p {
   height: 100px;
   border-radius: 50%;
   object-fit: cover;
-  border: 2px solid #ddd;
+  border: 2px solid var(--border-primary);
+  transition: border-color 0.3s ease;
 }
 
 .avatar-input {

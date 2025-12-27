@@ -26,6 +26,26 @@ const routes = [
     meta: { requiresAuth: true },
   },
   {
+    path: '/user-management',
+    name: 'UserManagement',
+    component: () => import('../views/admin/user/UserManagement.vue'),
+    meta: { requiresAuth: true },
+  },
+  {
+    path: '/department-management',
+    name: 'DepartmentManagement',
+    component: () =>
+      import('../views/admin/department/DepartmentManagement.vue'),
+    meta: { requiresAuth: true },
+  },
+  {
+    path: '/organization-management',
+    name: 'OrganizationManagement',
+    component: () =>
+      import('../views/admin/organization/OrganizationManagement.vue'),
+    meta: { requiresAuth: true },
+  },
+  {
     path: '/chat-view/:typeChat/:chatKey',
     name: 'chat-view',
     component: () => import('../views/chat-view/ChatView.vue'),
@@ -33,9 +53,13 @@ const routes = [
   },
   {
     path: '/:pathMatch(.*)*',
-    name: 'NotFound',
-    component: () => import('../views/NotFound.vue'),
-    meta: { requiresAuth: true },
+    name: '404',
+    component: () => import('../views/error/404.vue'),
+  },
+  {
+    path: '/:pathMatch(.*)*',
+    name: '403',
+    component: () => import('../views/error/403.vue'),
   },
 ]
 
@@ -45,7 +69,8 @@ const router = createRouter({
 })
 
 router.beforeEach(async (to, from, next) => {
-  const isAuthenticated = localStorageUtils.get('token') == null ? false : true
+  const isAuthenticated =
+    localStorageUtils.get('userInfo')?.accessToken == null ? false : true
   if (to.meta.requiresAuth && !isAuthenticated) {
     next({ name: 'Login', query: { redirect: to.fullPath } })
     return

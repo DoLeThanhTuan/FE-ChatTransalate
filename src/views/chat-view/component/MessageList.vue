@@ -19,13 +19,14 @@
       <template v-if="msg.type === 'MESSAGE'">
         <div
           class="message"
-          :class="{ 'message-own': msg.fromUser === authStore.userInfo.id }"
+          :class="{ 'message-own': msg.fromUser === authStore.userInfo().id }"
         >
-          <img
-            v-if="msg.fromUser !== authStore.userInfo.id"
-            class="avatar"
-            :src="getURLAvatar(msg.avatar)"
-            alt="avatar"
+          <Avatar
+            v-if="msg.fromUser !== authStore.userInfo().id"
+            :avatar="msg.avatar"
+            :status="userStore.usersDict[msg.fromUser]?.status"
+            size="large"
+            :show-status="true"
           />
           <div class="msg-content">
             <div class="msg-header">
@@ -83,24 +84,68 @@
               </span>
             </div>
           </div>
-          <img
-            v-if="msg.fromUser === authStore.userInfo.id"
-            class="avatar"
-            :src="getURLAvatar(msg.avatar)"
-            alt="avatar"
+          <Avatar
+            v-if="msg.fromUser === authStore.userInfo().id"
+            :avatar="msg.avatar"
+            :status="userStore.usersDict[msg.fromUser]?.status"
+            size="large"
+            :show-status="true"
           />
           <DropdownMenu
-            v-if="msg.fromUser === authStore.userInfo.id"
+            :is-own="msg.fromUser === authStore.userInfo().id"
             :data="msg"
+            :can-edit="msg.fromUser === authStore.userInfo().id"
+            :can-delete="msg.fromUser === authStore.userInfo().id"
             :can-detail="false"
+            :can-translate="msg.contentOriginal == null"
+            :can-return="msg.contentOriginal != null"
             @edit="editMessage"
             @delete="clickDeleteMessage"
+            @translate="handleTranslate"
+            @return="handleReturn"
+          />
+        </div>
+      </template>
+      <template v-else-if="msg.type === 'DELETE_MESSAGE'">
+        <div
+          class="message"
+          :class="{ 'message-own': msg.fromUser === authStore.userInfo().id }"
+        >
+          <Avatar
+            v-if="msg.fromUser !== authStore.userInfo().id"
+            :avatar="msg.avatar"
+            :status="userStore.usersDict[msg.fromUser]?.status"
+            size="large"
+            :show-status="true"
+          />
+          <div class="msg-content">
+            <div class="msg-header">
+              <span class="msg-user">{{
+                userStore.usersDict[msg.fromUser].name
+              }}</span>
+              <span class="msg-time">
+                {{ formatDate(msg.createdAt) }}
+              </span>
+            </div>
+            <div class="msg-text msg-text-delete">Tin nhắn này đã được xóa</div>
+          </div>
+          <Avatar
+            v-if="msg.fromUser === authStore.userInfo().id"
+            :avatar="msg.avatar"
+            :status="userStore.usersDict[msg.fromUser]?.status"
+            size="large"
+            :show-status="true"
           />
         </div>
       </template>
       <template v-else>
         <div class="system-message">
-          <img :src="getURLAvatar(msg.avatar)" class="system-avatar" />
+          <Avatar
+            :avatar="msg.avatar"
+            :status="userStore.usersDict[msg.fromUser]?.status"
+            size="medium"
+            :show-status="true"
+          />
           <span class="system-name">{{
             userStore.usersDict[msg.fromUser].name
           }}</span>
@@ -112,42 +157,49 @@
     </div>
     <ModalConfirmDelete
       :visible="isShowModalDelete"
+      :id="deleteMessageId"
       message="Bạn chắc chắn muốn xóa tin nhắn này không?"
       @confirm="confirmDeleteMessage"
       @cancel="cancelDeleteMessage"
     />
+    <VueLoading v-model:active="isLoading" :can-cancel="false" loader="dots" />
   </div>
 </template>
 
 <script setup>
 import ModalConfirmDelete from '../../../components/common/ModalConfirmDelete.vue'
-import DropdownMenu from '../../../components/common/DropdownMenu.vue'
+import DropdownMenu from '../../../components/common/DropdownMenuMessage.vue'
 import { ref, onMounted, onUnmounted, computed, nextTick, watch } from 'vue'
 import { messageApi } from '@/axios/api-services/messageApi'
 import { formatDate } from '@/utils/date'
 import localStorageUtils from '@/utils/localStorageUtils'
 import {
   connectSocket,
-  disconnectSocket,
   subscribeSocket,
+  subscribeSocketNotification,
 } from '@/socket/socketService'
 import { useAuthStore } from '@/stores/authStore'
 import { useChannelStore } from '@/stores/channelStore'
 import { useUserChatStore } from '@/stores/userChatStore'
 import { useUserStore } from '@/stores/userStore'
-import { getURLAvatar } from '@/utils/image'
+import Avatar from '@/components/common/Avatar.vue'
 import {
   removeVietnameseTones,
   convertMessageMultilanguage,
 } from '@/utils/string'
 import { Status, TypeChat, URLMessage } from '@/config/enum'
-import { useRoute } from 'vue-router'
+import { useRoute, useRouter } from 'vue-router'
+import { toast } from 'vue3-toastify'
+import { aiApi } from '@/axios/api-services/aiApi'
+import { showChatNotification } from '@/utils/notification'
 
 const authStore = useAuthStore()
 const channelStore = useChannelStore()
 const userChatStore = useUserChatStore()
 const userStore = useUserStore()
 const route = useRoute()
+const router = useRouter()
+const isLoading = ref(false)
 
 // Reactive state
 const messages = ref([])
@@ -162,7 +214,7 @@ const editedContent = ref('')
 
 // New state for message delete
 const isShowModalDelete = ref(false)
-const deleteMessageId = ref(null)
+const deleteMessageId = ref('')
 
 // Connection state
 const isConnected = ref(false)
@@ -213,7 +265,7 @@ const handleDisconnect = () => {
 const handleConnectSuccess = async () => {
   isConnected.value = true
   clearError()
-
+  subscribeGeneral()
   try {
     if (isChannelChat.value && currentChannelId.value) {
       await fetchMessagesChannel(true)
@@ -248,15 +300,96 @@ const handleConnectionError = (error) => {
   handleDisconnect()
 }
 
+const isViewingThisChat = (message) => {
+  const typeChatMessageNotification = message.channelId
+    ? TypeChat.CHANNEL
+    : TypeChat.USER
+  const typeChatCurrent = route.params.typeChat
+  const chatKeyCurrent = route.params.chatKey
+  if (typeChatCurrent == typeChatMessageNotification) {
+    if (typeChatMessageNotification == TypeChat.USER) {
+      return message.fromUser == chatKeyCurrent
+    } else {
+      return message.channelId == chatKeyCurrent
+    }
+  } else {
+    return false
+  }
+}
+
 const handleReceiveMessage = (message) => {
   const index = messages.value.findIndex((m) => m.id === message.id)
   if (index !== -1) {
     messages.value[index].content = message.content
     messages.value[index].isEdit = true
+    messages.value[index].type = message.type
   } else {
-    messages.value.push(message)
+    if (
+      message.type == Status.REMOVE_MEMBER ||
+      message.type == Status.JOIN_CHANNEL ||
+      message.type == Status.LEAVE_CHANNEL
+    ) {
+      channelStore.updateMemberChannel(message)
+    }
+    if (message.channelId) {
+      messages.value.push(message)
+    } else if (
+      (message.toUser == authStore.userInfo().id ||
+        message.fromUser == authStore.userInfo().id) &&
+      (route.params.chatKey == message.toUser ||
+        route.params.chatKey == message.fromUser)
+    ) {
+      messages.value.push(message)
+    }
     scrollToBottom()
   }
+}
+
+const handleNotification = (message) => {
+  if (message.isNew && isNotificationOwn(message)) {
+    if (message.fromUser != authStore.userInfo().id) {
+      message.fromName = userStore.usersDict[message.fromUser].name
+      if (message.channelId) {
+        const channelMessage = channelStore.channelsDict[message.channelId]
+        if (channelMessage) {
+          message.channelName = channelMessage.name
+        }
+      }
+      if (message.type != Status.MESSAGE) {
+        message.content = convertMessageMultilanguage(message)
+      }
+      showChatNotification(message, (typeChat, chatKey) => {
+        router.push(`/chat-view/${typeChat}/${chatKey}`)
+      })
+    }
+  }
+}
+
+const isNotificationOwn = (message) => {
+  var isNotification = false
+  var ofCurrentUser = false
+  if (message.fromUser == authStore.userInfo().id) {
+    return isNotification
+  }
+  const typeChatNotification = message.channelId
+    ? TypeChat.CHANNEL
+    : TypeChat.USER
+  if (typeChatNotification == TypeChat.CHANNEL) {
+    const isChannelOwn = channelStore.channelsDict[message.channelId]
+    if (isChannelOwn) {
+      ofCurrentUser = true
+    }
+  } else {
+    ofCurrentUser = message.toUser == authStore.userInfo().id
+  }
+  if (ofCurrentUser) {
+    isNotification = !isViewingThisChat(message)
+  }
+  return isNotification
+}
+
+const subscribeGeneral = () => {
+  subscribeSocketNotification(`${URLMessage.GENERAL}`, handleNotification)
 }
 
 const subscribeToChannel = () => {
@@ -413,7 +546,7 @@ const handleKeyDown = (event) => {
 
 const editMessage = (msg) => {
   // Chỉ cho phép chỉnh sửa tin nhắn của chính mình và không phải tin nhắn hệ thống
-  if (msg.fromUser === authStore.userInfo.id && msg.type === 'MESSAGE') {
+  if (msg.fromUser === authStore.userInfo().id && msg.type === 'MESSAGE') {
     editingMessageId.value = msg.id
     editedContent.value = msg.content // Tải nội dung hiện tại
     nextTick(() => {
@@ -484,6 +617,46 @@ const updateMessage = async (messageId, newContent) => {
 
 // --- End Message Editing Logic ---
 
+const handleTranslate = async (msg) => {
+  isLoading.value = true
+  const langs = [
+    { value: 'ENGLISH', label: 'EN' },
+    { value: 'VIETNAMESE', label: 'VI' },
+    { value: 'JAPAN', label: 'JP' },
+  ]
+  const language = langs.find(
+    (l) => l.label === localStorageUtils.get('language').toUpperCase()
+  )
+  try {
+    const params = {
+      language: language.value,
+      content: msg.content,
+    }
+    const response = await aiApi.translateMessage(params)
+    if (!response.data.success) {
+      toast.error('Có lỗi xảy ra vui lòng thử lại')
+    } else {
+      const index = messages.value.findIndex((m) => m.id === msg.id)
+      messages.value[index].isOriginal = false
+      messages.value[index].contentOriginal = messages.value[index].content
+      messages.value[index].content = response.data.content
+    }
+  } catch {
+    console.error('Translate error!')
+    toast.error('Có lỗi xảy ra vui lòng thử lại')
+  } finally {
+    isLoading.value = false
+  }
+}
+
+const handleReturn = async (msg) => {
+  isLoading.value = true
+  const index = messages.value.findIndex((m) => m.id === msg.id)
+  messages.value[index].content = messages.value[index].contentOriginal
+  messages.value[index].contentOriginal = null
+  isLoading.value = false
+}
+
 // --- Start Message Delete Logic ---
 const clickDeleteMessage = (data) => {
   isShowModalDelete.value = true
@@ -498,23 +671,27 @@ const cancelDeleteMessage = () => {
 const confirmDeleteMessage = (msgId) => {
   if (msgId != null) {
     try {
+      isLoading.value = true
       if (typeChat.value == TypeChat.CHANNEL) {
         channelStore.sendMessageToChannel({
           id: msgId,
-          content: '',
+          content: '{DELETE_MESSAGE}',
           channelId: route.params.chatKey,
           type: Status.DELETE_MESSAGE,
         })
       } else {
         userChatStore.sendMessageToUser({
           id: msgId,
-          content: '',
+          content: '{DELETE_MESSAGE}',
           userId: route.params.chatKey,
           type: Status.DELETE_MESSAGE,
         })
       }
     } catch (error) {
       console.error('Error delete message:', error)
+    } finally {
+      isShowModalDelete.value = false
+      isLoading.value = false
     }
   }
 }
@@ -586,9 +763,6 @@ onUnmounted(() => {
   if (reconnectTimeout.value) {
     clearTimeout(reconnectTimeout.value)
   }
-
-  // Disconnect WebSocket
-  disconnectSocket()
 })
 
 // Watchers
@@ -747,7 +921,7 @@ watch(
   background: #e3f2fd;
 }
 
-.message-own .avatar {
+.message-own .avatar-wrapper {
   order: 2;
 }
 
@@ -820,6 +994,11 @@ watch(
   white-space: pre-wrap;
   word-break: break-word;
   overflow-wrap: break-word;
+}
+
+.msg-text-delete {
+  color: #ff8c8c !important;
+  font-style: italic;
 }
 
 .message-own .msg-text {

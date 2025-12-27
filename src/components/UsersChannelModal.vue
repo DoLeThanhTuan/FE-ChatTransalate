@@ -9,48 +9,177 @@
 
       <!-- Body -->
       <div class="modal-body">
-        <template v-if="members && members.length">
-          <ul class="member-list">
-            <li
-              v-for="user in members"
-              :key="user.id"
-              class="member-item flex items-center gap-3"
-            >
-              <img
-                :src="getURLAvatar(user.avatar)"
-                alt="avatar"
-                class="member-avatar"
-              />
-              <div class="flex flex-col gap-1">
-                <span class="member-name">{{ user.name }}</span>
-                <small class="member-username">{{ user.email }}</small>
-              </div>
-            </li>
-          </ul>
-        </template>
+        <div class="tabs">
+          <button
+            type="button"
+            class="tab-btn"
+            :class="{ active: activeTab === 'members' }"
+            @click="activeTab = 'members'"
+          >
+            <font-awesome-icon :icon="['fas', 'user-tie']" /> Thành viên
+          </button>
+          <button
+            type="button"
+            class="tab-btn"
+            :class="{ active: activeTab === 'add' }"
+            @click="activeTab = 'add'"
+          >
+            + Thêm thành viên
+          </button>
+        </div>
 
-        <template v-else>
-          <p class="text-center text-secondary">Không có thành viên nào</p>
-        </template>
+        <div v-if="activeTab === 'members'">
+          <template v-if="members && members.length">
+            <ul class="member-list">
+              <li
+                v-for="user in members"
+                :key="user.id"
+                class="member-item flex items-center justify-between"
+              >
+                <div class="flex items-center gap-3">
+                  <Avatar
+                    :avatar="user.avatar"
+                    :status="user.status"
+                    size="medium"
+                    :show-status="true"
+                  />
+                  <div class="flex flex-col gap-1">
+                    <span class="member-name">{{ user.name }}</span>
+                    <small class="member-username">{{ user.email }}</small>
+                  </div>
+                </div>
+                <DropdownMenu
+                  :data="user"
+                  :can-remove="!channelStore.channelCurrent?.isDefault"
+                  @remove="handleRemove"
+                  @chat="handleChatPrive"
+                />
+              </li>
+            </ul>
+          </template>
+
+          <template v-else>
+            <p class="text-center text-secondary">Không có thành viên nào</p>
+          </template>
+        </div>
+
+        <div v-else class="add-member-panel">
+          <div class="candidate-search flex gap-2">
+            <input
+              v-model.trim="searchKeyword"
+              type="text"
+              placeholder="Tìm theo tên hoặc email..."
+            />
+            <button class="btn primary" type="button">Tìm</button>
+          </div>
+          <div class="divider"></div>
+
+          <div v-if="filteredCandidates.length" class="candidate-list">
+            <label
+              v-for="user in filteredCandidates"
+              :key="user.id"
+              class="candidate-item"
+            >
+              <input
+                type="checkbox"
+                :value="user.id"
+                v-model="selectedCandidateIds"
+              />
+              <Avatar :avatar="user" size="small" />
+              <div class="candidate-info">
+                <span class="candidate-name">{{ user.name }}</span>
+                <small class="candidate-email">{{ user.email }}</small>
+              </div>
+            </label>
+          </div>
+          <p v-else class="empty-state">Không tìm thấy</p>
+        </div>
       </div>
 
       <!-- Footer -->
-      <div class="modal-actions">
+      <div class="modal-actions gap-2">
         <button class="modal-cancel-btn" @click="$emit('close')">Đóng</button>
+        <button
+          class="btn primary"
+          type="button"
+          @click="handleAddMembers"
+          :disabled="!selectedCandidateIds.length"
+        >
+          Xác nhận
+        </button>
       </div>
     </div>
   </div>
 </template>
 
 <script setup>
-import { getURLAvatar } from '@/utils/image'
+import DropdownMenu from './common/DropdownMenuUser.vue'
+import Avatar from './common/Avatar.vue'
+import { computed, ref, watch } from 'vue'
+import { useRouter } from 'vue-router'
+import { TypeChat } from '@/config/enum'
+import { useAuthStore } from '@/stores/authStore'
+import { useChannelStore } from '@/stores/channelStore'
 
 const props = defineProps({
   visible: { type: Boolean, default: false },
+  channelId: { type: [String, Number], required: true },
   members: { type: Array, default: () => [] },
+  availableUsers: { type: Array, default: () => [] },
 })
 
-const emit = defineEmits(['close'])
+const emit = defineEmits(['close', 'add-members'])
+const router = useRouter()
+const activeTab = ref('members')
+const searchKeyword = ref('')
+const selectedCandidateIds = ref([])
+const authStore = useAuthStore()
+const channelStore = useChannelStore()
+
+const memberIds = computed(
+  () => new Set((props.members || []).map((member) => member.id))
+)
+
+const filteredCandidates = computed(() => {
+  const keyword = searchKeyword.value.toLowerCase()
+  return (props.availableUsers || [])
+    .filter((user) => !memberIds.value.has(user.id))
+    .filter((user) => {
+      if (!keyword) return true
+      const name = user.name?.toLowerCase() || ''
+      const email = user.email?.toLowerCase() || ''
+      return name.includes(keyword) || email.includes(keyword)
+    })
+})
+
+const handleRemove = (user) => {
+  // Gửi socket message đến với format @UserCurrent {REMOVED} @UserWasRemoved
+  // console.log(`${authStore.userInfo().id} đã xóa ${user.id}`)
+  channelStore.removeMemberFromChannel(channelStore.channelCurrent.id, [
+    user.id,
+  ])
+}
+
+const handleChatPrive = (user) => {
+  router.push(`/chat-view/${TypeChat.USER}/${user.id}`)
+  emit('close')
+}
+
+const handleAddMembers = () => {
+  emit('add-members', [...selectedCandidateIds.value])
+  selectedCandidateIds.value = []
+}
+
+watch(
+  () => props.visible,
+  (v) => {
+    if (!v) {
+      activeTab.value = 'members'
+      searchKeyword.value = ''
+      selectedCandidateIds.value = []
+    }
+  }
+)
 </script>
 
 <style scoped>
@@ -114,7 +243,40 @@ const emit = defineEmits(['close'])
 
 /* Body */
 .modal-body {
-  padding: 1rem 1.5rem;
+  padding: 0.5rem 1.5rem;
+}
+.tabs {
+  display: flex;
+  gap: 0.4rem;
+  margin-bottom: 0.75rem;
+  padding: 0.25rem;
+  background: var(--bg-tab);
+  border-radius: 999px;
+}
+.tab-btn {
+  flex: 1;
+  border: none;
+  background: transparent;
+  color: var(--text-secondary);
+  padding: 0.45rem 0.8rem;
+  border-radius: 999px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s, color 0.2s;
+}
+.tab-btn.active {
+  background: var(--bg-secondary);
+  color: var(--text-primary);
+}
+.tab-btn:not(.active):hover {
+  background: rgba(255, 255, 255, 0.04);
+}
+.divider {
+  margin: 1rem 0;
+  height: 1px;
+  background: var(--border-primary);
+  opacity: 0.6;
 }
 .member-list {
   list-style: none;
@@ -125,13 +287,6 @@ const emit = defineEmits(['close'])
   padding: 0.6rem 0;
   border-bottom: 1px solid var(--border-primary);
 }
-.member-avatar {
-  width: 40px;
-  height: 40px;
-  border-radius: 50%;
-  border: 2px solid var(--border-primary, #e0e0e0);
-  object-fit: cover;
-}
 .member-name {
   font-weight: 600;
   color: var(--text-primary);
@@ -139,6 +294,95 @@ const emit = defineEmits(['close'])
 .member-username {
   color: var(--text-secondary);
   font-size: 0.85rem;
+}
+.add-member-panel {
+  margin-top: 1rem;
+  display: flex;
+  flex-direction: column;
+}
+.panel-header h3 {
+  margin: 0;
+  font-size: 1.05rem;
+}
+.panel-header p {
+  margin: 0.2rem 0 0;
+  color: var(--text-secondary);
+  font-size: 0.9rem;
+}
+.candidate-search input {
+  width: 100%;
+  border: 1px solid var(--border-primary);
+  border-radius: 8px;
+  padding: 0.6rem 0.8rem;
+  background: var(--bg-tertiary);
+  color: var(--text-primary);
+}
+.candidate-list {
+  max-height: 220px;
+  overflow-y: auto;
+  border: 1px solid var(--border-primary);
+  border-radius: 8px;
+  padding: 0.4rem;
+  background: var(--bg-secondary);
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+.candidate-item {
+  display: flex;
+  align-items: center;
+  gap: 0.7rem;
+  padding: 0.45rem 0.5rem;
+  border-radius: 6px;
+  transition: background 0.2s;
+}
+.candidate-item:hover {
+  background: var(--hover-bg);
+}
+.candidate-name {
+  font-weight: 600;
+  color: var(--text-primary);
+}
+.candidate-email {
+  color: var(--text-secondary);
+}
+.empty-state {
+  margin: 0;
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+  text-align: center;
+  padding: 0.5rem 0;
+}
+.panel-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.75rem;
+}
+.btn {
+  border: none;
+  border-radius: 8px;
+  padding: 0.6rem 1.2rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: opacity 0.2s;
+}
+.btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+.btn.primary {
+  background: #1ed760;
+  color: #fff;
+}
+.btn.primary:hover:not(:disabled) {
+  filter: brightness(0.95);
+}
+.btn.subtle {
+  background: var(--bg-tertiary);
+  color: var(--text-secondary);
+}
+.btn.subtle:hover:not(:disabled) {
+  filter: brightness(0.95);
 }
 
 /* Footer */

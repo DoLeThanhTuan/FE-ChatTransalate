@@ -6,7 +6,8 @@
           "BTN_EDIT": "Edit",
           "BTN_DELETE": "Delete",
           "BTN_DETAIL": "Detail",
-          "BTN_TRANSLATE": "Translate"
+          "BTN_TRANSLATE": "Translate",
+          "BTN_ORIGINAL": "Original"
         }
       },
       "MODAL_CONFIRM_DELETE": {

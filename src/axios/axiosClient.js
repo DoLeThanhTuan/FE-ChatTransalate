@@ -1,9 +1,8 @@
-import axios from "axios";
+import axios from 'axios'
 import { handleErrorNavigation } from '@/utils/handlerError.js'
 
-
 const axiosInstance = axios.create({
-    baseURL: import.meta.env.VITE_API_URL,
+  baseURL: import.meta.env.VITE_API_URL,
 })
 
 // axiosInstance.defaults.headers.common['Access-Control-Allow-Origin'] = '*';
@@ -12,23 +11,23 @@ const axiosInstance = axios.create({
 
 // Add a request interceptor
 axiosInstance.interceptors.request.use(
-    (config) => {
-        return config;
-    },
-    (error) => {
-        return Promise.reject(error);
-    }
-);
+  (config) => {
+    return config
+  },
+  (error) => {
+    return Promise.reject(error)
+  }
+)
 
 // Add a response interceptor
 axiosInstance.interceptors.response.use(
-    (response) => {
-        return response;
-    },
-    (error) => {
-        handleErrorNavigation(error);
-        return Promise.reject(error)
-    }
+  (response) => {
+    return response
+  },
+  (error) => {
+    handleErrorNavigation(error)
+    return Promise.reject(error)
+  }
 )
 
-export default axiosInstance 
+export default axiosInstance

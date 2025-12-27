@@ -1,6 +1,6 @@
 import { defineStore } from 'pinia'
 import { channelApi } from '@/axios/api-services/channelApi'
-import { ref } from 'vue'
+import { computed, ref } from 'vue'
 import { toast } from 'vue3-toastify'
 import { send } from '@/socket/socketService'
 import { Status, URLMessage } from '@/config/enum'
@@ -8,6 +8,12 @@ import { Status, URLMessage } from '@/config/enum'
 export const useChannelStore = defineStore('channel', () => {
   const channelCurrent = ref({})
   const channels = ref([])
+  const channelsDict = computed(() =>
+    channels.value.reduce((item, channel) => {
+      item[channel.id] = channel
+      return item
+    }, {})
+  )
 
   const fetchChannelById = async (channelId) => {
     try {
@@ -56,6 +62,68 @@ export const useChannelStore = defineStore('channel', () => {
       return res.data
     } catch (e) {
       console.error(e)
+    }
+  }
+
+  // const addMemberIntoChannel = async (channelId, userIds) => {
+  //   try {
+  //     const params = {
+  //       channelId: channelId,
+  //       userIds: userIds,
+  //     }
+  //     const res = await channelApi.addMemberIntoChannel(params)
+  //     await sendMessageToChannel({
+  //       content: `{${Status.LEAVE_CHANNEL}}`,
+  //       channelId: channelCurrent.value.id,
+  //       type: Status.LEAVE_CHANNEL,
+  //     })
+  //     await fetchChannel()
+  //     return res.data
+  //   } catch (e) {
+  //     console.error(e)
+  //   }
+  // }
+
+  const removeMemberFromChannel = async (channelId, userIds) => {
+    try {
+      const params = {
+        channelId: channelId,
+        userIds: userIds,
+      }
+      const res = await channelApi.removeMemberFromChannel(params)
+      await sendMessageToChannel({
+        content: `{${Status.REMOVE_MEMBER}}${params.userIds}`,
+        channelId: channelCurrent.value.id,
+        type: Status.REMOVE_MEMBER,
+      })
+      channelCurrent.value.members = channelCurrent.value.members.filter(
+        (member_id) => !userIds.includes(member_id)
+      )
+      return res.data
+    } catch (e) {
+      console.error(e)
+    }
+  }
+
+  const updateMemberChannel = async (message) => {
+    var actionUserIds = []
+    if (message.type == Status.REMOVE_MEMBER) {
+      actionUserIds = message.content.replace(`{${Status.REMOVE_MEMBER}}`, '')
+      actionUserIds = actionUserIds.split(',')
+      channelCurrent.value.members = channelCurrent.value.members.filter(
+        (member_id) => !actionUserIds.includes(member_id)
+      )
+    } else if (message.type == Status.JOIN_CHANNEL) {
+      const index = channelCurrent.value.members.findIndex(
+        (member) => member == message.fromUser
+      )
+      if (index === -1) {
+        channelCurrent.value.members.push(message.fromUser)
+      }
+    } else if (message.type == Status.LEAVE_CHANNEL) {
+      channelCurrent.value.members = channelCurrent.value.members.filter(
+        (member) => member !== message.fromUser
+      )
     }
   }
 
@@ -122,10 +190,13 @@ export const useChannelStore = defineStore('channel', () => {
   return {
     channelCurrent,
     channels,
+    channelsDict,
     fetchChannelById,
     fetchChannel,
     createChannel,
     leaveChannel,
+    removeMemberFromChannel,
+    updateMemberChannel,
     searchChannel,
     joinChannel,
     getUserName,

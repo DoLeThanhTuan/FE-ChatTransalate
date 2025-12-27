@@ -36,6 +36,7 @@
         class="border-2 btn-translate cursor-pointer bg-[#f3f4f8]"
         @click="showTranslateModal = true"
       >
+        <font-awesome-icon icon="fa-solid fa-language" />
         {{ $t('COMPONENT.CHAT_VIEW.SIDE_BAR.BUTTON.BTN_TRANSLATE') }}
       </button>
       <textarea
@@ -65,6 +66,20 @@
         </div>
       </div>
       <div class="msg-actions">
+        <select
+          v-model="languageSend"
+          class="border-2 btn-translate cursor-pointer bg-[#f3f4f8]"
+        >
+          <option
+            v-for="lang in languages"
+            :key="lang.value"
+            :value="lang.value"
+          >
+            ⇄
+            {{ lang.label }}
+          </option>
+        </select>
+
         <div class="emoji-picker-container">
           <button class="action-btn" @click="toggleEmojiPicker">😊</button>
           <div v-if="showEmojiPicker" class="emoji-picker">
@@ -118,6 +133,7 @@
     <TranslateModal
       :visible="showTranslateModal"
       :content="message.content"
+      :language-default="languageSend"
       @close="showTranslateModal = false"
       @confirm="handleTranslate"
     />
@@ -133,13 +149,20 @@ import { removeVietnameseTones } from '@/utils/string'
 import { useUserChatStore } from '@/stores/userChatStore'
 import { useUserStore } from '@/stores/userStore'
 import { useRoute } from 'vue-router'
-import { TypeChat, Language } from '@/config/enum'
+import { TypeChat } from '@/config/enum'
 import TranslateModal from '../../../components/TranslateModal.vue'
 
 const message = ref({
   content: '',
   language: 'VI',
 })
+const languages = ref([
+  { value: '', label: 'N/A' },
+  { value: 'ENGLISH', label: 'EN' },
+  { value: 'VIETNAMESE', label: 'VI' },
+  { value: 'JAPAN', label: 'JP' },
+])
+const languageSend = ref('')
 const textareaRef = ref(null)
 const showEmojiPicker = ref(false)
 const selectedFiles = ref([])

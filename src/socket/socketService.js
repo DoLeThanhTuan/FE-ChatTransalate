@@ -3,6 +3,7 @@ import { Client } from '@stomp/stompjs'
 
 let stompClient = null
 let currentSubscription = null
+let currentSubscriptionNotification = null
 let urlSocket = 'http://localhost:8000/ws'
 
 export const connectSocket = (
@@ -11,6 +12,10 @@ export const connectSocket = (
   onDisconnect,
   onError
 ) => {
+  if (token == null) {
+    disconnectSocket()
+    return
+  }
   return new Promise((resolve, reject) => {
     const socket = new SockJS(`${urlSocket}?token=${token}`)
     stompClient = new Client({
@@ -59,6 +64,31 @@ export const subscribeSocket = (urlSubcribe, onMessageCallback) => {
   console.log(urlSubcribe)
 }
 
+export const subscribeSocketNotification = (
+  urlSubcribeNotification,
+  onMessageCallback
+) => {
+  if (!stompClient || !stompClient.connected) {
+    console.warn('Cannot subscribe because socket is not connected')
+    return
+  }
+
+  // Hủy subscription cũ nếu có
+  if (currentSubscription) {
+    currentSubscription.unsubscribe()
+  }
+
+  // Tạo subscription mới
+  currentSubscriptionNotification = stompClient.subscribe(
+    urlSubcribeNotification,
+    (message) => {
+      const parsed = JSON.parse(message.body)
+      onMessageCallback(parsed)
+    }
+  )
+  console.log(urlSubcribeNotification)
+}
+
 export const disconnectSocket = () => {
   if (currentSubscription) {
     currentSubscription.unsubscribe()
@@ -69,6 +99,7 @@ export const disconnectSocket = () => {
     stompClient.deactivate()
     stompClient = null
   }
+  console.log('disconnected')
 }
 
 export const send = (destination, message) => {

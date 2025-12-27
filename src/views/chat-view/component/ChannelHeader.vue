@@ -23,6 +23,7 @@
             <span>Channel Details</span>
           </button>
           <button
+            v-if="!channelStore.channelCurrent?.isDefault"
             @click="handleLeaveChannel()"
             class="dropdown-item dropdown-item-danger"
           >
@@ -37,6 +38,7 @@
       </span>
       <UsersChannelModal
         :visible="showMembers"
+        :channel-id="channelStore.channelCurrent.id"
         :members="
           userStore.getUsersByIds(channelStore.channelCurrent?.members || [])
         "
@@ -76,12 +78,12 @@
     </div>
     <div class="header-right">
       <ThemeToggle />
-      <span class="member-count">{{ authStore.userInfo.name }}</span>
+      <span class="member-count">{{ authStore.userInfo().name }}</span>
 
       <div class="dropdown">
         <img
           class="avatar"
-          :src="getURLAvatar(authStore.userInfo.avatar)"
+          :src="getURLAvatar(authStore.userInfo().avatar)"
           alt="avatar"
         />
         <div class="dropdown-content">
@@ -107,7 +109,7 @@ import { TypeChat } from '@/config/enum'
 import { useRoute } from 'vue-router'
 import { useUserStore } from '@/stores/userStore'
 import UsersChannelModal from '../../../components/UsersChannelModal.vue'
-
+import { disconnectSocket } from '@/socket/socketService'
 const route = useRoute()
 const router = useRouter()
 const authStore = useAuthStore()
@@ -130,9 +132,10 @@ const handleClickOutside = (event) => {
   }
 }
 
-const handleLogout = () => {
+const handleLogout = async () => {
+  disconnectSocket()
   authStore.clearAuth()
-  router.push('/login')
+  window.location.replace('/login')
 }
 
 const handleLeaveChannel = async () => {
