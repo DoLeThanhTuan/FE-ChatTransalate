@@ -59,6 +59,7 @@ import { toast } from 'vue3-toastify'
 const props = defineProps({
   visible: { type: Boolean, default: false },
   content: { type: String, default: '' },
+  languageDefault: { type: String, default: '' },
   languages: {
     type: Array,
     default: () => [
@@ -73,7 +74,7 @@ const emit = defineEmits(['close', 'confirm'])
 const isLoading = ref(false)
 const sourceText = ref('')
 const translatedText = ref('')
-const selectedLanguage = ref('ENGLISH')
+const selectedLanguage = ref(props.languageDefault)
 
 watch(
   () => props.visible,
@@ -81,7 +82,7 @@ watch(
     if (v) {
       sourceText.value = props.content || ''
       translatedText.value = ''
-      selectedLanguage.value = 'ENGLISH'
+      selectedLanguage.value = props.languageDefault || 'ENGLISH'
     }
   }
 )

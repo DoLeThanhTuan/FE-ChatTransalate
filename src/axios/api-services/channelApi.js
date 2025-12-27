@@ -24,6 +24,24 @@ export const channelApi = {
       headers: { ...setHeader() },
     })
   },
+  addMemberIntoChannel: async (params) => {
+    return await axiosClient.post(
+      ENDPOINT + `/member/add/${params.channelId}`,
+      params,
+      {
+        headers: { ...setHeader() },
+      }
+    )
+  },
+  removeMemberFromChannel: async (params) => {
+    return await axiosClient.post(
+      ENDPOINT + `/member/remove/${params.channelId}`,
+      params,
+      {
+        headers: { ...setHeader() },
+      }
+    )
+  },
   joinChannel: async (channelId) => {
     return await axiosClient.get(ENDPOINT + `/join/${channelId}`, {
       headers: { ...setHeader() },

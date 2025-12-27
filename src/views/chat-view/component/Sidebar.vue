@@ -68,7 +68,7 @@
       <ul v-if="isShowUser">
         <template v-for="(user, index) in userStore.users" :key="user.email">
           <li
-            v-if="user.id != authStore.userInfo.id"
+            v-if="user.id != authStore.userInfo().id"
             @click="handleUserClick(user.id)"
             class="user"
             :class="{
@@ -78,10 +78,11 @@
             }"
           >
             <div class="user-item">
-              <img
-                class="avatar"
-                :src="getURLAvatar(user.avatar)"
-                alt="avatar"
+              <Avatar
+                :avatar="user.avatar"
+                :status="user.status"
+                size="small"
+                :show-status="true"
               />
               {{ user.name }}
             </div>
@@ -102,7 +103,7 @@ import { useChannelStore } from '@/stores/channelStore'
 import { TypeChat } from '@/config/enum'
 import { useUserStore } from '@/stores/userStore'
 import { useAuthStore } from '@/stores/authStore'
-import { getURLAvatar } from '@/utils/image'
+import Avatar from '@/components/common/Avatar.vue'
 
 const route = useRoute()
 const router = useRouter()
@@ -200,10 +201,6 @@ ul {
   display: flex;
   align-items: center;
   gap: 1rem;
-}
-.user-item .avatar {
-  width: 30px;
-  height: 30px;
 }
 .icon-right {
   font-size: 0.9rem;

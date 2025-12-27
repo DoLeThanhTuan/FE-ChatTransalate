@@ -15,6 +15,7 @@ const URLMessage = Object.freeze({
   CHANNEL: '/app/chat/send',
   RECEIVE_USER_MESSAGE: '/user/queue/private',
   USER: '/app/chat/private',
+  GENERAL: '/topic/messages/general',
 })
 
 const Language = Object.freeze([
@@ -29,10 +30,6 @@ const Language = Object.freeze([
   {
     value: 'JP',
     name: 'JP',
-  },
-  {
-    value: 'CHINESE',
-    name: 'CHINESE',
   },
 ])
 

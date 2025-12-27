@@ -153,8 +153,8 @@ const handleRegister = async () => {
     const response = await authApi.signup(formData)
 
     if (response.status == 200) {
-      toast.success('Đăng ký thành công! Vui lòng đăng nhập.')
       router.push('/login')
+      toast.success('Đăng ký thành công! Vui lòng đăng nhập.')
     } else {
       toast.error('Đăng ký thất bại')
     }

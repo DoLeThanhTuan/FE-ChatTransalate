@@ -40,6 +40,7 @@
   --bg-primary: #ffffff;
   --bg-secondary: #fff;
   --bg-tertiary: #f3f4f8;
+  --bg-tab: #e3f2fd;
   --text-primary: #23272f;
   --text-secondary: #666;
   --border-secondary: #ddd;
@@ -53,6 +54,7 @@ html.light {
   --bg-primary: #ffffff;
   --bg-secondary: #fff;
   --bg-tertiary: #f3f4f8;
+  --bg-tab: #e3f2fd;
   --text-primary: #23272f;
   --text-secondary: #666;
   --border-primary: #e0e0e0;
@@ -70,6 +72,7 @@ html.dark {
   --bg-primary: #1a1a1a;
   --bg-secondary: #23272f;
   --bg-tertiary: #181c22;
+  --bg-tab: #181c22;
   --text-primary: #e5e7eb;
   --text-secondary: #bdbdbd;
   --border-primary: #726767;

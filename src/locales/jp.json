@@ -1,0 +1,38 @@
+{
+  "COMPONENT": {
+    "COMMON": {
+      "DROP_DOWN_MENU": {
+        "BUTTON": {
+          "BTN_EDIT": "編集",
+          "BTN_DELETE": "削除",
+          "BTN_DETAIL": "詳細",
+          "BTN_TRANSLATE": "翻訳",
+          "BTN_ORIGINAL": "原文"
+        }
+      },
+      "MODAL_CONFIRM_DELETE": {
+        "LABEL": {
+          "HEADER": "削除の確認",
+          "MESSAGE": "本当に削除しますか？"
+        },
+        "BUTTON": {
+          "BTN_CANCEL": "キャンセル",
+          "BTN_DELETE": "削除"
+        }
+      }
+    },
+    "CHAT_VIEW": {
+      "SIDE_BAR": {
+        "LABEL": {
+          "CHANNELS": "チャンネル",
+          "USERS": "ユーザー"
+        },
+        "BUTTON": {
+          "CREATE_CHANNEL": "チャンネルを作成",
+          "SEARCH_CHANNEL": "チャンネルに参加",
+          "BTN_TRANSLATE": "翻訳"
+        }
+      }
+    }
+  }
+}

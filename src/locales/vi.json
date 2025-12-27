@@ -6,7 +6,8 @@
           "BTN_EDIT": "Chỉnh sửa",
           "BTN_DELETE": "Xóa",
           "BTN_DETAIL": "Chi tiết",
-          "BTN_TRANSLATE": "Dịch"
+          "BTN_TRANSLATE": "Dịch",
+          "BTN_ORIGINAL": "Bản gốc"
         }
       },
       "MODAL_CONFIRM_DELETE": {
@@ -32,6 +33,125 @@
           "BTN_TRANSLATE": "Dịch"
         }
       }
+    }
+  },
+  "USER_MANAGEMENT": {
+    "TITLE": "Quản lý người dùng",
+    "BUTTON": {
+      "CREATE_USER": "Tạo người dùng mới",
+      "EDIT": "Chỉnh sửa",
+      "DELETE": "Xóa",
+      "UPDATE": "Cập nhật",
+      "CREATE": "Tạo mới",
+      "CANCEL": "Hủy"
+    },
+    "LABEL": {
+      "SEARCH_PLACEHOLDER": "Tìm kiếm theo tên, email...",
+      "ALL_ROLES": "Tất cả vai trò",
+      "USERNAME": "Tên đăng nhập",
+      "EMAIL": "Email",
+      "PHONE": "Số điện thoại",
+      "ROLE": "Vai trò",
+      "PASSWORD": "Mật khẩu",
+      "AVATAR": "Ảnh đại diện",
+      "SELECT_ROLE": "Chọn vai trò",
+      "NO_DATA": "Không có dữ liệu",
+      "LOADING": "Đang tải...",
+      "PROCESSING": "Đang xử lý..."
+    },
+    "MODAL": {
+      "CREATE_TITLE": "Tạo người dùng mới",
+      "EDIT_TITLE": "Chỉnh sửa người dùng"
+    },
+    "MESSAGE": {
+      "CREATE_SUCCESS": "Tạo người dùng thành công",
+      "UPDATE_SUCCESS": "Cập nhật người dùng thành công",
+      "DELETE_SUCCESS": "Xóa người dùng thành công",
+      "CREATE_ERROR": "Không thể tạo người dùng",
+      "UPDATE_ERROR": "Không thể cập nhật người dùng",
+      "DELETE_ERROR": "Không thể xóa người dùng",
+      "FETCH_ERROR": "Không thể tải danh sách người dùng"
+    }
+  },
+  "DEPARTMENT_MANAGEMENT": {
+    "TITLE": "Quản lý phòng ban",
+    "BUTTON": {
+      "CREATE_DEPARTMENT": "Tạo phòng ban mới",
+      "EDIT": "Chỉnh sửa",
+      "DELETE": "Xóa",
+      "VIEW_USERS": "Xem nhân viên",
+      "UPDATE": "Cập nhật",
+      "CREATE": "Tạo mới",
+      "CANCEL": "Hủy"
+    },
+    "LABEL": {
+      "SEARCH_PLACEHOLDER": "Tìm kiếm theo tên phòng ban...",
+      "NAME": "Tên phòng ban",
+      "DESCRIPTION": "Mô tả",
+      "USER_COUNT": "Số lượng nhân viên",
+      "CREATED_DATE": "Ngày tạo",
+      "NO_DATA": "Không có dữ liệu",
+      "LOADING": "Đang tải...",
+      "PROCESSING": "Đang xử lý...",
+      "NO_DEPARTMENT": "Không có phòng ban",
+      "ALL_DEPARTMENTS": "Tất cả phòng ban"
+    },
+    "MODAL": {
+      "CREATE_TITLE": "Tạo phòng ban mới",
+      "EDIT_TITLE": "Chỉnh sửa phòng ban",
+      "VIEW_USERS_TITLE": "Danh sách nhân viên"
+    },
+    "MESSAGE": {
+      "CREATE_SUCCESS": "Tạo phòng ban thành công",
+      "UPDATE_SUCCESS": "Cập nhật phòng ban thành công",
+      "DELETE_SUCCESS": "Xóa phòng ban thành công",
+      "CREATE_ERROR": "Không thể tạo phòng ban",
+      "UPDATE_ERROR": "Không thể cập nhật phòng ban",
+      "DELETE_ERROR": "Không thể xóa phòng ban",
+      "FETCH_ERROR": "Không thể tải danh sách phòng ban",
+      "FETCH_USERS_ERROR": "Không thể tải danh sách nhân viên",
+      "NO_USERS": "Không có nhân viên nào trong phòng ban này"
+    }
+  },
+  "ORGANIZATION_MANAGEMENT": {
+    "TITLE": "Quản lý tổ chức",
+    "BUTTON": {
+      "CREATE_ORGANIZATION": "Tạo tổ chức mới",
+      "EDIT": "Chỉnh sửa",
+      "DELETE": "Xóa",
+      "VIEW_DEPARTMENTS": "Xem phòng ban",
+      "UPDATE": "Cập nhật",
+      "CREATE": "Tạo mới",
+      "CANCEL": "Hủy"
+    },
+    "LABEL": {
+      "SEARCH_PLACEHOLDER": "Tìm kiếm theo tên tổ chức...",
+      "NAME": "Tên tổ chức",
+      "DESCRIPTION": "Mô tả",
+      "DEPARTMENT_COUNT": "Số lượng phòng ban",
+      "CREATED_DATE": "Ngày tạo",
+      "NO_DATA": "Không có dữ liệu",
+      "LOADING": "Đang tải...",
+      "PROCESSING": "Đang xử lý...",
+      "NO_ORGANIZATION": "Không có tổ chức",
+      "ALL_ORGANIZATIONS": "Tất cả tổ chức",
+      "SELECT_ORGANIZATION": "Chọn tổ chức"
+    },
+    "MODAL": {
+      "CREATE_TITLE": "Tạo tổ chức mới",
+      "EDIT_TITLE": "Chỉnh sửa tổ chức",
+      "VIEW_DEPARTMENTS_TITLE": "Danh sách phòng ban"
+    },
+    "MESSAGE": {
+      "CREATE_SUCCESS": "Tạo tổ chức thành công",
+      "UPDATE_SUCCESS": "Cập nhật tổ chức thành công",
+      "DELETE_SUCCESS": "Xóa tổ chức thành công",
+      "CREATE_ERROR": "Không thể tạo tổ chức",
+      "UPDATE_ERROR": "Không thể cập nhật tổ chức",
+      "DELETE_ERROR": "Không thể xóa tổ chức",
+      "FETCH_ERROR": "Không thể tải danh sách tổ chức",
+      "FETCH_DEPARTMENTS_ERROR": "Không thể tải danh sách phòng ban",
+      "NO_DEPARTMENTS": "Không có phòng ban nào trong tổ chức này"
     }
   }
 }

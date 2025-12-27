@@ -32,7 +32,7 @@
 
         <button
           class="px-4 py-2 rounded-lg font-semibold text-white bg-red-600"
-          @click="emit('confirm')"
+          @click="emit('confirm', props.id)"
         >
           {{ $t('COMPONENT.COMMON.MODAL_CONFIRM_DELETE.BUTTON.BTN_DELETE') }}
         </button>
@@ -44,6 +44,7 @@
 <script setup>
 const props = defineProps({
   visible: { type: Boolean, default: false },
+  id: { type: [Number, String], required: true },
 })
 
 const emit = defineEmits(['confirm', 'cancel'])

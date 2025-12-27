@@ -54,6 +54,7 @@ import { toast } from 'vue3-toastify'
 import { useAuthStore } from '@/stores/authStore'
 import { TypeChat } from '@/config/enum'
 import { channelApi } from '@/axios/api-services/channelApi'
+import { requestNotificationPermission } from '@/utils/notification'
 
 const router = useRouter()
 const loading = ref(false)
@@ -73,9 +74,11 @@ const handleLogin = async () => {
     authStore.setToken(response.data.accessToken)
     authStore.setUserInfo(response.data)
     if (response.status == 200) {
+      await requestNotificationPermission()
       const response = await channelApi.getChannelDefault()
-      if (response.status == 200)
+      if (response.status == 200) {
         router.push(`/chat-view/${TypeChat.CHANNEL}/${response.data.id}`)
+      }
     }
   } catch (error) {
     console.error('Login error:', error)

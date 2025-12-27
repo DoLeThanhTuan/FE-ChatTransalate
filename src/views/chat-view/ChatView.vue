@@ -52,7 +52,7 @@ const toggleSidebar = () => {
 const fetchChannel = async (chatId) => {
   try {
     const response = await channelStore.fetchChannelById(chatId)
-    if (!response) router.push({ name: 'NotFound' })
+    if (!response) router.push({ name: '404' })
   } catch (e) {
     console.error('Error fetching channel:', e)
   }
