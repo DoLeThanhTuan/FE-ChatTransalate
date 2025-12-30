@@ -97,7 +97,7 @@ const avatarSize = computed(() => {
 .avatar {
   border-radius: 50%;
   object-fit: cover;
-  border: 2px solid var(--border-primary, #e0e0e0);
+  border: 1px solid var(--border-primary, #e0e0e0);
   display: block;
 }
 

@@ -25,6 +25,7 @@ export const useUserChatStore = defineStore('userChat', () => {
     userId,
     uploadFiles,
     type = Status.MESSAGE,
+    messageReplyId = null,
   }) => {
     if (content.trim() || files.length > 0) {
       try {
@@ -37,6 +38,9 @@ export const useUserChatStore = defineStore('userChat', () => {
           content,
           type,
           files: uploadedFiles,
+          messageReply: {
+            id: messageReplyId,
+          },
         }
         send(`${URLMessage.USER}/${userId}`, messageData)
         return true

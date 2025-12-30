@@ -7,6 +7,7 @@ const Status = Object.freeze({
   CHANGE_NAME: 'CHANGE_NAME',
   REMOVE_MEMBER: 'REMOVE_MEMBER',
   DELETE_MESSAGE: 'DELETE_MESSAGE',
+  REACTION_MESSAGE: 'REACTION_MESSAGE',
 })
 
 const URLMessage = Object.freeze({

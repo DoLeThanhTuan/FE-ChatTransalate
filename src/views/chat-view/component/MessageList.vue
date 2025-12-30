@@ -1,159 +1,256 @@
 <template>
-  <div class="message-list" ref="messageListRef">
-    <div v-if="!isConnected" class="connection-status">
-      <div class="status-message" :class="{ error: !isConnected }">
-        {{ connectionStatusMessage }}
+  <div class="message-list-wrapper">
+    <div class="message-list" ref="messageListRef">
+      <div v-if="!isConnected" class="connection-status">
+        <div class="status-message" :class="{ error: !isConnected }">
+          {{ connectionStatusMessage }}
+        </div>
       </div>
-    </div>
 
-    <div v-if="error" class="error-message">
-      <span>{{ error }}</span>
-      <button @click="retryFetch" class="retry-btn">Thử lại</button>
-    </div>
+      <div v-if="error" class="error-message">
+        <span>{{ error }}</span>
+        <button @click="retryFetch" class="retry-btn">Thử lại</button>
+      </div>
 
-    <div v-if="loading && messages.length > 0" class="load-more-indicator">
-      <div class="loading-spinner small"></div>
-      <span>Đang tải thêm...</span>
-    </div>
-    <div v-for="msg in messages" :key="msg.id">
-      <template v-if="msg.type === 'MESSAGE'">
-        <div
-          class="message"
-          :class="{ 'message-own': msg.fromUser === authStore.userInfo().id }"
-        >
-          <Avatar
-            v-if="msg.fromUser !== authStore.userInfo().id"
-            :avatar="msg.avatar"
-            :status="userStore.usersDict[msg.fromUser]?.status"
-            size="large"
-            :show-status="true"
-          />
-          <div class="msg-content">
-            <div class="msg-header">
-              <span class="msg-user">{{
-                userStore.usersDict[msg.fromUser].name
-              }}</span>
-              <span class="msg-time">
-                {{ formatDate(msg.createdAt) }}
-                <span v-if="msg.isEdit" class="msg-edited">(đã sửa)</span>
-              </span>
-            </div>
-
-            <template v-if="editingMessageId === msg.id">
-              <textarea
-                v-model="editedContent"
-                @keydown="handleKeyDown"
-                @keyup.esc="cancelEdit"
-                class="msg-edit-input"
-                rows="3"
-              ></textarea>
-              <div class="msg-edit-actions">
-                <button
-                  @click="saveEdit"
-                  class="save-btn"
-                  :disabled="!editedContent.trim()"
-                >
-                  Lưu
-                </button>
-                <button @click="cancelEdit" class="cancel-btn edit-hint">
-                  Hủy
-                </button>
+      <div v-if="loading && messages.length > 0" class="load-more-indicator">
+        <div class="loading-spinner small"></div>
+        <span>Đang tải thêm...</span>
+      </div>
+      <div v-for="msg in messages" :key="msg.id">
+        <template v-if="msg.type === 'MESSAGE'">
+          <div
+            class="message"
+            :class="{ 'message-own': msg.fromUser === authStore.userInfo().id }"
+          >
+            <Avatar
+              v-if="msg.fromUser !== authStore.userInfo().id"
+              :avatar="msg.avatar"
+              :status="userStore.usersDict[msg.fromUser]?.status"
+              size="large"
+              :show-status="true"
+            />
+            <div class="msg-content">
+              <div class="msg-header">
+                <span class="msg-user">{{
+                  userStore.usersDict[msg.fromUser]?.name
+                }}</span>
+                <span class="msg-time">
+                  {{ formatDate(msg.createdAt) }}
+                  <span v-if="msg.isEdit" class="msg-edited">(đã sửa)</span>
+                </span>
               </div>
-            </template>
-            <template v-else>
-              <div
-                class="msg-text"
-                v-html="highlightMentions(msg.content)"
-              ></div>
-            </template>
 
-            <div v-if="msg.files && msg.files.length > 0" class="msg-files">
-              <div v-for="file in msg.files" :key="file.id" class="msg-file">
-                <div class="file-icon">📎</div>
-                <div class="file-info">
-                  <a :href="file.path" target="_blank" class="file-name">{{
-                    file.name
-                  }}</a>
-                  <div class="file-size">{{ formatFileSize(file.size) }}</div>
+              <!-- Reply Message Preview -->
+              <div v-if="msg.messageReply" class="msg-reply-preview">
+                <div class="msg-reply-preview-content">
+                  <div class="msg-reply-preview-header">
+                    <font-awesome-icon
+                      :icon="['fa', 'reply']"
+                      class="msg-reply-icon"
+                    />
+                    <span class="msg-reply-user">
+                      {{ userStore.usersDict[msg.messageReply.fromUser]?.name }}
+                    </span>
+                  </div>
+                  <div class="msg-reply-preview-text">
+                    {{
+                      msg.messageReply.content.length > 100
+                        ? msg.messageReply.content.substring(0, 100) + '...'
+                        : msg.messageReply.content
+                    }}
+                  </div>
                 </div>
               </div>
+
+              <template v-if="editingMessageId === msg.id">
+                <textarea
+                  v-model="editedContent"
+                  @keydown="handleKeyDown"
+                  @keyup.esc="cancelEdit"
+                  class="msg-edit-input"
+                  rows="3"
+                ></textarea>
+                <div class="msg-edit-actions">
+                  <button
+                    @click="saveEdit"
+                    class="save-btn"
+                    :disabled="!editedContent.trim()"
+                  >
+                    Lưu
+                  </button>
+                  <button @click="cancelEdit" class="cancel-btn edit-hint">
+                    Hủy
+                  </button>
+                </div>
+              </template>
+              <template v-else>
+                <div
+                  class="msg-text"
+                  v-html="highlightMentions(msg.content)"
+                ></div>
+              </template>
+
+              <div v-if="msg.files && msg.files.length > 0" class="msg-files">
+                <div v-for="file in msg.files" :key="file.id" class="msg-file">
+                  <div class="file-icon">📎</div>
+                  <div class="file-info">
+                    <a :href="file.path" target="_blank" class="file-name">{{
+                      file.name
+                    }}</a>
+                    <div class="file-size">{{ formatFileSize(file.size) }}</div>
+                  </div>
+                </div>
+              </div>
+              <div class="msg-reactions">
+                <span
+                  v-for="emotion in msg.emotions"
+                  :key="emotion.emotionId"
+                  :class="[
+                    'reaction',
+                    emotion.users.includes(authStore.userInfo().id)
+                      ? 'reaction-own'
+                      : null,
+                  ]"
+                  :title="getReactionTooltip(emotion)"
+                  @click="selectReaction(msg, emotion.emotionId)"
+                >
+                  {{ getEmotionIcon(emotion.emotionId) }}
+                  {{ emotion.users?.length || 0 }}
+                </span>
+              </div>
             </div>
-            <div class="msg-reactions">
-              <span v-for="r in msg.reactions" :key="r.emoji" class="reaction">
-                {{ r.emoji }} {{ r.count }}
-              </span>
+            <Avatar
+              v-if="msg.fromUser === authStore.userInfo().id"
+              :avatar="msg.avatar"
+              :status="userStore.usersDict[msg.fromUser]?.status"
+              size="large"
+              :show-status="true"
+            />
+            <div>
+              <DropdownMenu
+                :is-own="msg.fromUser === authStore.userInfo().id"
+                :data="msg"
+                :can-edit="msg.fromUser === authStore.userInfo().id"
+                :can-delete="msg.fromUser === authStore.userInfo().id"
+                :can-detail="false"
+                :can-translate="msg.contentOriginal == null"
+                :can-return="msg.contentOriginal != null"
+                @edit="editMessage"
+                @delete="clickDeleteMessage"
+                @translate="handleTranslate"
+                @return="handleReturn"
+              />
+              <button
+                class="reply-btn hover:bg-[#1ed760]"
+                @click.stop="handleReplyClick(msg)"
+                title="Trả lời tin nhắn"
+              >
+                <font-awesome-icon :icon="['fa', 'reply']" />
+              </button>
+              <div class="reaction-picker-container">
+                <button
+                  class="reaction-add-btn hover:bg-[#1ed760]"
+                  @click.stop="toggleReactionPicker(msg.id)"
+                  title="Thêm reaction"
+                >
+                  <font-awesome-icon :icon="['fas', 'face-smile']" />
+                </button>
+                <ReactionPicker
+                  :visible="showReactionPicker === msg.id"
+                  :position="
+                    msg.fromUser === authStore.userInfo().id ? 'right' : 'left'
+                  "
+                  @select="(iconId) => selectReaction(msg, iconId)"
+                  @close="showReactionPicker = null"
+                />
+              </div>
             </div>
           </div>
-          <Avatar
-            v-if="msg.fromUser === authStore.userInfo().id"
-            :avatar="msg.avatar"
-            :status="userStore.usersDict[msg.fromUser]?.status"
-            size="large"
-            :show-status="true"
-          />
-          <DropdownMenu
-            :is-own="msg.fromUser === authStore.userInfo().id"
-            :data="msg"
-            :can-edit="msg.fromUser === authStore.userInfo().id"
-            :can-delete="msg.fromUser === authStore.userInfo().id"
-            :can-detail="false"
-            :can-translate="msg.contentOriginal == null"
-            :can-return="msg.contentOriginal != null"
-            @edit="editMessage"
-            @delete="clickDeleteMessage"
-            @translate="handleTranslate"
-            @return="handleReturn"
-          />
+        </template>
+        <template v-else-if="msg.type === 'DELETE_MESSAGE'">
+          <div
+            class="message"
+            :class="{ 'message-own': msg.fromUser === authStore.userInfo().id }"
+          >
+            <Avatar
+              v-if="msg.fromUser !== authStore.userInfo().id"
+              :avatar="msg.avatar"
+              :status="userStore.usersDict[msg.fromUser]?.status"
+              size="large"
+              :show-status="true"
+            />
+            <div class="msg-content">
+              <div class="msg-header">
+                <span class="msg-user">{{
+                  userStore.usersDict[msg.fromUser].name
+                }}</span>
+                <span class="msg-time">
+                  {{ formatDate(msg.createdAt) }}
+                </span>
+              </div>
+              <div class="msg-text msg-text-delete">
+                Tin nhắn này đã được xóa
+              </div>
+            </div>
+            <Avatar
+              v-if="msg.fromUser === authStore.userInfo().id"
+              :avatar="msg.avatar"
+              :status="userStore.usersDict[msg.fromUser]?.status"
+              size="large"
+              :show-status="true"
+            />
+          </div>
+        </template>
+        <template v-else>
+          <div class="system-message">
+            <Avatar
+              :avatar="msg.avatar"
+              :status="userStore.usersDict[msg.fromUser]?.status"
+              size="medium"
+              :show-status="true"
+            />
+            <span class="system-name">{{
+              userStore.usersDict[msg.fromUser].name
+            }}</span>
+            <span class="system-content">{{
+              convertMessageMultilanguage(msg)
+            }}</span>
+          </div>
+        </template>
+      </div>
+    </div>
+    <!-- Reply Preview ở ngoài phần scrollable -->
+    <div
+      v-if="replyingToMessage && statusreplyingToMessage"
+      class="reply-preview-container"
+    >
+      <div class="reply-preview">
+        <div class="reply-preview-content">
+          <div class="reply-preview-header">
+            <font-awesome-icon :icon="['fa', 'reply']" class="reply-icon" />
+            <span class="reply-preview-user">
+              {{ userStore.usersDict[replyingToMessage.fromUser]?.name }}
+            </span>
+            <span class="reply-preview-time">
+              {{ formatDate(replyingToMessage.createdAt) }}
+            </span>
+          </div>
+          <div class="reply-preview-text">
+            {{
+              replyingToMessage.content.length > 150
+                ? replyingToMessage.content.substring(0, 150) + '...'
+                : replyingToMessage.content
+            }}
+          </div>
         </div>
-      </template>
-      <template v-else-if="msg.type === 'DELETE_MESSAGE'">
-        <div
-          class="message"
-          :class="{ 'message-own': msg.fromUser === authStore.userInfo().id }"
+        <button
+          @click="cancelReply"
+          class="reply-preview-cancel"
+          title="Hủy trả lời"
         >
-          <Avatar
-            v-if="msg.fromUser !== authStore.userInfo().id"
-            :avatar="msg.avatar"
-            :status="userStore.usersDict[msg.fromUser]?.status"
-            size="large"
-            :show-status="true"
-          />
-          <div class="msg-content">
-            <div class="msg-header">
-              <span class="msg-user">{{
-                userStore.usersDict[msg.fromUser].name
-              }}</span>
-              <span class="msg-time">
-                {{ formatDate(msg.createdAt) }}
-              </span>
-            </div>
-            <div class="msg-text msg-text-delete">Tin nhắn này đã được xóa</div>
-          </div>
-          <Avatar
-            v-if="msg.fromUser === authStore.userInfo().id"
-            :avatar="msg.avatar"
-            :status="userStore.usersDict[msg.fromUser]?.status"
-            size="large"
-            :show-status="true"
-          />
-        </div>
-      </template>
-      <template v-else>
-        <div class="system-message">
-          <Avatar
-            :avatar="msg.avatar"
-            :status="userStore.usersDict[msg.fromUser]?.status"
-            size="medium"
-            :show-status="true"
-          />
-          <span class="system-name">{{
-            userStore.usersDict[msg.fromUser].name
-          }}</span>
-          <span class="system-content">{{
-            convertMessageMultilanguage(msg)
-          }}</span>
-        </div>
-      </template>
+          <font-awesome-icon :icon="['fa', 'xmark']" />
+        </button>
+      </div>
     </div>
     <ModalConfirmDelete
       :visible="isShowModalDelete"
@@ -183,6 +280,7 @@ import { useChannelStore } from '@/stores/channelStore'
 import { useUserChatStore } from '@/stores/userChatStore'
 import { useUserStore } from '@/stores/userStore'
 import Avatar from '@/components/common/Avatar.vue'
+import ReactionPicker from '@/components/common/ReactionPicker.vue'
 import {
   removeVietnameseTones,
   convertMessageMultilanguage,
@@ -192,6 +290,7 @@ import { useRoute, useRouter } from 'vue-router'
 import { toast } from 'vue3-toastify'
 import { aiApi } from '@/axios/api-services/aiApi'
 import { showChatNotification } from '@/utils/notification'
+import { getIconById } from '@/utils/iconUtils'
 
 const authStore = useAuthStore()
 const channelStore = useChannelStore()
@@ -219,6 +318,13 @@ const deleteMessageId = ref('')
 // Connection state
 const isConnected = ref(false)
 const reconnectTimeout = ref(null)
+
+// Reaction picker state
+const showReactionPicker = ref(null)
+
+// Reply state
+const replyingToMessage = ref(null)
+const statusreplyingToMessage = computed(() => authStore.replyingToMessage)
 
 // Template refs
 const messageListRef = ref(null)
@@ -317,36 +423,70 @@ const isViewingThisChat = (message) => {
   }
 }
 
+const handleReceiveReactionMessage = (message) => {
+  const index = messages.value.findIndex((m) => m.id === message.id)
+  const emotionId = Number(message.content)
+  const user = message.fromUser
+  const emotions = messages.value[index].emotions
+  const emotion = emotions.find((e) => e.emotionId === emotionId)
+
+  if (emotion) {
+    const userIndex = emotion.users.indexOf(user)
+    if (userIndex !== -1) {
+      emotion.users.splice(userIndex, 1)
+      if (emotion.users.length === 0) {
+        const emotionIndex = emotions.indexOf(emotion)
+        emotions.splice(emotionIndex, 1)
+      }
+    } else {
+      emotion.users.push(user)
+    }
+  } else {
+    emotions.push({
+      emotionId,
+      users: [user],
+    })
+  }
+}
+
 const handleReceiveMessage = (message) => {
   const index = messages.value.findIndex((m) => m.id === message.id)
-  if (index !== -1) {
-    messages.value[index].content = message.content
-    messages.value[index].isEdit = true
-    messages.value[index].type = message.type
+  if (message.type == Status.REACTION_MESSAGE) {
+    handleReceiveReactionMessage(message)
   } else {
-    if (
-      message.type == Status.REMOVE_MEMBER ||
-      message.type == Status.JOIN_CHANNEL ||
-      message.type == Status.LEAVE_CHANNEL
-    ) {
-      channelStore.updateMemberChannel(message)
+    if (index !== -1) {
+      messages.value[index].content = message.content
+      messages.value[index].isEdit = true
+      messages.value[index].type = message.type
+    } else {
+      if (
+        message.type == Status.REMOVE_MEMBER ||
+        message.type == Status.JOIN_CHANNEL ||
+        message.type == Status.LEAVE_CHANNEL
+      ) {
+        channelStore.updateMemberChannel(message)
+      }
+      if (message.channelId) {
+        messages.value.push(message)
+      } else if (
+        (message.toUser == authStore.userInfo().id ||
+          message.fromUser == authStore.userInfo().id) &&
+        (route.params.chatKey == message.toUser ||
+          route.params.chatKey == message.fromUser)
+      ) {
+        messages.value.push(message)
+      }
+      scrollToBottom()
     }
-    if (message.channelId) {
-      messages.value.push(message)
-    } else if (
-      (message.toUser == authStore.userInfo().id ||
-        message.fromUser == authStore.userInfo().id) &&
-      (route.params.chatKey == message.toUser ||
-        route.params.chatKey == message.fromUser)
-    ) {
-      messages.value.push(message)
-    }
-    scrollToBottom()
   }
 }
 
 const handleNotification = (message) => {
-  if (message.isNew && isNotificationOwn(message)) {
+  if (
+    message.type != Status.REACTION_MESSAGE &&
+    message.isNew &&
+    isNotificationOwn(message)
+  ) {
     if (message.fromUser != authStore.userInfo().id) {
       message.fromName = userStore.usersDict[message.fromUser].name
       if (message.channelId) {
@@ -706,6 +846,63 @@ const formatFileSize = (size) => {
   return parseFloat((size / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i]
 }
 
+const getEmotionIcon = (emotionId) => {
+  const icon = getIconById(emotionId)
+  return icon ? icon.value : '❓'
+}
+
+const getReactionTooltip = (emotion) => {
+  if (!emotion.users || emotion.users.length === 0) {
+    return ''
+  }
+  const userNames = emotion.users
+    .map((userId) => {
+      const user = userStore.usersDict[userId]
+      return user ? user.name : userId
+    })
+    .filter(Boolean)
+  return userNames.join(', ')
+}
+
+// Reaction picker functions
+const toggleReactionPicker = (messageId) => {
+  if (showReactionPicker.value === messageId) {
+    showReactionPicker.value = null
+  } else {
+    showReactionPicker.value = messageId
+  }
+}
+
+const selectReaction = (message, emotionId) => {
+  if (route.params.typeChat == TypeChat.CHANNEL) {
+    channelStore.sendMessageToChannel({
+      id: message.id,
+      content: `${emotionId}`,
+      channelId: message.channelId,
+      type: Status.REACTION_MESSAGE,
+    })
+  } else {
+    userChatStore.sendMessageToUser({
+      id: message.id,
+      content: `${emotionId}`,
+      userId: route.params.chatKey,
+      type: Status.REACTION_MESSAGE,
+    })
+  }
+}
+
+const handleReplyClick = (message) => {
+  if (message.type === 'MESSAGE') {
+    replyingToMessage.value = message
+    authStore.replyingToMessage = message.id
+  }
+}
+
+const cancelReply = () => {
+  replyingToMessage.value = null
+  authStore.replyingToMessage = null
+}
+
 const highlightMentions = (text) => {
   if (!text) return ''
 
@@ -749,6 +946,12 @@ onMounted(async () => {
   if (messageListRef.value) {
     messageListRef.value.addEventListener('scroll', handleScroll)
   }
+  // Close reaction picker when clicking outside
+  document.addEventListener('click', (e) => {
+    if (!e.target.closest('.reaction-picker-container')) {
+      showReactionPicker.value = null
+    }
+  })
   // Initialize WebSocket connection
   await connectWS()
 })
@@ -777,6 +980,8 @@ watch(
     hasMore.value = true
     error.value = null
     editingMessageId.value = null // Reset edit state
+    replyingToMessage.value = null // Reset reply state
+    authStore.replyingToMessage = null
 
     if (isConnected.value) {
       if (newTypeChat === TypeChat.CHANNEL && currentChatKey.value) {
@@ -803,6 +1008,8 @@ watch(
     hasMore.value = true
     error.value = null
     editingMessageId.value = null // Reset edit state
+    replyingToMessage.value = null // Reset reply state
+    authStore.replyingToMessage = null
 
     if (isConnected.value) {
       if (isChannelChat.value && currentChannelId.value) {
@@ -893,10 +1100,17 @@ watch(
 
 /* --- Existing Styles below --- */
 
+.message-list-wrapper {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  background: var(--bg-primary);
+}
+
 .message-list {
   flex: 1;
   overflow-y: auto;
-  background: var(--bg-primary);
   padding: 1.5rem 2.5rem;
   display: flex;
   flex-direction: column;
@@ -963,6 +1177,8 @@ watch(
   display: flex;
   flex-direction: column;
   gap: 0.3rem;
+  min-width: 0;
+  overflow: hidden;
 }
 
 .msg-header {
@@ -984,6 +1200,74 @@ watch(
 .msg-time {
   color: #888;
   font-size: 0.95rem;
+}
+
+.msg-reply-preview {
+  margin-bottom: 0.5rem;
+  padding: 0.5rem 0.7rem;
+  background: rgba(0, 0, 0, 0.05);
+  border-left: 3px solid #1976d2;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background-color 0.2s;
+  min-width: 0;
+  overflow: hidden;
+}
+
+.message-own .msg-reply-preview {
+  background: rgba(255, 255, 255, 0.3);
+}
+
+.msg-reply-preview:hover {
+  background: rgba(0, 0, 0, 0.08);
+}
+
+.message-own .msg-reply-preview:hover {
+  background: rgba(255, 255, 255, 0.4);
+}
+
+.msg-reply-preview-content {
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+}
+
+.msg-reply-preview-header {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.85rem;
+  min-width: 0;
+  flex-shrink: 0;
+}
+
+.msg-reply-icon {
+  font-size: 0.8rem;
+  color: #1976d2;
+}
+
+.msg-reply-user {
+  font-weight: 600;
+  color: #1976d2;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  flex-shrink: 0;
+}
+
+.msg-reply-preview-text {
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+  line-height: 1.4;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
+  -webkit-box-orient: vertical;
+  word-break: break-word;
+  overflow-wrap: break-word;
+  min-width: 0;
 }
 
 .msg-text {
@@ -1057,6 +1341,7 @@ watch(
 
 .msg-reactions {
   display: flex;
+  align-items: center;
   gap: 0.5rem;
   margin-top: 0.2rem;
 }
@@ -1068,7 +1353,151 @@ watch(
   font-size: 1rem;
   color: #23272f;
   border: 1px solid #e0e0e0;
+  cursor: pointer;
+  transition: background-color 0.2s, transform 0.1s;
+  position: relative;
 }
+
+.reaction-own {
+  background-color: #bee2fb;
+}
+
+.reaction:hover {
+  transform: scale(1.05);
+}
+
+.reaction-picker-container {
+  position: relative;
+  display: inline-block;
+}
+
+.reaction-add-btn {
+  border-radius: 12px;
+  font-size: 1rem;
+  color: var(--text-primary);
+  cursor: pointer;
+  transition: background-color 0.2s;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 28px;
+  height: 24px;
+}
+
+.message-own .reaction-add-btn {
+  color: #000000;
+}
+
+.reaction-add-icon {
+  font-size: 1.2rem;
+  font-weight: bold;
+  line-height: 1;
+}
+
+/* --- Reply Feature Styles --- */
+.reply-btn {
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  padding: 0.3rem 0.5rem;
+  border-radius: 6px;
+  color: var(--text-primary);
+  transition: all 0.2s;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.95rem;
+}
+
+.message-own .reply-btn {
+  color: #000000;
+}
+
+.reply-preview-container {
+  flex-shrink: 0;
+  padding: 1rem 1rem;
+  box-shadow: 0 -2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.reply-preview {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.8rem;
+  background: var(--hover-bg);
+  border: 1px solid #7ee787;
+  border-left: 4px solid #7ee787;
+  border-radius: 8px;
+  padding: 0.5rem 0.8rem;
+  position: relative;
+  max-width: 100%;
+}
+
+.reply-preview-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  min-width: 0;
+}
+
+.reply-preview-header {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  font-size: 0.85rem;
+  color: #7ee787;
+  flex-wrap: wrap;
+}
+
+.reply-icon {
+  font-size: 0.85rem;
+}
+
+.reply-preview-user {
+  font-weight: 600;
+}
+
+.reply-preview-time {
+  font-size: 0.8rem;
+  color: var(--text-secondary);
+  margin-left: auto;
+}
+
+.reply-preview-text {
+  font-size: 0.9rem;
+  color: var(--text-primary);
+  line-height: 1.5;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
+  -webkit-box-orient: vertical;
+}
+
+.reply-preview-cancel {
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  padding: 0.3rem;
+  border-radius: 4px;
+  color: var(--text-secondary);
+  transition: all 0.2s;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.9rem;
+  flex-shrink: 0;
+  width: 28px;
+  height: 28px;
+}
+
+.reply-preview-cancel:hover {
+  background: var(--hover-bg);
+  color: var(--text-primary);
+}
+
+/* --- End Reply Feature Styles --- */
 
 .connection-status {
   position: sticky;
@@ -1227,6 +1656,12 @@ html.dark .system-content {
     padding: 0.6rem;
     gap: 0.6rem;
     max-width: 90%;
+    overflow: hidden;
+  }
+
+  .msg-content {
+    min-width: 0;
+    max-width: 100%;
   }
 
   .avatar,
@@ -1298,6 +1733,35 @@ html.dark .system-content {
     flex-direction: column;
     gap: 0.5rem;
   }
+
+  .reply-preview-container {
+    padding: 0.4rem 0.5rem;
+  }
+
+  .msg-reply-preview {
+    padding: 0.4rem 0.5rem;
+    margin-bottom: 0.4rem;
+    max-width: 100%;
+    box-sizing: border-box;
+  }
+
+  .msg-reply-preview-header {
+    font-size: 0.8rem;
+    gap: 0.4rem;
+    flex-wrap: nowrap;
+  }
+
+  .msg-reply-icon {
+    font-size: 0.75rem;
+    flex-shrink: 0;
+  }
+
+  .msg-reply-preview-text {
+    font-size: 0.85rem;
+    max-width: 100%;
+    word-break: break-word;
+    overflow-wrap: break-word;
+  }
 }
 
 @media (max-width: 400px) {
@@ -1311,6 +1775,12 @@ html.dark .system-content {
     gap: 0.4rem;
     border-radius: 8px;
     max-width: 95%;
+    overflow: hidden;
+  }
+
+  .msg-content {
+    min-width: 0;
+    max-width: 100%;
   }
 
   .avatar {
@@ -1385,6 +1855,35 @@ html.dark .system-content {
   .retry-btn {
     padding: 0.3rem 0.6rem;
     font-size: 0.8rem;
+  }
+
+  .reply-preview-container {
+    padding: 0.4rem 0.3rem;
+  }
+
+  .msg-reply-preview {
+    padding: 0.3rem 0.4rem;
+    margin-bottom: 0.3rem;
+    max-width: 100%;
+    box-sizing: border-box;
+  }
+
+  .msg-reply-preview-header {
+    font-size: 0.75rem;
+    gap: 0.3rem;
+    flex-wrap: nowrap;
+  }
+
+  .msg-reply-icon {
+    font-size: 0.7rem;
+    flex-shrink: 0;
+  }
+
+  .msg-reply-preview-text {
+    font-size: 0.8rem;
+    max-width: 100%;
+    word-break: break-word;
+    overflow-wrap: break-word;
   }
 }
 </style>
