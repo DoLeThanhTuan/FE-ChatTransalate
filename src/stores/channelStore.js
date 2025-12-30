@@ -164,6 +164,7 @@ export const useChannelStore = defineStore('channel', () => {
     channelId,
     uploadFiles,
     type = Status.MESSAGE,
+    messageReplyId = null,
   }) => {
     if (content.trim() || files.length > 0) {
       try {
@@ -176,6 +177,9 @@ export const useChannelStore = defineStore('channel', () => {
           content,
           type,
           files: uploadedFiles,
+          messageReply: {
+            id: messageReplyId,
+          },
         }
         send(`${URLMessage.CHANNEL}/${channelId}`, messageData)
         return true

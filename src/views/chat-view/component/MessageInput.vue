@@ -151,6 +151,7 @@ import { useUserStore } from '@/stores/userStore'
 import { useRoute } from 'vue-router'
 import { TypeChat } from '@/config/enum'
 import TranslateModal from '../../../components/TranslateModal.vue'
+import { useAuthStore } from '@/stores/authStore'
 
 const message = ref({
   content: '',
@@ -170,6 +171,7 @@ const currentCategory = ref('emotions')
 const searchQuery = ref('')
 const channelStore = useChannelStore()
 const userChatStore = useUserChatStore()
+const authStore = useAuthStore()
 const userStore = useUserStore()
 const route = useRoute()
 const typeChat = computed(() => route.params.typeChat)
@@ -396,6 +398,7 @@ const sendMessage = async () => {
           files: selectedFiles.value,
           channelId: route.params.chatKey,
           uploadFiles: uploadFiles,
+          messageReplyId: authStore.replyingToMessage,
         })
       } else {
         userChatStore.sendMessageToUser({
@@ -403,8 +406,10 @@ const sendMessage = async () => {
           files: selectedFiles.value,
           userId: route.params.chatKey,
           uploadFiles: uploadFiles,
+          messageReplyId: authStore.replyingToMessage,
         })
       }
+      authStore.replyingToMessage = null
       message.value.content = '' // Clear input after sending
       selectedFiles.value = [] // Clear selected files
     } catch (error) {

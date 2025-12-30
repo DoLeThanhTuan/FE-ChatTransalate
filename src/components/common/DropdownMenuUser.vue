@@ -2,6 +2,7 @@
   <div ref="wrapper" class="relative inline-block">
     <!-- Button mở dropdown -->
     <button
+      v-if="props.data.id !== authStore.userInfo().id"
       class="px-2 rounded-full hover:bg-[#1ed760] hover:text-[#ffff]"
       @click="open = !open"
     >
@@ -35,8 +36,8 @@
 </template>
 
 <script setup>
+import { useAuthStore } from '@/stores/authStore'
 import { ref, onMounted, onBeforeUnmount } from 'vue'
-
 // Props: data, quyền
 const props = defineProps({
   data: { type: Object, default: () => ({}) },
@@ -44,6 +45,7 @@ const props = defineProps({
   canChat: { type: Boolean, default: true },
 })
 
+const authStore = useAuthStore()
 // Emit events
 const emit = defineEmits(['remove', 'chat'])
 
@@ -56,9 +58,7 @@ const handleRemove = () => {
   open.value = false
 }
 const handleChatPrive = () => {
-  // emit('chat', props.data)
-  console.log(props.data.id != '2f190692-c15d-471c-8619-9ce6822b89d8')
-
+  emit('chat', props.data)
   open.value = false
 }
 // Click ngoài dropdown sẽ đóng

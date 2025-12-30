@@ -1,7 +1,10 @@
 import { defineStore } from 'pinia'
 import localStorageUtils from '@/utils/localStorageUtils'
+import { ref } from 'vue'
 
 export const useAuthStore = defineStore('auth', () => {
+  const replyingToMessage = ref(null)
+
   const userInfo = () => {
     return localStorageUtils.get('userInfo')
   }
@@ -24,6 +27,7 @@ export const useAuthStore = defineStore('auth', () => {
   }
 
   return {
+    replyingToMessage,
     userInfo,
     token,
     clearAuth,
