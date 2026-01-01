@@ -3,7 +3,7 @@
     <div class="modal-content">
       <!-- Header -->
       <div class="modal-header">
-        <h2>Danh sách thành viên</h2>
+        <h2>{{ $t('COMPONENT.CHANNEL.USERS.TITLE') }}</h2>
         <span class="close-btn" @click="$emit('close')">×</span>
       </div>
 
@@ -16,7 +16,7 @@
             :class="{ active: activeTab === 'members' }"
             @click="activeTab = 'members'"
           >
-            <font-awesome-icon :icon="['fas', 'user-tie']" /> Thành viên
+            <font-awesome-icon :icon="['fas', 'user-tie']" /> {{ $t('COMPONENT.CHANNEL.USERS.TAB_MEMBERS') }}
           </button>
           <button
             type="button"
@@ -24,7 +24,7 @@
             :class="{ active: activeTab === 'add' }"
             @click="activeTab = 'add'"
           >
-            + Thêm thành viên
+            + {{ $t('COMPONENT.CHANNEL.USERS.TAB_ADD') }}
           </button>
         </div>
 
@@ -59,7 +59,7 @@
           </template>
 
           <template v-else>
-            <p class="text-center text-secondary">Không có thành viên nào</p>
+            <p class="text-center text-secondary">{{ $t('COMPONENT.CHANNEL.USERS.NO_MEMBERS') }}</p>
           </template>
         </div>
 
@@ -68,9 +68,9 @@
             <input
               v-model.trim="searchKeyword"
               type="text"
-              placeholder="Tìm theo tên hoặc email..."
+              :placeholder="$t('COMPONENT.CHANNEL.USERS.SEARCH_PLACEHOLDER')"
             />
-            <button class="btn primary" type="button">Tìm</button>
+            <button class="btn primary" type="button">{{ $t('COMPONENT.CHANNEL.USERS.SEARCH') }}</button>
           </div>
           <div class="divider"></div>
 
@@ -92,20 +92,20 @@
               </div>
             </label>
           </div>
-          <p v-else class="empty-state">Không tìm thấy</p>
+          <p v-else class="empty-state">{{ $t('COMPONENT.CHANNEL.USERS.NOT_FOUND') }}</p>
         </div>
       </div>
 
       <!-- Footer -->
       <div class="modal-actions gap-2">
-        <button class="modal-cancel-btn" @click="$emit('close')">Đóng</button>
+        <button class="modal-cancel-btn" @click="$emit('close')">{{ $t('COMPONENT.CHANNEL.USERS.CLOSE') }}</button>
         <button
           class="btn primary"
           type="button"
           @click="handleAddMembers"
           :disabled="!selectedCandidateIds.length"
         >
-          Xác nhận
+          {{ $t('COMPONENT.CHANNEL.USERS.CONFIRM') }}
         </button>
       </div>
     </div>

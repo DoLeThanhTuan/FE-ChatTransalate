@@ -3,7 +3,7 @@
     <div class="header-content">
       <div class="header-left">
         <router-link to="/" class="logo-link">
-          <h1 class="logo">Chat App</h1>
+          <h1 class="logo">{{ $t('COMPONENT.COMMON.APP_HEADER.LOGO') }}</h1>
         </router-link>
         <nav class="nav-menu">
           <router-link
@@ -12,7 +12,7 @@
             :class="{ active: $route.name === 'UserManagement' }"
           >
             <i class="fas fa-users"></i>
-            <span>Quản lý người dùng</span>
+            <span>{{ $t('COMPONENT.COMMON.APP_HEADER.NAV.USER_MANAGEMENT') }}</span>
           </router-link>
           <router-link
             to="/organization-management"
@@ -20,7 +20,7 @@
             :class="{ active: $route.name === 'OrganizationManagement' }"
           >
             <i class="fas fa-building"></i>
-            <span>Quản lý tổ chức</span>
+            <span>{{ $t('COMPONENT.COMMON.APP_HEADER.NAV.ORGANIZATION_MANAGEMENT') }}</span>
           </router-link>
           <router-link
             to="/department-management"
@@ -28,7 +28,7 @@
             :class="{ active: $route.name === 'DepartmentManagement' }"
           >
             <i class="fas fa-sitemap"></i>
-            <span>Quản lý phòng ban</span>
+            <span>{{ $t('COMPONENT.COMMON.APP_HEADER.NAV.DEPARTMENT_MANAGEMENT') }}</span>
           </router-link>
           <router-link
             to="/profile"
@@ -36,7 +36,7 @@
             :class="{ active: $route.name === 'Profile' }"
           >
             <i class="fas fa-user"></i>
-            <span>Hồ sơ</span>
+            <span>{{ $t('COMPONENT.COMMON.APP_HEADER.NAV.PROFILE') }}</span>
           </router-link>
         </nav>
       </div>
@@ -62,11 +62,11 @@
               @click="closeUserMenu"
             >
               <i class="fas fa-user"></i>
-              <span>Hồ sơ</span>
+              <span>{{ $t('COMPONENT.COMMON.APP_HEADER.USER_MENU.PROFILE') }}</span>
             </router-link>
             <button @click="handleLogout" class="dropdown-item logout-item">
               <i class="fas fa-sign-out-alt"></i>
-              <span>Đăng xuất</span>
+              <span>{{ $t('COMPONENT.COMMON.APP_HEADER.USER_MENU.LOGOUT') }}</span>
             </button>
           </div>
         </div>

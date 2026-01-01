@@ -1,9 +1,9 @@
 <template>
   <div class="not-found">
-    <h1>403</h1>
-    <h2>Không thể truy cập</h2>
-    <p>Bạn không có quyền để truy cập trang này.</p>
-    <router-link to="/" class="home-link">Về trang chủ</router-link>
+    <h1>{{ $t('ERROR.403.TITLE') }}</h1>
+    <h2>{{ $t('ERROR.403.HEADING') }}</h2>
+    <p>{{ $t('ERROR.403.MESSAGE') }}</p>
+    <router-link to="/" class="home-link">{{ $t('ERROR.403.HOME_LINK') }}</router-link>
   </div>
 </template>
 

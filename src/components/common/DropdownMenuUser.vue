@@ -20,7 +20,7 @@
         @click="handleRemove"
         class="flex items-center px-3 py-2 hover:rounded-[8px] hover:bg-[var(--bg-tab)] cursor-pointer gap-2"
       >
-        <span>Xóa khỏi nhóm</span>
+        <span>{{ $t('COMPONENT.COMMON.DROPDOWN_USER.REMOVE_FROM_GROUP') }}</span>
       </div>
 
       <!-- Nhắn tin riêng -->
@@ -29,7 +29,7 @@
         @click="handleChatPrive"
         class="flex items-center px-3 py-2 hover:rounded-[8px] hover:bg-[var(--bg-tab)] cursor-pointer gap-2"
       >
-        <span>Nhắn tin riêng</span>
+        <span>{{ $t('COMPONENT.COMMON.DROPDOWN_USER.PRIVATE_MESSAGE') }}</span>
       </div>
     </div>
   </div>

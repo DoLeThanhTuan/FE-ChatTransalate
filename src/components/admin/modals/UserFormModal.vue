@@ -3,7 +3,7 @@
     <div class="modal-content">
       <div class="modal-header">
         <h2>
-          {{ isEditMode ? 'Chỉnh sửa người dùng' : 'Tạo người dùng mới' }}
+          {{ isEditMode ? $t('USER_MANAGEMENT.MODAL.EDIT_TITLE') : $t('USER_MANAGEMENT.MODAL.CREATE_TITLE') }}
         </h2>
         <button @click="$emit('close')" class="btn-close">
           <i class="fas fa-times"></i>
@@ -12,44 +12,44 @@
 
       <form @submit.prevent="handleSubmit" class="user-form">
         <div class="form-group">
-          <label>Tên đăng nhập *</label>
+          <label>{{ $t('USER_MANAGEMENT.LABEL.USERNAME') }} *</label>
           <input
             v-model="localFormData.name"
             type="text"
             required
-            placeholder="Nhập tên đăng nhập"
+            :placeholder="$t('USER_MANAGEMENT.MODAL.USERNAME_PLACEHOLDER')"
           />
         </div>
 
         <div class="form-group">
-          <label>Email *</label>
+          <label>{{ $t('USER_MANAGEMENT.LABEL.EMAIL') }} *</label>
           <input
             v-model="localFormData.email"
             type="email"
             required
-            placeholder="Nhập email"
+            :placeholder="$t('USER_MANAGEMENT.MODAL.EMAIL_PLACEHOLDER')"
           />
         </div>
 
         <div class="form-group">
-          <label>Số điện thoại</label>
+          <label>{{ $t('USER_MANAGEMENT.LABEL.PHONE') }}</label>
           <input
             v-model="localFormData.phone"
             type="tel"
-            placeholder="Nhập số điện thoại"
+            :placeholder="$t('USER_MANAGEMENT.MODAL.PHONE_PLACEHOLDER')"
           />
         </div>
 
         <div class="form-group">
-          <label>Vai trò *</label>
+          <label>{{ $t('USER_MANAGEMENT.LABEL.ROLE') }} *</label>
           <select v-model="localFormData.role" required>
-            <option value="USER">User</option>
-            <option value="ADMIN">Admin</option>
+            <option value="USER">{{ $t('USER_MANAGEMENT.MODAL.ROLE_USER') }}</option>
+            <option value="ADMIN">{{ $t('USER_MANAGEMENT.MODAL.ROLE_ADMIN') }}</option>
           </select>
         </div>
 
         <div class="form-group">
-          <label>Phòng ban</label>
+          <label>{{ $t('USER_MANAGEMENT.LABEL.DEPARTMENT') }}</label>
           <select v-model="localFormData.departmentId">
             <option v-for="dept in departments" :key="dept.id" :value="dept.id">
               {{ dept.name }}
@@ -58,22 +58,22 @@
         </div>
 
         <div v-if="!isEditMode" class="form-group">
-          <label>Mật khẩu *</label>
+          <label>{{ $t('USER_MANAGEMENT.LABEL.PASSWORD') }} *</label>
           <input
             v-model="localFormData.password"
             type="password"
             :required="!isEditMode"
-            placeholder="Nhập mật khẩu"
+            :placeholder="$t('USER_MANAGEMENT.MODAL.PASSWORD_PLACEHOLDER')"
           />
         </div>
 
         <div class="form-actions">
           <button type="button" @click="$emit('close')" class="btn-cancel">
-            Hủy
+            {{ $t('USER_MANAGEMENT.BUTTON.CANCEL') }}
           </button>
           <button type="submit" class="btn-submit" :disabled="submitting">
             {{
-              submitting ? 'Đang xử lý...' : isEditMode ? 'Cập nhật' : 'Tạo mới'
+              submitting ? $t('USER_MANAGEMENT.LABEL.PROCESSING') : isEditMode ? $t('USER_MANAGEMENT.BUTTON.UPDATE') : $t('USER_MANAGEMENT.BUTTON.CREATE')
             }}
           </button>
         </div>

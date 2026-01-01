@@ -9,7 +9,7 @@
               channelStore.channelCurrent?.name ||
               $t('COMPONENT.COMMON.MODAL_CONFIRM_DELETE.LABEL.MESSAGE')
             "
-            >{{ channelStore.channelCurrent?.name || 'Loading...' }}</span
+            >{{ channelStore.channelCurrent?.name || $t('COMPONENT.CHAT_VIEW.CHANNEL_HEADER.LOADING') }}</span
           >
           <font-awesome-icon
             v-if="channelStore.channelCurrent?.name"
@@ -20,7 +20,7 @@
         <div v-if="isDropdownOpen" class="channel-dropdown">
           <button class="dropdown-item">
             <font-awesome-icon :icon="['fas', 'info-circle']" />
-            <span>Channel Details</span>
+            <span>{{ $t('COMPONENT.CHAT_VIEW.CHANNEL_HEADER.CHANNEL_DETAILS') }}</span>
           </button>
           <button
             v-if="!channelStore.channelCurrent?.isDefault"
@@ -28,7 +28,7 @@
             class="dropdown-item dropdown-item-danger"
           >
             <font-awesome-icon :icon="['fas', 'right-from-bracket']" />
-            <span>Leave Channel</span>
+            <span>{{ $t('COMPONENT.CHAT_VIEW.CHANNEL_HEADER.LEAVE_CHANNEL') }}</span>
           </button>
         </div>
       </div>
@@ -44,15 +44,15 @@
         "
         @close="showMembers = false"
       />
-      <span class="location">Huntsville</span>
+      <span class="location">{{ $t('COMPONENT.CHAT_VIEW.CHANNEL_HEADER.LOCATION') }}</span>
     </div>
     <div v-if="isUserChat" class="header-left">
       <div class="channel-menu-container" ref="menuContainer">
         <button @click="toggleDropdown" class="channel-name-button">
           <span
             class="channel-name"
-            :title="userChatStore.userChatCurrent?.name || 'Loading...'"
-            >{{ userChatStore.userChatCurrent?.name || 'Loading...' }}</span
+            :title="userChatStore.userChatCurrent?.name || $t('COMPONENT.CHAT_VIEW.CHANNEL_HEADER.LOADING')"
+            >{{ userChatStore.userChatCurrent?.name || $t('COMPONENT.CHAT_VIEW.CHANNEL_HEADER.LOADING') }}</span
           >
           <font-awesome-icon
             v-if="channelStore.channelCurrent?.name"
@@ -63,18 +63,18 @@
         <div v-if="isDropdownOpen" class="channel-dropdown">
           <button class="dropdown-item">
             <font-awesome-icon :icon="['fas', 'info-circle']" />
-            <span>Info</span>
+            <span>{{ $t('COMPONENT.CHAT_VIEW.CHANNEL_HEADER.INFO') }}</span>
           </button>
           <button
             @click="handleLeaveChannel()"
             class="dropdown-item dropdown-item-danger"
           >
             <font-awesome-icon icon="fa-solid fa-ban" />
-            <span>Chặn</span>
+            <span>{{ $t('COMPONENT.CHAT_VIEW.CHANNEL_HEADER.BLOCK') }}</span>
           </button>
         </div>
       </div>
-      <span class="location">Huntsville</span>
+      <span class="location">{{ $t('COMPONENT.CHAT_VIEW.CHANNEL_HEADER.LOCATION') }}</span>
     </div>
     <div class="header-right">
       <ThemeToggle />
@@ -89,7 +89,7 @@
         <div class="dropdown-content">
           <div class="dropdown-item" @click="handleLogout">
             <font-awesome-icon :icon="['fas', 'right-from-bracket']" />
-            <span>Đăng xuất</span>
+            <span>{{ $t('COMPONENT.COMMON.APP_HEADER.USER_MENU.LOGOUT') }}</span>
           </div>
         </div>
       </div>

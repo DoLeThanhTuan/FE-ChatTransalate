@@ -2,18 +2,18 @@
   <div v-if="visible" class="modal-overlay dark">
     <div class="modal-content dark">
       <div class="modal-header">
-        <h2>Translate</h2>
+        <h2>{{ $t('COMPONENT.TRANSLATE_MODAL.TITLE') }}</h2>
 
         <span class="close-btn" @click="$emit('close')">×</span>
       </div>
 
       <div class="modal-body">
-        <label class="modal-label">Văn bản nguồn</label>
+        <label class="modal-label">{{ $t('COMPONENT.TRANSLATE_MODAL.SOURCE_LABEL') }}</label>
 
         <textarea
           v-model="sourceText"
           class="modal-input dark"
-          placeholder="Nhập văn bản..."
+          :placeholder="$t('COMPONENT.TRANSLATE_MODAL.SOURCE_PLACEHOLDER')"
           rows="8"
         ></textarea>
 
@@ -30,21 +30,21 @@
             </select>
           </div>
 
-          <button class="translate-btn" @click="handleTranslate">Dịch</button>
+          <button class="translate-btn" @click="handleTranslate">{{ $t('COMPONENT.TRANSLATE_MODAL.TRANSLATE_BUTTON') }}</button>
         </div>
 
         <textarea
           v-model="translatedText"
           class="modal-input dark"
-          placeholder="Bản dịch sẽ hiển thị ở đây"
+          :placeholder="$t('COMPONENT.TRANSLATE_MODAL.RESULT_PLACEHOLDER')"
           rows="8"
           readonly
         ></textarea>
       </div>
 
       <div class="modal-actions">
-        <button class="modal-cancel-btn" @click="$emit('close')">Đóng</button>
-        <button class="modal-cancel-btn" @click="confirm">Xác nhận</button>
+        <button class="modal-cancel-btn" @click="$emit('close')">{{ $t('COMPONENT.TRANSLATE_MODAL.CLOSE') }}</button>
+        <button class="modal-cancel-btn" @click="confirm">{{ $t('COMPONENT.TRANSLATE_MODAL.CONFIRM') }}</button>
       </div>
     </div>
   </div>
@@ -53,8 +53,11 @@
 
 <script setup>
 import { ref, watch } from 'vue'
+import { useI18n } from 'vue-i18n'
 import { aiApi } from '@/axios/api-services/aiApi'
 import { toast } from 'vue3-toastify'
+
+const { t } = useI18n()
 
 const props = defineProps({
   visible: { type: Boolean, default: false },
@@ -96,13 +99,13 @@ const handleTranslate = async () => {
     }
     const response = await aiApi.translateMessage(params)
     if (!response.data.success) {
-      toast.error('Có lỗi xảy ra vui lòng thử lại')
+      toast.error(t('COMPONENT.TRANSLATE_MODAL.ERROR'))
     } else {
       translatedText.value = response.data.content
     }
   } catch {
     console.error('Translate error!')
-    toast.error('Có lỗi xảy ra vui lòng thử lại')
+    toast.error(t('COMPONENT.TRANSLATE_MODAL.ERROR'))
   } finally {
     isLoading.value = false
   }

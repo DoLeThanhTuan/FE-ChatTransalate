@@ -1,9 +1,9 @@
 <template>
   <div class="not-found">
-    <h1>404</h1>
-    <h2>Không tìm thấy trang</h2>
-    <p>Trang bạn đang tìm kiếm không tồn tại hoặc đã bị di chuyển.</p>
-    <router-link to="/" class="home-link">Về trang chủ</router-link>
+    <h1>{{ $t('ERROR.404.TITLE') }}</h1>
+    <h2>{{ $t('ERROR.404.HEADING') }}</h2>
+    <p>{{ $t('ERROR.404.MESSAGE') }}</p>
+    <router-link to="/" class="home-link">{{ $t('ERROR.404.HOME_LINK') }}</router-link>
   </div>
 </template>
 

@@ -9,12 +9,12 @@
 
       <div v-if="error" class="error-message">
         <span>{{ error }}</span>
-        <button @click="retryFetch" class="retry-btn">Thử lại</button>
+        <button @click="retryFetch" class="retry-btn">{{ $t('COMPONENT.CHAT_VIEW.MESSAGE_LIST.RETRY') }}</button>
       </div>
 
       <div v-if="loading && messages.length > 0" class="load-more-indicator">
         <div class="loading-spinner small"></div>
-        <span>Đang tải thêm...</span>
+        <span>{{ $t('COMPONENT.CHAT_VIEW.MESSAGE_LIST.LOADING_MORE') }}</span>
       </div>
       <div v-for="msg in messages" :key="msg.id">
         <template v-if="msg.type === 'MESSAGE'">
@@ -36,7 +36,7 @@
                 }}</span>
                 <span class="msg-time">
                   {{ formatDate(msg.createdAt) }}
-                  <span v-if="msg.isEdit" class="msg-edited">(đã sửa)</span>
+                  <span v-if="msg.isEdit" class="msg-edited">({{ $t('COMPONENT.CHAT_VIEW.MESSAGE_LIST.EDITED') }})</span>
                 </span>
               </div>
 
@@ -76,10 +76,10 @@
                     class="save-btn"
                     :disabled="!editedContent.trim()"
                   >
-                    Lưu
+                    {{ $t('COMPONENT.CHAT_VIEW.MESSAGE_LIST.SAVE') }}
                   </button>
                   <button @click="cancelEdit" class="cancel-btn edit-hint">
-                    Hủy
+                    {{ $t('COMPONENT.CHAT_VIEW.MESSAGE_LIST.CANCEL') }}
                   </button>
                 </div>
               </template>
@@ -143,7 +143,7 @@
               <button
                 class="reply-btn hover:bg-[#1ed760]"
                 @click.stop="handleReplyClick(msg)"
-                title="Trả lời tin nhắn"
+                :title="$t('COMPONENT.CHAT_VIEW.MESSAGE_LIST.REPLY_MESSAGE')"
               >
                 <font-awesome-icon :icon="['fa', 'reply']" />
               </button>
@@ -151,7 +151,7 @@
                 <button
                   class="reaction-add-btn hover:bg-[#1ed760]"
                   @click.stop="toggleReactionPicker(msg.id)"
-                  title="Thêm reaction"
+                  :title="$t('COMPONENT.CHAT_VIEW.MESSAGE_LIST.ADD_REACTION')"
                 >
                   <font-awesome-icon :icon="['fas', 'face-smile']" />
                 </button>
@@ -189,7 +189,7 @@
                 </span>
               </div>
               <div class="msg-text msg-text-delete">
-                Tin nhắn này đã được xóa
+                {{ $t('COMPONENT.CHAT_VIEW.MESSAGE_LIST.MESSAGE_DELETED') }}
               </div>
             </div>
             <Avatar
@@ -246,7 +246,7 @@
         <button
           @click="cancelReply"
           class="reply-preview-cancel"
-          title="Hủy trả lời"
+          :title="$t('COMPONENT.CHAT_VIEW.MESSAGE_LIST.CANCEL_REPLY')"
         >
           <font-awesome-icon :icon="['fa', 'xmark']" />
         </button>
@@ -255,7 +255,7 @@
     <ModalConfirmDelete
       :visible="isShowModalDelete"
       :id="deleteMessageId"
-      message="Bạn chắc chắn muốn xóa tin nhắn này không?"
+      :message="$t('COMPONENT.CHAT_VIEW.MESSAGE_LIST.DELETE_MESSAGE_CONFIRM')"
       @confirm="confirmDeleteMessage"
       @cancel="cancelDeleteMessage"
     />
@@ -267,6 +267,7 @@
 import ModalConfirmDelete from '../../../components/common/ModalConfirmDelete.vue'
 import DropdownMenu from '../../../components/common/DropdownMenuMessage.vue'
 import { ref, onMounted, onUnmounted, computed, nextTick, watch } from 'vue'
+import { useI18n } from 'vue-i18n'
 import { messageApi } from '@/axios/api-services/messageApi'
 import { formatDate } from '@/utils/date'
 import localStorageUtils from '@/utils/localStorageUtils'
@@ -291,6 +292,8 @@ import { toast } from 'vue3-toastify'
 import { aiApi } from '@/axios/api-services/aiApi'
 import { showChatNotification } from '@/utils/notification'
 import { getIconById } from '@/utils/iconUtils'
+
+const { t } = useI18n()
 
 const authStore = useAuthStore()
 const channelStore = useChannelStore()
@@ -332,7 +335,7 @@ const messageListRef = ref(null)
 // Computed properties
 const connectionStatusMessage = computed(() => {
   if (!isConnected.value) {
-    return 'Đang kết nối...'
+    return t('COMPONENT.CHAT_VIEW.MESSAGE_LIST.CONNECTING')
   }
   return ''
 })
@@ -383,7 +386,7 @@ const handleConnectSuccess = async () => {
     scrollToBottom()
   } catch (err) {
     console.error('Error fetching initial messages:', err)
-    error.value = 'Không thể tải tin nhắn ban đầu'
+    error.value = t('COMPONENT.CHAT_VIEW.MESSAGE_LIST.ERROR_LOADING_MESSAGES')
   }
 }
 
@@ -554,13 +557,13 @@ const connectWS = async () => {
     )
   } catch (err) {
     console.error('Failed to connect WebSocket:', err)
-    error.value = 'Không thể kết nối...'
+    error.value = t('COMPONENT.CHAT_VIEW.MESSAGE_LIST.ERROR_CONNECTING')
   }
 }
 
 const fetchMessagesChannel = async (isInitial = false) => {
   if (!currentChatKey.value) {
-    error.value = 'Không có channel được chọn'
+    error.value = t('COMPONENT.CHAT_VIEW.MESSAGE_LIST.ERROR_NO_CHANNEL')
     return
   }
 
@@ -606,7 +609,7 @@ const fetchMessagesChannel = async (isInitial = false) => {
     }
   } catch (err) {
     console.error('Error fetching channel messages:', err)
-    error.value = 'Không thể tải tin nhắn kênh'
+    error.value = t('COMPONENT.CHAT_VIEW.MESSAGE_LIST.ERROR_LOAD_CHANNEL_MESSAGES')
   } finally {
     loading.value = false
   }
@@ -614,7 +617,7 @@ const fetchMessagesChannel = async (isInitial = false) => {
 
 const fetchMessagesUser = async (isInitial = false) => {
   if (!currentChatKey.value) {
-    error.value = 'Không có người dùng được chọn'
+    error.value = t('COMPONENT.CHAT_VIEW.MESSAGE_LIST.ERROR_NO_USER')
     return
   }
 
@@ -654,7 +657,7 @@ const fetchMessagesUser = async (isInitial = false) => {
     }
   } catch (err) {
     console.error('Error fetching user messages:', err)
-    error.value = 'Không thể tải tin nhắn người dùng'
+    error.value = t('COMPONENT.CHAT_VIEW.MESSAGE_LIST.ERROR_LOAD_USER_MESSAGES')
   } finally {
     loading.value = false
   }
@@ -725,7 +728,7 @@ const saveEdit = async () => {
     cancelEdit()
   } catch (err) {
     console.error('Error updating message:', err)
-    error.value = 'Không thể sửa tin nhắn. Vui lòng thử lại.'
+    error.value = t('COMPONENT.CHAT_VIEW.MESSAGE_LIST.ERROR_UPDATE_MESSAGE')
   }
 }
 
@@ -774,7 +777,7 @@ const handleTranslate = async (msg) => {
     }
     const response = await aiApi.translateMessage(params)
     if (!response.data.success) {
-      toast.error('Có lỗi xảy ra vui lòng thử lại')
+      toast.error(t('COMPONENT.CHAT_VIEW.MESSAGE_LIST.TRANSLATE_ERROR'))
     } else {
       const index = messages.value.findIndex((m) => m.id === msg.id)
       messages.value[index].isOriginal = false
@@ -783,7 +786,7 @@ const handleTranslate = async (msg) => {
     }
   } catch {
     console.error('Translate error!')
-    toast.error('Có lỗi xảy ra vui lòng thử lại')
+    toast.error(t('COMPONENT.CHAT_VIEW.MESSAGE_LIST.TRANSLATE_ERROR'))
   } finally {
     isLoading.value = false
   }

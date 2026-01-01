@@ -3,9 +3,9 @@
     <AppHeader />
     <div class="department-management-container">
       <div class="header">
-        <h1>Quản lý phòng ban</h1>
+        <h1>{{ $t('DEPARTMENT_MANAGEMENT.TITLE') }}</h1>
         <button @click="openCreateModal" class="btn-create">
-          <i class="fas fa-plus"></i> Tạo phòng ban mới
+          <i class="fas fa-plus"></i> {{ $t('DEPARTMENT_MANAGEMENT.BUTTON.CREATE_DEPARTMENT') }}
         </button>
       </div>
 
@@ -16,12 +16,12 @@
           <input
             v-model="searchQuery"
             type="text"
-            placeholder="Tìm kiếm theo tên phòng ban..."
+            :placeholder="$t('DEPARTMENT_MANAGEMENT.LABEL.SEARCH_PLACEHOLDER')"
             class="search-input"
           />
         </div>
         <select v-model="organizationFilter" class="filter-select">
-          <option value="">Tất cả tổ chức</option>
+          <option value="">{{ $t('DEPARTMENT_MANAGEMENT.LABEL.ALL_ORGANIZATIONS') }}</option>
           <option
             v-for="organization in organizations"
             :key="organization.id"
@@ -35,7 +35,7 @@
       <!-- Loading -->
       <div v-if="loading" class="loading-container">
         <div class="spinner"></div>
-        <p>Đang tải...</p>
+        <p>{{ $t('DEPARTMENT_MANAGEMENT.LABEL.LOADING') }}</p>
       </div>
 
       <!-- Departments Table -->
@@ -43,13 +43,13 @@
         <table class="departments-table">
           <thead>
             <tr>
-              <th>ID</th>
-              <th>Tên phòng ban</th>
-              <th>Tổ chức</th>
-              <th>Mô tả</th>
-              <th>Số lượng nhân viên</th>
-              <th>Ngày tạo</th>
-              <th>Thao tác</th>
+              <th>{{ $t('DEPARTMENT_MANAGEMENT.LABEL.ID') }}</th>
+              <th>{{ $t('DEPARTMENT_MANAGEMENT.LABEL.NAME') }}</th>
+              <th>{{ $t('DEPARTMENT_MANAGEMENT.LABEL.ORGANIZATION') }}</th>
+              <th>{{ $t('DEPARTMENT_MANAGEMENT.LABEL.DESCRIPTION') }}</th>
+              <th>{{ $t('DEPARTMENT_MANAGEMENT.LABEL.USER_COUNT') }}</th>
+              <th>{{ $t('DEPARTMENT_MANAGEMENT.LABEL.CREATED_DATE') }}</th>
+              <th>{{ $t('DEPARTMENT_MANAGEMENT.LABEL.ACTIONS') }}</th>
             </tr>
           </thead>
           <tbody>
@@ -69,21 +69,21 @@
                   <button
                     @click="openEditModal(department)"
                     class="btn-action btn-edit"
-                    title="Chỉnh sửa"
+                    :title="$t('DEPARTMENT_MANAGEMENT.BUTTON.EDIT')"
                   >
                     <font-awesome-icon :icon="['fas', 'edit']" />
                   </button>
                   <button
                     @click="openViewUsersModal(department)"
                     class="btn-action btn-view"
-                    title="Xem nhân viên"
+                    :title="$t('DEPARTMENT_MANAGEMENT.BUTTON.VIEW_USERS')"
                   >
                     <font-awesome-icon :icon="['fas', 'info']" />
                   </button>
                   <button
                     @click="openDeleteModal(department)"
                     class="btn-action btn-delete"
-                    title="Xóa"
+                    :title="$t('DEPARTMENT_MANAGEMENT.BUTTON.DELETE')"
                   >
                     <font-awesome-icon :icon="['fas', 'trash']" />
                   </button>
@@ -91,7 +91,7 @@
               </td>
             </tr>
             <tr v-if="filteredDepartments.length === 0">
-              <td colspan="7" class="no-data">Không có dữ liệu</td>
+              <td colspan="7" class="no-data">{{ $t('DEPARTMENT_MANAGEMENT.LABEL.NO_DATA') }}</td>
             </tr>
           </tbody>
         </table>
@@ -130,6 +130,7 @@
 
 <script setup>
 import { ref, computed, onMounted } from 'vue'
+import { useI18n } from 'vue-i18n'
 import AppHeader from '@/components/common/AppHeader.vue'
 import { departmentApi } from '@/axios/api-services/departmentApi'
 import { useDepartmentStore } from '@/stores/departmentStore'
@@ -138,6 +139,8 @@ import ModalConfirmDelete from '@/components/common/ModalConfirmDelete.vue'
 import DepartmentFormModal from '@/components/admin/modals/DepartmentFormModal.vue'
 import DepartmentUsersModal from '@/components/admin/modals/DepartmentUsersModal.vue'
 import { toast } from 'vue3-toastify'
+
+const { t } = useI18n()
 
 const departmentStore = useDepartmentStore()
 const organizationStore = useOrganizationStore()
@@ -197,7 +200,7 @@ const fetchDepartments = async () => {
     departments.value = response.data || []
   } catch (error) {
     console.error('Error fetching departments:', error)
-    toast.error('Không thể tải danh sách phòng ban')
+    toast.error(t('DEPARTMENT_MANAGEMENT.MESSAGE.FETCH_ERROR'))
   } finally {
     loading.value = false
   }
@@ -238,7 +241,7 @@ const openViewUsersModal = async (department) => {
     departmentUsers.value = response.data || []
   } catch (error) {
     console.error('Error fetching department users:', error)
-    toast.error('Không thể tải danh sách nhân viên')
+    toast.error(t('DEPARTMENT_MANAGEMENT.MESSAGE.FETCH_USERS_ERROR'))
     departmentUsers.value = []
   } finally {
     usersLoading.value = false
@@ -266,10 +269,10 @@ const handleSubmit = async (payload) => {
   try {
     if (isEditMode.value) {
       await departmentApi.update(selectedDepartment.value.id, payload)
-      toast.success('Cập nhật phòng ban thành công')
+      toast.success(t('DEPARTMENT_MANAGEMENT.MESSAGE.UPDATE_SUCCESS'))
     } else {
       await departmentApi.create(payload)
-      toast.success('Tạo phòng ban thành công')
+      toast.success(t('DEPARTMENT_MANAGEMENT.MESSAGE.CREATE_SUCCESS'))
     }
     closeModal()
     await fetchDepartments()
@@ -279,8 +282,8 @@ const handleSubmit = async (payload) => {
     toast.error(
       error.response?.data?.message ||
         (isEditMode.value
-          ? 'Không thể cập nhật phòng ban'
-          : 'Không thể tạo phòng ban')
+          ? t('DEPARTMENT_MANAGEMENT.MESSAGE.UPDATE_ERROR')
+          : t('DEPARTMENT_MANAGEMENT.MESSAGE.CREATE_ERROR'))
     )
   } finally {
     submitting.value = false
@@ -290,13 +293,13 @@ const handleSubmit = async (payload) => {
 const handleDelete = async (id) => {
   try {
     await departmentApi.delete(id)
-    toast.success('Xóa phòng ban thành công')
+    toast.success(t('DEPARTMENT_MANAGEMENT.MESSAGE.DELETE_SUCCESS'))
     closeDeleteModal()
     await fetchDepartments()
     await departmentStore.fetchDepartments() // Refresh store
   } catch (error) {
     console.error('Error deleting department:', error)
-    toast.error('Không thể xóa phòng ban')
+    toast.error(t('DEPARTMENT_MANAGEMENT.MESSAGE.DELETE_ERROR'))
   }
 }
 

@@ -1,21 +1,21 @@
 <template>
   <div class="register-container">
     <div class="register-box">
-      <h2>Đăng ký tài khoản</h2>
+      <h2>{{ $t('AUTH.REGISTER.TITLE') }}</h2>
       <form @submit.prevent="handleRegister" class="register-form">
         <div class="form-group">
-          <label for="name">Họ và tên</label>
+          <label for="name">{{ $t('AUTH.REGISTER.NAME_LABEL') }}</label>
           <input
             type="text"
             id="name"
             v-model="form.name"
-            placeholder="Nhập họ và tên"
+            :placeholder="$t('AUTH.REGISTER.NAME_PLACEHOLDER')"
             required
           />
         </div>
 
         <div class="form-group">
-          <label for="avatar">Ảnh đại diện</label>
+          <label for="avatar">{{ $t('AUTH.REGISTER.AVATAR_LABEL') }}</label>
           <div class="avatar-upload">
             <img
               :src="avatarPreview || defaultAvatar"
@@ -30,62 +30,62 @@
               class="avatar-input"
             />
             <label for="avatar" class="avatar-label">
-              {{ avatarPreview ? 'Thay đổi ảnh' : 'Chọn ảnh' }}
+              {{ avatarPreview ? $t('AUTH.REGISTER.CHANGE_AVATAR') : $t('AUTH.REGISTER.SELECT_AVATAR') }}
             </label>
           </div>
         </div>
 
         <div class="form-group">
-          <label for="email">Email</label>
+          <label for="email">{{ $t('AUTH.REGISTER.EMAIL_LABEL') }}</label>
           <input
             type="email"
             id="email"
             v-model="form.email"
-            placeholder="Nhập email của bạn"
+            :placeholder="$t('AUTH.REGISTER.EMAIL_PLACEHOLDER')"
             required
           />
         </div>
 
         <div class="form-group">
-          <label for="phone">Số điện thoại</label>
+          <label for="phone">{{ $t('AUTH.REGISTER.PHONE_LABEL') }}</label>
           <input
             type="tel"
             id="phone"
             v-model="form.phone"
-            placeholder="Nhập số điện thoại"
+            :placeholder="$t('AUTH.REGISTER.PHONE_PLACEHOLDER')"
             pattern="[0-9]{10}"
             required
           />
         </div>
 
         <div class="form-group">
-          <label for="password">Mật khẩu</label>
+          <label for="password">{{ $t('AUTH.REGISTER.PASSWORD_LABEL') }}</label>
           <input
             type="password"
             id="password"
             v-model="form.password"
-            placeholder="Nhập mật khẩu"
+            :placeholder="$t('AUTH.REGISTER.PASSWORD_PLACEHOLDER')"
             required
           />
         </div>
 
         <div class="form-group">
-          <label for="confirmPassword">Xác nhận mật khẩu</label>
+          <label for="confirmPassword">{{ $t('AUTH.REGISTER.CONFIRM_PASSWORD_LABEL') }}</label>
           <input
             type="password"
             id="confirmPassword"
             v-model="form.confirmPassword"
-            placeholder="Nhập lại mật khẩu"
+            :placeholder="$t('AUTH.REGISTER.CONFIRM_PASSWORD_PLACEHOLDER')"
             required
           />
         </div>
 
         <button type="submit" class="register-button" :disabled="loading">
-          {{ loading ? 'Đang đăng ký...' : 'Đăng ký' }}
+          {{ loading ? $t('AUTH.REGISTER.BUTTON_LOADING') : $t('AUTH.REGISTER.BUTTON') }}
         </button>
 
         <div class="login-link">
-          Đã có tài khoản? <router-link to="/login">Đăng nhập</router-link>
+          {{ $t('AUTH.REGISTER.HAS_ACCOUNT') }} <router-link to="/login">{{ $t('AUTH.REGISTER.LOGIN_LINK') }}</router-link>
         </div>
       </form>
     </div>
@@ -95,9 +95,12 @@
 <script setup>
 import { ref } from 'vue'
 import { useRouter } from 'vue-router'
+import { useI18n } from 'vue-i18n'
 import defaultAvatar from '@/assets/default-avatar.png'
 import { authApi } from '@/axios/api-services/authApi'
 import { toast } from 'vue3-toastify'
+
+const { t } = useI18n()
 
 const router = useRouter()
 const loading = ref(false)
@@ -118,7 +121,7 @@ const handleAvatarChange = (event) => {
   if (file) {
     if (file.size > 5 * 1024 * 1024) {
       // 5MB limit
-      alert('Kích thước ảnh không được vượt quá 5MB')
+      alert(t('AUTH.REGISTER.AVATAR_SIZE_ERROR'))
       return
     }
     avatarFile.value = file
@@ -129,13 +132,13 @@ const handleAvatarChange = (event) => {
 
 const handleRegister = async () => {
   if (form.value.password !== form.value.confirmPassword) {
-    alert('Mật khẩu xác nhận không khớp')
+    alert(t('AUTH.REGISTER.PASSWORD_MISMATCH'))
     return
   }
 
   // Validate phone number
   if (!/^[0-9]{10}$/.test(form.value.phone)) {
-    alert('Số điện thoại phải có 10 chữ số')
+    alert(t('AUTH.REGISTER.PHONE_INVALID'))
     return
   }
 
@@ -154,13 +157,13 @@ const handleRegister = async () => {
 
     if (response.status == 200) {
       router.push('/login')
-      toast.success('Đăng ký thành công! Vui lòng đăng nhập.')
+      toast.success(t('AUTH.REGISTER.SUCCESS'))
     } else {
-      toast.error('Đăng ký thất bại')
+      toast.error(t('AUTH.REGISTER.ERROR'))
     }
   } catch (error) {
     console.error('Register error:', error)
-    toast.error('Có lỗi xảy ra khi đăng ký')
+    toast.error(t('AUTH.REGISTER.ERROR_GENERAL'))
   } finally {
     loading.value = false
   }
