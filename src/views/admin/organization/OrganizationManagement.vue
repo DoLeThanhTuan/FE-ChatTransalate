@@ -3,9 +3,9 @@
     <AppHeader />
     <div class="organization-management-container">
       <div class="header">
-        <h1>Quản lý tổ chức</h1>
+        <h1>{{ $t('ORGANIZATION_MANAGEMENT.TITLE') }}</h1>
         <button @click="openCreateModal" class="btn-create">
-          <i class="fas fa-plus"></i> Tạo tổ chức mới
+          <i class="fas fa-plus"></i> {{ $t('ORGANIZATION_MANAGEMENT.BUTTON.CREATE_ORGANIZATION') }}
         </button>
       </div>
 
@@ -16,7 +16,7 @@
           <input
             v-model="searchQuery"
             type="text"
-            placeholder="Tìm kiếm theo tên tổ chức..."
+            :placeholder="$t('ORGANIZATION_MANAGEMENT.LABEL.SEARCH_PLACEHOLDER')"
             class="search-input"
           />
         </div>
@@ -25,7 +25,7 @@
       <!-- Loading -->
       <div v-if="loading" class="loading-container">
         <div class="spinner"></div>
-        <p>Đang tải...</p>
+        <p>{{ $t('ORGANIZATION_MANAGEMENT.LABEL.LOADING') }}</p>
       </div>
 
       <!-- Organizations Table -->
@@ -33,12 +33,12 @@
         <table class="organizations-table">
           <thead>
             <tr>
-              <th>ID</th>
-              <th>Tên tổ chức</th>
-              <th>Quốc gia</th>
-              <th>Số lượng nhân sự</th>
-              <th>Số lượng phòng ban</th>
-              <th>Thao tác</th>
+              <th>{{ $t('ORGANIZATION_MANAGEMENT.LABEL.ID') }}</th>
+              <th>{{ $t('ORGANIZATION_MANAGEMENT.LABEL.NAME') }}</th>
+              <th>{{ $t('ORGANIZATION_MANAGEMENT.LABEL.COUNTRY') }}</th>
+              <th>{{ $t('ORGANIZATION_MANAGEMENT.LABEL.USER_COUNT') }}</th>
+              <th>{{ $t('ORGANIZATION_MANAGEMENT.LABEL.DEPARTMENT_COUNT') }}</th>
+              <th>{{ $t('ORGANIZATION_MANAGEMENT.LABEL.ACTIONS') }}</th>
             </tr>
           </thead>
           <tbody>
@@ -60,21 +60,21 @@
                   <button
                     @click="openEditModal(organization)"
                     class="btn-action btn-edit"
-                    title="Chỉnh sửa"
+                    :title="$t('ORGANIZATION_MANAGEMENT.BUTTON.EDIT')"
                   >
                     <font-awesome-icon :icon="['fas', 'edit']" />
                   </button>
                   <button
                     @click="openViewDepartmentsModal(organization)"
                     class="btn-action btn-view"
-                    title="Xem phòng ban"
+                    :title="$t('ORGANIZATION_MANAGEMENT.BUTTON.VIEW_DEPARTMENTS')"
                   >
                     <font-awesome-icon :icon="['fas', 'info']" />
                   </button>
                   <button
                     @click="openDeleteModal(organization)"
                     class="btn-action btn-delete"
-                    title="Xóa"
+                    :title="$t('ORGANIZATION_MANAGEMENT.BUTTON.DELETE')"
                   >
                     <font-awesome-icon :icon="['fas', 'trash']" />
                   </button>
@@ -82,7 +82,7 @@
               </td>
             </tr>
             <tr v-if="filteredOrganizations.length === 0">
-              <td colspan="6" class="no-data">Không có dữ liệu</td>
+              <td colspan="6" class="no-data">{{ $t('ORGANIZATION_MANAGEMENT.LABEL.NO_DATA') }}</td>
             </tr>
           </tbody>
         </table>
@@ -118,6 +118,7 @@
 
 <script setup>
 import { ref, computed, onMounted } from 'vue'
+import { useI18n } from 'vue-i18n'
 import { organizationApi } from '@/axios/api-services/organizationApi'
 import { useOrganizationStore } from '@/stores/organizationStore'
 import ModalConfirmDelete from '@/components/common/ModalConfirmDelete.vue'
@@ -125,6 +126,8 @@ import OrganizationFormModal from '@/components/admin/modals/OrganizationFormMod
 import OrganizationDepartmentsModal from '@/components/admin/modals/OrganizationDepartmentsModal.vue'
 import AppHeader from '@/components/common/AppHeader.vue'
 import { toast } from 'vue3-toastify'
+
+const { t } = useI18n()
 
 const organizationStore = useOrganizationStore()
 const organizations = ref([])
@@ -190,7 +193,7 @@ const fetchOrganizations = async () => {
     organizations.value = response.data || []
   } catch (error) {
     console.error('Error fetching organizations:', error)
-    toast.error('Không thể tải danh sách tổ chức')
+    toast.error(t('ORGANIZATION_MANAGEMENT.MESSAGE.FETCH_ERROR'))
   } finally {
     loading.value = false
   }
@@ -231,7 +234,7 @@ const openViewDepartmentsModal = async (organization) => {
     organizationDepartments.value = response.data || []
   } catch (error) {
     console.error('Error fetching organization departments:', error)
-    toast.error('Không thể tải danh sách phòng ban')
+    toast.error(t('ORGANIZATION_MANAGEMENT.MESSAGE.FETCH_DEPARTMENTS_ERROR'))
     organizationDepartments.value = []
   } finally {
     departmentsLoading.value = false
@@ -259,17 +262,17 @@ const handleSubmit = async (payload) => {
   try {
     if (payload.id) {
       await organizationApi.update(selectedOrganization.value.id, payload)
-      toast.success('Cập nhật tổ chức thành công')
+      toast.success(t('ORGANIZATION_MANAGEMENT.MESSAGE.UPDATE_SUCCESS'))
     } else {
       await organizationApi.create(payload)
-      toast.success('Tạo tổ chức thành công')
+      toast.success(t('ORGANIZATION_MANAGEMENT.MESSAGE.CREATE_SUCCESS'))
     }
     closeModal()
     await fetchOrganizations()
     await organizationStore.fetchOrganizations()
   } catch (error) {
     console.error('Error saving organization:', error)
-    toast.error('Xảy ra lỗi vui lòng thử lại')
+    toast.error(t('ORGANIZATION_MANAGEMENT.MESSAGE.GENERAL_ERROR'))
   } finally {
     submitting.value = false
   }
@@ -279,9 +282,9 @@ const handleDelete = async (id) => {
   try {
     const res = await organizationApi.delete(id)
     if (res.status && res.data) {
-      toast.success('Xóa tổ chức thành công')
+      toast.success(t('ORGANIZATION_MANAGEMENT.MESSAGE.DELETE_SUCCESS'))
     } else {
-      toast.error('Không thể xóa tổ chức')
+      toast.error(t('ORGANIZATION_MANAGEMENT.MESSAGE.DELETE_ERROR'))
     }
     closeDeleteModal()
     await fetchOrganizations()

@@ -9,7 +9,7 @@
       <input
         type="text"
         v-model="searchQuery"
-        placeholder="Tìm icon..."
+        :placeholder="$t('COMPONENT.CHAT_VIEW.MESSAGE_INPUT.SEARCH_EMOJI')"
         class="reaction-search"
       />
       <div class="reaction-categories">

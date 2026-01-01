@@ -1,6 +1,6 @@
 <template>
   <div class="home">
-    <h1>Welcome to LiveStream</h1>
+    <h1>{{ $t('HOME.TITLE') }}</h1>
     <div class="streams-grid">
       <div v-for="stream in streams" :key="stream.id" class="stream-card">
         <router-link :to="'/stream/' + stream.id">
@@ -8,7 +8,7 @@
           <div class="stream-info">
             <h3>{{ stream.title }}</h3>
             <p>{{ stream.username }}</p>
-            <span class="viewers">{{ stream.viewers }} viewers</span>
+            <span class="viewers">{{ stream.viewers }} {{ $t('HOME.VIEWERS') }}</span>
           </div>
         </router-link>
       </div>

@@ -2,7 +2,7 @@
   <button 
     @click="themeStore.toggleTheme()" 
     class="theme-toggle"
-    :title="themeStore.isDark ? 'Chuyển sang chế độ sáng' : 'Chuyển sang chế độ tối'"
+    :title="themeStore.isDark ? $t('COMPONENT.THEME_TOGGLE.SWITCH_TO_LIGHT') : $t('COMPONENT.THEME_TOGGLE.SWITCH_TO_DARK')"
   >
     <!-- Sun icon for dark mode -->
     <svg 

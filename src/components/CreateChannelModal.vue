@@ -2,28 +2,28 @@
   <div v-if="visible" class="modal-overlay">
     <div class="modal-content">
       <div class="modal-header">
-        <h2>Tạo mới channel</h2>
+        <h2>{{ $t('COMPONENT.CHANNEL.CREATE.TITLE') }}</h2>
         <span class="close-btn" @click="$emit('close')">×</span>
       </div>
       <div class="modal-body">
-        <label class="modal-label">Tên channel</label>
+        <label class="modal-label">{{ $t('COMPONENT.CHANNEL.CREATE.NAME_LABEL') }}</label>
         <div>
           <input
             v-model="channelName"
             :class="['modal-input', { 'input-error': showError }]"
-            placeholder="Nhập tên cho channel mới"
+            :placeholder="$t('COMPONENT.CHANNEL.CREATE.NAME_PLACEHOLDER')"
           />
           <div v-if="showError" class="input-error-message">
-            Tên channel phải có ít nhất 1 kí tự.
+            {{ $t('COMPONENT.CHANNEL.CREATE.NAME_ERROR') }}
           </div>
         </div>
 
         <div class="modal-url-row">
-          <span class="modal-url-label">URL:</span>
+          <span class="modal-url-label">{{ $t('COMPONENT.CHANNEL.CREATE.URL_LABEL') }}</span>
           <span v-if="!editingUrl" class="modal-url">{{ url }}</span>
           <input v-else v-model="urlEdit" class="modal-url-edit dark" />
           <span class="modal-url-edit-btn" @click="toggleEditUrl">{{
-            editingUrl ? 'Save' : 'Edit'
+            editingUrl ? $t('COMPONENT.CHANNEL.CREATE.SAVE_URL') : $t('COMPONENT.CHANNEL.CREATE.EDIT_URL')
           }}</span>
         </div>
         <div class="modal-section modal-public-group">
@@ -33,8 +33,8 @@
           >
             <span class="icon">🌐</span>
             <div>
-              <div class="public-title">Channel chung</div>
-              <div class="public-desc">Bất kỳ ai đều có thể tham gia</div>
+              <div class="public-title">{{ $t('COMPONENT.CHANNEL.CREATE.PUBLIC_TITLE') }}</div>
+              <div class="public-desc">{{ $t('COMPONENT.CHANNEL.CREATE.PUBLIC_DESC') }}</div>
             </div>
             <span v-if="isPublic" class="checkmark">✔</span>
           </button>
@@ -44,31 +44,31 @@
           >
             <span class="icon">🔒</span>
             <div>
-              <div class="public-title">Channel Riêng</div>
-              <div class="public-desc">Chỉ những thành viên được mời</div>
+              <div class="public-title">{{ $t('COMPONENT.CHANNEL.CREATE.PRIVATE_TITLE') }}</div>
+              <div class="public-desc">{{ $t('COMPONENT.CHANNEL.CREATE.PRIVATE_DESC') }}</div>
             </div>
             <span v-if="!isPublic" class="checkmark">✔</span>
           </button>
         </div>
         <label class="modal-label" style="margin-top: 0.5rem"
-          >Mô tả <span class="optional">(optional)</span></label
+          >{{ $t('COMPONENT.CHANNEL.CREATE.DESCRIPTION_LABEL') }} <span class="optional">{{ $t('COMPONENT.CHANNEL.CREATE.OPTIONAL') }}</span></label
         >
         <textarea
           v-model="purpose"
           class="modal-input"
-          placeholder="Nhập mô tả cho channel này"
+          :placeholder="$t('COMPONENT.CHANNEL.CREATE.DESCRIPTION_PLACEHOLDER')"
           rows="2"
         ></textarea>
         <div class="modal-checkbox-row"></div>
       </div>
       <div class="modal-actions">
-        <button class="modal-cancel-btn" @click="$emit('close')">Hủy</button>
+        <button class="modal-cancel-btn" @click="$emit('close')">{{ $t('COMPONENT.CHANNEL.CREATE.CANCEL') }}</button>
         <button
           class="modal-create-btn"
           :disabled="!channelName.trim()"
           @click="handleCreate"
         >
-          Tạo
+          {{ $t('COMPONENT.CHANNEL.CREATE.CREATE') }}
         </button>
       </div>
     </div>
@@ -78,10 +78,13 @@
 
 <script setup>
 import { ref, watch } from 'vue'
+import { useI18n } from 'vue-i18n'
 import { useChannelStore } from '@/stores/channelStore'
 import { toast } from 'vue3-toastify'
 import { useRouter } from 'vue-router'
 import { TypeChat } from '@/config/enum'
+
+const { t } = useI18n()
 const props = defineProps({
   visible: Boolean,
 })
@@ -130,13 +133,13 @@ const handleCreate = async () => {
     if (res) {
       resetForm()
       await router.push(`/chat-view/${TypeChat.CHANNEL}/${res.id}`)
-      toast.success('Tạo channel thành công!')
+      toast.success(t('COMPONENT.CHANNEL.CREATE.SUCCESS'))
       emit('close')
     } else {
-      toast.warning('Channel đã tồn tại')
+      toast.warning(t('COMPONENT.CHANNEL.CREATE.EXISTS'))
     }
   } catch (e) {
-    toast.error('Lỗi trong quá trình tạo')
+    toast.error(t('COMPONENT.CHANNEL.CREATE.ERROR'))
   } finally {
     isLoading.value = false
   }

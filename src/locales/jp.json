@@ -5,7 +5,7 @@
         "BUTTON": {
           "BTN_EDIT": "編集",
           "BTN_DELETE": "削除",
-          "BTN_DETAIL": "詳細",
+          "BTN_DETAIL": "詳細を表示",
           "BTN_TRANSLATE": "翻訳",
           "BTN_ORIGINAL": "原文"
         }
@@ -13,12 +13,29 @@
       "MODAL_CONFIRM_DELETE": {
         "LABEL": {
           "HEADER": "削除の確認",
-          "MESSAGE": "本当に削除しますか？"
+          "MESSAGE": "本当に削除してもよろしいですか？"
         },
         "BUTTON": {
           "BTN_CANCEL": "キャンセル",
-          "BTN_DELETE": "削除"
+          "BTN_DELETE": "削除を実行"
         }
+      },
+      "APP_HEADER": {
+        "LOGO": "エンタープライズチャットシステム",
+        "NAV": {
+          "USER_MANAGEMENT": "ユーザー管理",
+          "ORGANIZATION_MANAGEMENT": "組織管理",
+          "DEPARTMENT_MANAGEMENT": "部署管理",
+          "PROFILE": "プロフィール"
+        },
+        "USER_MENU": {
+          "PROFILE": "プロフィール",
+          "LOGOUT": "ログアウト"
+        }
+      },
+      "DROPDOWN_USER": {
+        "REMOVE_FROM_GROUP": "グループから削除",
+        "PRIVATE_MESSAGE": "個別メッセージを送信"
       }
     },
     "CHAT_VIEW": {
@@ -29,10 +46,179 @@
         },
         "BUTTON": {
           "CREATE_CHANNEL": "チャンネルを作成",
-          "SEARCH_CHANNEL": "チャンネルに参加",
+          "SEARCH_CHANNEL": "チャンネルを検索",
           "BTN_TRANSLATE": "翻訳"
-        }
+        },
+        "LOGO": "Smart Chat"
+      },
+      "CHANNEL_HEADER": {
+        "LOADING": "読み込み中...",
+        "CHANNEL_DETAILS": "チャンネル情報",
+        "LEAVE_CHANNEL": "チャンネルを退出",
+        "INFO": "詳細",
+        "BLOCK": "ブロック",
+        "LOCATION": "Huntsville"
+      },
+      "MESSAGE_INPUT": {
+        "PLACEHOLDER": "メッセージを入力してください...",
+        "TRANSLATE": "メッセージを翻訳",
+        "SEARCH_EMOJI": "絵文字を検索...",
+        "SEND_FILE": "ファイルを送信",
+        "FILES_COUNT": "件のファイル",
+        "REMOVE_ALL_FILES": "すべてのファイルを削除",
+        "REMOVE_FILE": "ファイルを削除",
+        "MAX_FILES_ERROR": "アップロードできるファイルは最大 {max} 件までです。",
+        "UPLOAD_ERROR": "ファイルのアップロード中にエラーが発生しました。"
+      },
+      "MESSAGE_LIST": {
+        "CONNECTING": "接続中...",
+        "RETRY": "再試行",
+        "LOADING_MORE": "さらに読み込み中...",
+        "EDITED": "（編集済み）",
+        "SAVE": "保存",
+        "CANCEL": "キャンセル",
+        "REPLY_MESSAGE": "メッセージに返信",
+        "ADD_REACTION": "リアクションを追加",
+        "MESSAGE_DELETED": "このメッセージは削除されました",
+        "CANCEL_REPLY": "返信をキャンセル",
+        "DELETE_MESSAGE_CONFIRM": "このメッセージを削除してもよろしいですか？",
+        "ERROR_LOADING_MESSAGES": "初期メッセージを読み込めませんでした。",
+        "ERROR_CONNECTING": "接続できませんでした。",
+        "ERROR_NO_CHANNEL": "チャンネルが選択されていません。",
+        "ERROR_LOAD_CHANNEL_MESSAGES": "チャンネルのメッセージを読み込めませんでした。",
+        "ERROR_NO_USER": "ユーザーが選択されていません。",
+        "ERROR_LOAD_USER_MESSAGES": "ユーザーのメッセージを読み込めませんでした。",
+        "ERROR_UPDATE_MESSAGE": "メッセージを更新できませんでした。再度お試しください。",
+        "TRANSLATE_ERROR": "翻訳中にエラーが発生しました。再度お試しください。"
       }
+    },
+    "CHANNEL": {
+      "CREATE": {
+        "TITLE": "新規チャンネル作成",
+        "NAME_LABEL": "チャンネル名",
+        "NAME_PLACEHOLDER": "チャンネル名を入力してください",
+        "NAME_ERROR": "チャンネル名は1文字以上で入力してください。",
+        "URL_LABEL": "チャンネルURL：",
+        "EDIT_URL": "編集",
+        "SAVE_URL": "保存",
+        "PUBLIC_TITLE": "公開チャンネル",
+        "PUBLIC_DESC": "すべてのユーザーが参加できます。",
+        "PRIVATE_TITLE": "非公開チャンネル",
+        "PRIVATE_DESC": "招待されたメンバーのみ参加できます。",
+        "DESCRIPTION_LABEL": "説明",
+        "OPTIONAL": "（任意）",
+        "DESCRIPTION_PLACEHOLDER": "チャンネルの説明を入力してください",
+        "CANCEL": "キャンセル",
+        "CREATE": "作成",
+        "SUCCESS": "チャンネルが正常に作成されました。",
+        "EXISTS": "同じ名前のチャンネルが既に存在します。",
+        "ERROR": "チャンネル作成中にエラーが発生しました。"
+      },
+      "JOIN": {
+        "TITLE": "チャンネル検索",
+        "SEARCH_PLACEHOLDER": "検索キーワードを入力してください",
+        "SEARCH": "検索",
+        "EMPTY": "該当するチャンネルがありません"
+      },
+      "USERS": {
+        "TITLE": "メンバー一覧",
+        "TAB_MEMBERS": "メンバー",
+        "TAB_ADD": "メンバーを追加",
+        "NO_MEMBERS": "メンバーがいません",
+        "SEARCH_PLACEHOLDER": "名前またはメールアドレスで検索...",
+        "SEARCH": "検索",
+        "NOT_FOUND": "該当する結果がありません",
+        "CLOSE": "閉じる",
+        "CONFIRM": "確認"
+      }
+    },
+    "TRANSLATE_MODAL": {
+      "TITLE": "翻訳",
+      "SOURCE_LABEL": "元のテキスト",
+      "SOURCE_PLACEHOLDER": "テキストを入力してください",
+      "TRANSLATE_BUTTON": "翻訳",
+      "RESULT_PLACEHOLDER": "翻訳結果がここに表示されます",
+      "CLOSE": "閉じる",
+      "CONFIRM": "確認",
+      "ERROR": "翻訳中にエラーが発生しました。"
+    },
+    "THEME_TOGGLE": {
+      "SWITCH_TO_LIGHT": "ライトモードに切り替え",
+      "SWITCH_TO_DARK": "ダークモードに切り替え"
     }
+  },
+  "AUTH": {
+    "LOGIN": {
+      "TITLE": "ログイン",
+      "ACCOUNT_LABEL": "ユーザー名",
+      "ACCOUNT_PLACEHOLDER": "ユーザー名を入力してください",
+      "PASSWORD_LABEL": "パスワード",
+      "PASSWORD_PLACEHOLDER": "パスワードを入力してください",
+      "REMEMBER_ME": "ログイン状態を保持",
+      "FORGOT_PASSWORD": "パスワードをお忘れですか？",
+      "BUTTON": "ログイン",
+      "BUTTON_LOADING": "ログイン中...",
+      "NO_ACCOUNT": "アカウントをお持ちでない場合",
+      "REGISTER_LINK": "新規登録",
+      "ERROR": "ログインに失敗しました。"
+    },
+    "REGISTER": {
+      "TITLE": "ユーザー登録",
+      "NAME_LABEL": "氏名",
+      "NAME_PLACEHOLDER": "氏名を入力してください",
+      "AVATAR_LABEL": "プロフィール画像",
+      "CHANGE_AVATAR": "画像を変更",
+      "SELECT_AVATAR": "画像を選択",
+      "EMAIL_LABEL": "メールアドレス",
+      "EMAIL_PLACEHOLDER": "メールアドレスを入力してください",
+      "PHONE_LABEL": "電話番号",
+      "PHONE_PLACEHOLDER": "電話番号を入力してください",
+      "PASSWORD_LABEL": "パスワード",
+      "PASSWORD_PLACEHOLDER": "パスワードを入力してください",
+      "CONFIRM_PASSWORD_LABEL": "パスワード（確認）",
+      "CONFIRM_PASSWORD_PLACEHOLDER": "もう一度パスワードを入力してください",
+      "BUTTON": "登録",
+      "BUTTON_LOADING": "登録中...",
+      "HAS_ACCOUNT": "既にアカウントをお持ちの場合",
+      "LOGIN_LINK": "ログイン",
+      "AVATAR_SIZE_ERROR": "画像サイズは5MB以内にしてください。",
+      "PASSWORD_MISMATCH": "パスワードが一致しません。",
+      "PHONE_INVALID": "電話番号は10桁で入力してください。",
+      "SUCCESS": "登録が完了しました。ログインしてください。",
+      "ERROR": "登録に失敗しました。",
+      "ERROR_GENERAL": "登録中に予期しないエラーが発生しました。"
+    }
+  },
+  "PROFILE": {
+    "TITLE": "プロフィール情報",
+    "AVATAR_LABEL": "プロフィール画像",
+    "CHANGE_AVATAR": "画像を変更",
+    "SELECT_AVATAR": "画像を選択",
+    "USERNAME_LABEL": "ユーザー名",
+    "EMAIL_LABEL": "メールアドレス",
+    "PHONE_LABEL": "電話番号",
+    "ROLE_LABEL": "役割",
+    "LOGOUT_BUTTON": "ログアウト"
+  },
+  "ERROR": {
+    "404": {
+      "TITLE": "404",
+      "HEADING": "ページが見つかりません",
+      "MESSAGE": "指定されたページは存在しないか、移動された可能性があります。",
+      "HOME_LINK": "ホームへ戻る"
+    },
+    "403": {
+      "TITLE": "403",
+      "HEADING": "アクセス拒否",
+      "MESSAGE": "このページにアクセスする権限がありません。",
+      "HOME_LINK": "ホームへ戻る"
+    }
+  },
+  "HOME": {
+    "TITLE": "LiveStreamへようこそ",
+    "VIEWERS": "視聴者"
+  },
+  "language": {
+    "selectLanguage": "言語を選択"
   }
 }

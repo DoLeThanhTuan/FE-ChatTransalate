@@ -3,7 +3,7 @@
     <div class="modal-content">
       <div class="modal-header">
         <h2>
-          {{ isEditMode ? 'Chỉnh sửa phòng ban' : 'Tạo phòng ban mới' }}
+          {{ isEditMode ? $t('DEPARTMENT_MANAGEMENT.MODAL.EDIT_TITLE') : $t('DEPARTMENT_MANAGEMENT.MODAL.CREATE_TITLE') }}
         </h2>
         <button @click="$emit('close')" class="btn-close">
           <i class="fas fa-times"></i>
@@ -12,7 +12,7 @@
 
       <form @submit.prevent="handleSubmit" class="department-form">
         <div class="form-group">
-          <label>Tổ chức *</label>
+          <label>{{ $t('DEPARTMENT_MANAGEMENT.MODAL.ORGANIZATION_LABEL') }}</label>
           <select v-model="localFormData.organizationId" required>
             <option
               v-for="organization in organizations"
@@ -25,31 +25,31 @@
         </div>
 
         <div class="form-group">
-          <label>Tên phòng ban *</label>
+          <label>{{ $t('DEPARTMENT_MANAGEMENT.MODAL.NAME_LABEL') }}</label>
           <input
             v-model="localFormData.name"
             type="text"
             required
-            placeholder="Nhập tên phòng ban"
+            :placeholder="$t('DEPARTMENT_MANAGEMENT.MODAL.NAME_PLACEHOLDER')"
           />
         </div>
 
         <div class="form-group">
-          <label>Mô tả</label>
+          <label>{{ $t('DEPARTMENT_MANAGEMENT.MODAL.DESCRIPTION_LABEL') }}</label>
           <textarea
             v-model="localFormData.description"
             rows="4"
-            placeholder="Nhập mô tả phòng ban"
+            :placeholder="$t('DEPARTMENT_MANAGEMENT.MODAL.DESCRIPTION_PLACEHOLDER')"
           ></textarea>
         </div>
 
         <div class="form-actions">
           <button type="button" @click="$emit('close')" class="btn-cancel">
-            Hủy
+            {{ $t('DEPARTMENT_MANAGEMENT.BUTTON.CANCEL') }}
           </button>
           <button type="submit" class="btn-submit" :disabled="submitting">
             {{
-              submitting ? 'Đang xử lý...' : isEditMode ? 'Cập nhật' : 'Tạo mới'
+              submitting ? $t('DEPARTMENT_MANAGEMENT.LABEL.PROCESSING') : isEditMode ? $t('DEPARTMENT_MANAGEMENT.BUTTON.UPDATE') : $t('DEPARTMENT_MANAGEMENT.BUTTON.CREATE')
             }}
           </button>
         </div>

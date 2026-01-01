@@ -3,10 +3,10 @@
     <AppHeader />
     <div class="profile-container">
       <div class="profile-box">
-        <h2>Thông tin cá nhân</h2>
+        <h2>{{ $t('PROFILE.TITLE') }}</h2>
         <div class="profile-info">
           <div class="form-group">
-            <label for="avatar">Ảnh đại diện</label>
+            <label for="avatar">{{ $t('PROFILE.AVATAR_LABEL') }}</label>
             <div class="avatar-upload">
               <img
                 :src="avatarPreview || defaultAvatar"
@@ -21,28 +21,28 @@
                 class="avatar-input"
               />
               <label for="avatar" class="avatar-label">
-                {{ avatarPreview ? 'Thay đổi ảnh' : 'Chọn ảnh' }}
+                {{ avatarPreview ? $t('PROFILE.CHANGE_AVATAR') : $t('PROFILE.SELECT_AVATAR') }}
               </label>
             </div>
           </div>
           <div class="info-group">
-            <label>Tên đăng nhập</label>
+            <label>{{ $t('PROFILE.USERNAME_LABEL') }}</label>
             <p>{{ userInfo.username }}</p>
           </div>
           <div class="info-group">
-            <label>Email</label>
+            <label>{{ $t('PROFILE.EMAIL_LABEL') }}</label>
             <p>{{ userInfo.email }}</p>
           </div>
           <div class="info-group">
-            <label>Số điện thoại</label>
+            <label>{{ $t('PROFILE.PHONE_LABEL') }}</label>
             <p>{{ userInfo.phone }}</p>
           </div>
           <div class="info-group">
-            <label>Vai trò</label>
+            <label>{{ $t('PROFILE.ROLE_LABEL') }}</label>
             <p>{{ userInfo.role }}</p>
           </div>
         </div>
-        <button @click="handleLogout" class="logout-button">Đăng xuất</button>
+        <button @click="handleLogout" class="logout-button">{{ $t('PROFILE.LOGOUT_BUTTON') }}</button>
       </div>
     </div>
   </div>

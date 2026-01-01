@@ -3,7 +3,7 @@
     <div class="modal-content">
       <div class="modal-header">
         <h2>
-          {{ id ? 'Chỉnh sửa tổ chức' : 'Tạo tổ chức mới' }}
+          {{ id ? $t('ORGANIZATION_MANAGEMENT.MODAL.EDIT_TITLE') : $t('ORGANIZATION_MANAGEMENT.MODAL.CREATE_TITLE') }}
         </h2>
         <button @click="$emit('close')" class="btn-close">
           <i class="fas fa-times"></i>
@@ -12,17 +12,17 @@
 
       <div class="organization-form">
         <div class="form-group">
-          <label>Tên tổ chức *</label>
+          <label>{{ $t('ORGANIZATION_MANAGEMENT.MODAL.NAME_LABEL') }}</label>
           <input
             v-model="organization.name"
             type="text"
             required
-            placeholder="Nhập tên tổ chức"
+            :placeholder="$t('ORGANIZATION_MANAGEMENT.MODAL.NAME_PLACEHOLDER')"
           />
         </div>
 
         <div class="form-group">
-          <label>Quốc gia *</label>
+          <label>{{ $t('ORGANIZATION_MANAGEMENT.MODAL.COUNTRY_LABEL') }}</label>
           <select v-model="organization.country" class="select dark">
             <option
               v-for="lang in languages"
@@ -35,17 +35,17 @@
         </div>
 
         <div class="form-group">
-          <label>Mô tả</label>
+          <label>{{ $t('ORGANIZATION_MANAGEMENT.MODAL.DESCRIPTION_LABEL') }}</label>
           <textarea
             v-model="organization.description"
             rows="4"
-            placeholder="Nhập mô tả tổ chức"
+            :placeholder="$t('ORGANIZATION_MANAGEMENT.MODAL.DESCRIPTION_PLACEHOLDER')"
           ></textarea>
         </div>
 
         <div class="form-actions">
           <button type="button" @click="handleClose" class="btn-cancel">
-            Hủy
+            {{ $t('ORGANIZATION_MANAGEMENT.BUTTON.CANCEL') }}
           </button>
           <button
             type="submit"
@@ -53,7 +53,7 @@
             @click="handleSubmit"
             :disabled="isLoading"
           >
-            {{ 'Cập nhật' }}
+            {{ $t('ORGANIZATION_MANAGEMENT.BUTTON.UPDATE') }}
           </button>
         </div>
       </div>

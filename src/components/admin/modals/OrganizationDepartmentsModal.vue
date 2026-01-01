@@ -2,7 +2,7 @@
   <div v-if="visible" class="modal-overlay" @click.self="$emit('close')">
     <div class="modal-content modal-large">
       <div class="modal-header">
-        <h2>Danh sách phòng ban - {{ organizationName }}</h2>
+        <h2>{{ $t('ORGANIZATION_MANAGEMENT.MODAL.VIEW_DEPARTMENTS_TITLE') }} - {{ organizationName }}</h2>
         <button @click="$emit('close')" class="btn-close">
           <i class="fas fa-times"></i>
         </button>
@@ -11,10 +11,10 @@
       <div class="departments-list-container">
         <div v-if="loading" class="loading-container">
           <div class="spinner"></div>
-          <p>Đang tải...</p>
+          <p>{{ $t('ORGANIZATION_MANAGEMENT.LABEL.LOADING') }}</p>
         </div>
         <div v-else-if="departments.length === 0" class="no-data">
-          Không có phòng ban nào trong tổ chức này
+          {{ $t('ORGANIZATION_MANAGEMENT.MESSAGE.NO_DEPARTMENTS') }}
         </div>
         <div v-else class="departments-list">
           <div
@@ -25,7 +25,7 @@
             <div class="department-info">
               <div class="department-name">{{ dept.name }}</div>
               <div class="department-description">
-                {{ dept.description || 'Không có mô tả' }}
+                {{ dept.description || $t('ORGANIZATION_MANAGEMENT.MODAL.NO_DESCRIPTION') }}
               </div>
             </div>
           </div>

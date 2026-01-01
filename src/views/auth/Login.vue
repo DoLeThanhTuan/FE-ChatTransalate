@@ -1,26 +1,26 @@
 <template>
   <div class="login-container">
     <div class="login-box">
-      <h2>Đăng nhập</h2>
+      <h2>{{ $t('AUTH.LOGIN.TITLE') }}</h2>
       <form @submit.prevent="handleLogin" class="login-form">
         <div class="form-group">
-          <label for="email">Tài khoản</label>
+          <label for="email">{{ $t('AUTH.LOGIN.ACCOUNT_LABEL') }}</label>
           <input
             type="text"
             id="email"
             v-model="form.email"
-            placeholder="Nhập tên đăng nhập của bạn"
+            :placeholder="$t('AUTH.LOGIN.ACCOUNT_PLACEHOLDER')"
             required
           />
         </div>
 
         <div class="form-group">
-          <label for="password">Mật khẩu</label>
+          <label for="password">{{ $t('AUTH.LOGIN.PASSWORD_LABEL') }}</label>
           <input
             type="password"
             id="password"
             v-model="form.password"
-            placeholder="Nhập mật khẩu của bạn"
+            :placeholder="$t('AUTH.LOGIN.PASSWORD_PLACEHOLDER')"
             required
           />
         </div>
@@ -28,18 +28,18 @@
         <div class="form-options">
           <label class="remember-me">
             <input type="checkbox" v-model="form.remember" />
-            <span>Ghi nhớ đăng nhập</span>
+            <span>{{ $t('AUTH.LOGIN.REMEMBER_ME') }}</span>
           </label>
-          <a href="#" class="forgot-password">Quên mật khẩu?</a>
+          <a href="#" class="forgot-password">{{ $t('AUTH.LOGIN.FORGOT_PASSWORD') }}</a>
         </div>
 
         <button type="submit" class="login-button" :disabled="loading">
-          {{ loading ? 'Đang đăng nhập...' : 'Đăng nhập' }}
+          {{ loading ? $t('AUTH.LOGIN.BUTTON_LOADING') : $t('AUTH.LOGIN.BUTTON') }}
         </button>
 
         <div class="register-link">
-          Chưa có tài khoản?
-          <router-link to="/register">Đăng ký ngay</router-link>
+          {{ $t('AUTH.LOGIN.NO_ACCOUNT') }}
+          <router-link to="/register">{{ $t('AUTH.LOGIN.REGISTER_LINK') }}</router-link>
         </div>
       </form>
     </div>
@@ -49,12 +49,15 @@
 <script setup>
 import { ref } from 'vue'
 import { useRouter } from 'vue-router'
+import { useI18n } from 'vue-i18n'
 import { authApi } from '@/axios/api-services/authApi'
 import { toast } from 'vue3-toastify'
 import { useAuthStore } from '@/stores/authStore'
 import { TypeChat } from '@/config/enum'
 import { channelApi } from '@/axios/api-services/channelApi'
 import { requestNotificationPermission } from '@/utils/notification'
+
+const { t } = useI18n()
 
 const router = useRouter()
 const loading = ref(false)
@@ -82,7 +85,7 @@ const handleLogin = async () => {
     }
   } catch (error) {
     console.error('Login error:', error)
-    toast.error('Có lỗi xảy ra khi đăng nhập')
+    toast.error(t('AUTH.LOGIN.ERROR'))
   } finally {
     loading.value = false
   }

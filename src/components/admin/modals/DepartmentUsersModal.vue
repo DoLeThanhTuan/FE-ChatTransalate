@@ -2,7 +2,7 @@
   <div v-if="visible" class="modal-overlay" @click.self="$emit('close')">
     <div class="modal-content modal-large">
       <div class="modal-header">
-        <h2>Danh sách nhân viên - {{ departmentName }}</h2>
+        <h2>{{ $t('DEPARTMENT_MANAGEMENT.MODAL.VIEW_USERS_TITLE') }} - {{ departmentName }}</h2>
         <button @click="$emit('close')" class="btn-close">
           <i class="fas fa-times"></i>
         </button>
@@ -11,10 +11,10 @@
       <div class="users-list-container">
         <div v-if="loading" class="loading-container">
           <div class="spinner"></div>
-          <p>Đang tải...</p>
+          <p>{{ $t('DEPARTMENT_MANAGEMENT.LABEL.LOADING') }}</p>
         </div>
         <div v-else-if="users.length === 0" class="no-data">
-          Không có nhân viên nào trong phòng ban này
+          {{ $t('DEPARTMENT_MANAGEMENT.MESSAGE.NO_USERS') }}
         </div>
         <div v-else class="users-list">
           <div v-for="user in users" :key="user.id" class="user-item">

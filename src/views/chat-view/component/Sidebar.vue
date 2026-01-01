@@ -2,7 +2,7 @@
   <aside class="sidebar">
     <div class="sidebar-header">
       <LanguageSelector />
-      <div class="logo">Smart Chat</div>
+      <div class="logo">{{ $t('COMPONENT.CHAT_VIEW.SIDE_BAR.LOGO') }}</div>
       <button class="create-channel-btn" @click="showModal = true">
         + {{ $t('COMPONENT.CHAT_VIEW.SIDE_BAR.BUTTON.CREATE_CHANNEL') }}
       </button>

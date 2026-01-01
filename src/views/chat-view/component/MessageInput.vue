@@ -5,9 +5,9 @@
     </div>
     <div v-if="selectedFiles.length > 0" class="files-preview">
       <div class="files-header">
-        <span>{{ selectedFiles.length }} file(s)</span>
+        <span>{{ selectedFiles.length }} {{ $t('COMPONENT.CHAT_VIEW.MESSAGE_INPUT.FILES_COUNT') }}</span>
         <button class="remove-all-files" @click="removeAllFiles">
-          Xóa tất cả
+          {{ $t('COMPONENT.CHAT_VIEW.MESSAGE_INPUT.REMOVE_ALL_FILES') }}
         </button>
       </div>
       <div class="files-list">
@@ -24,7 +24,7 @@
           <button
             class="remove-file"
             @click="removeFile(index)"
-            title="Xóa file"
+            :title="$t('COMPONENT.CHAT_VIEW.MESSAGE_INPUT.REMOVE_FILE')"
           >
             ×
           </button>
@@ -42,7 +42,7 @@
       <textarea
         class="msg-input"
         v-model="message.content"
-        placeholder="Message..."
+        :placeholder="$t('COMPONENT.CHAT_VIEW.MESSAGE_INPUT.PLACEHOLDER')"
         @keydown="handleKeyDown"
         @input="onInput"
         rows="1"
@@ -87,7 +87,7 @@
               <input
                 type="text"
                 v-model="searchQuery"
-                placeholder="Tìm emoji..."
+                :placeholder="$t('COMPONENT.CHAT_VIEW.MESSAGE_INPUT.SEARCH_EMOJI')"
                 class="emoji-search"
               />
               <div class="emoji-categories">
@@ -116,7 +116,7 @@
             </div>
           </div>
         </div>
-        <label class="action-btn" title="Gửi file">
+        <label class="action-btn" :title="$t('COMPONENT.CHAT_VIEW.MESSAGE_INPUT.SEND_FILE')">
           📎
           <input
             type="file"
@@ -142,6 +142,7 @@
 
 <script setup>
 import { ref, watch, nextTick, computed } from 'vue'
+import { useI18n } from 'vue-i18n'
 import { fileApi } from '@/axios/api-services/fileApi'
 import { useChannelStore } from '@/stores/channelStore'
 import { getURLAvatar } from '@/utils/image'
@@ -152,6 +153,8 @@ import { useRoute } from 'vue-router'
 import { TypeChat } from '@/config/enum'
 import TranslateModal from '../../../components/TranslateModal.vue'
 import { useAuthStore } from '@/stores/authStore'
+
+const { t } = useI18n()
 
 const message = ref({
   content: '',
@@ -313,7 +316,7 @@ const removeAllFiles = () => {
 const handleFileUpload = (event) => {
   const files = Array.from(event.target.files)
   if (selectedFiles.value.length + files.length > MAX_FILES) {
-    alert(`Chỉ được chọn tối đa ${MAX_FILES} file`)
+    alert(t('COMPONENT.CHAT_VIEW.MESSAGE_INPUT.MAX_FILES_ERROR', { max: MAX_FILES }))
     return
   }
   selectedFiles.value.push(...files)
@@ -380,7 +383,7 @@ const uploadFiles = async (files) => {
     return response.data
   } catch (error) {
     console.error('Error uploading files:', error)
-    uploadError.value = 'Có lỗi trong quá trình upload file.'
+    uploadError.value = t('COMPONENT.CHAT_VIEW.MESSAGE_INPUT.UPLOAD_ERROR')
   }
 }
 

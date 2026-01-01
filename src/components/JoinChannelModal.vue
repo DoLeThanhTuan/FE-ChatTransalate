@@ -2,7 +2,7 @@
   <div v-if="visible" class="modal-overlay">
     <div class="modal-content">
       <div class="modal-header">
-        <h2>Tìm channel</h2>
+        <h2>{{ $t('COMPONENT.CHANNEL.JOIN.TITLE') }}</h2>
         <span class="close-btn" @click="$emit('close')">×</span>
       </div>
       <div class="modal-body">
@@ -10,12 +10,12 @@
           <input
             v-model="search"
             class="modal-input"
-            placeholder="Nhập kí tự để tìm"
+            :placeholder="$t('COMPONENT.CHANNEL.JOIN.SEARCH_PLACEHOLDER')"
             @keyup.enter="searchChannelsAPI"
           />
-          <button class="search-btn" @click="searchChannelsAPI">Tìm</button>
+          <button class="search-btn" @click="searchChannelsAPI">{{ $t('COMPONENT.CHANNEL.JOIN.SEARCH') }}</button>
         </div>
-        <div v-if="channels.length == 0" class="modal-section-title">Trống</div>
+        <div v-if="channels.length == 0" class="modal-section-title">{{ $t('COMPONENT.CHANNEL.JOIN.EMPTY') }}</div>
         <ul class="channel-list">
           <li
             v-for="channel in channels"

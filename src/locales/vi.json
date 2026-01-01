@@ -19,6 +19,23 @@
           "BTN_CANCEL": "Hủy",
           "BTN_DELETE": "Xóa"
         }
+      },
+      "APP_HEADER": {
+        "LOGO": "Chat App",
+        "NAV": {
+          "USER_MANAGEMENT": "Quản lý người dùng",
+          "ORGANIZATION_MANAGEMENT": "Quản lý tổ chức",
+          "DEPARTMENT_MANAGEMENT": "Quản lý phòng ban",
+          "PROFILE": "Hồ sơ"
+        },
+        "USER_MENU": {
+          "PROFILE": "Hồ sơ",
+          "LOGOUT": "Đăng xuất"
+        }
+      },
+      "DROPDOWN_USER": {
+        "REMOVE_FROM_GROUP": "Xóa khỏi nhóm",
+        "PRIVATE_MESSAGE": "Nhắn tin riêng"
       }
     },
     "CHAT_VIEW": {
@@ -31,9 +48,175 @@
           "CREATE_CHANNEL": "Tạo channel",
           "SEARCH_CHANNEL": "Tham gia channel",
           "BTN_TRANSLATE": "Dịch"
-        }
+        },
+        "LOGO": "Smart Chat"
+      },
+      "CHANNEL_HEADER": {
+        "LOADING": "Loading...",
+        "CHANNEL_DETAILS": "Channel Details",
+        "LEAVE_CHANNEL": "Leave Channel",
+        "INFO": "Info",
+        "BLOCK": "Chặn",
+        "LOCATION": "Huntsville"
+      },
+      "MESSAGE_INPUT": {
+        "PLACEHOLDER": "Message...",
+        "TRANSLATE": "Dịch",
+        "SEARCH_EMOJI": "Tìm emoji...",
+        "SEND_FILE": "Gửi file",
+        "FILES_COUNT": "file(s)",
+        "REMOVE_ALL_FILES": "Xóa tất cả",
+        "REMOVE_FILE": "Xóa file",
+        "MAX_FILES_ERROR": "Chỉ được chọn tối đa {max} file",
+        "UPLOAD_ERROR": "Có lỗi trong quá trình upload file."
+      },
+      "MESSAGE_LIST": {
+        "CONNECTING": "Đang kết nối...",
+        "RETRY": "Thử lại",
+        "LOADING_MORE": "Đang tải thêm...",
+        "EDITED": "(đã sửa)",
+        "SAVE": "Lưu",
+        "CANCEL": "Hủy",
+        "REPLY_MESSAGE": "Trả lời tin nhắn",
+        "ADD_REACTION": "Thêm reaction",
+        "MESSAGE_DELETED": "Tin nhắn này đã được xóa",
+        "CANCEL_REPLY": "Hủy trả lời",
+        "DELETE_MESSAGE_CONFIRM": "Bạn chắc chắn muốn xóa tin nhắn này không?",
+        "ERROR_LOADING_MESSAGES": "Không thể tải tin nhắn ban đầu",
+        "ERROR_CONNECTING": "Không thể kết nối...",
+        "ERROR_NO_CHANNEL": "Không có channel được chọn",
+        "ERROR_LOAD_CHANNEL_MESSAGES": "Không thể tải tin nhắn kênh",
+        "ERROR_NO_USER": "Không có người dùng được chọn",
+        "ERROR_LOAD_USER_MESSAGES": "Không thể tải tin nhắn người dùng",
+        "ERROR_UPDATE_MESSAGE": "Không thể sửa tin nhắn. Vui lòng thử lại.",
+        "TRANSLATE_ERROR": "Có lỗi xảy ra vui lòng thử lại"
       }
+    },
+    "CHANNEL": {
+      "CREATE": {
+        "TITLE": "Tạo mới channel",
+        "NAME_LABEL": "Tên channel",
+        "NAME_PLACEHOLDER": "Nhập tên cho channel mới",
+        "NAME_ERROR": "Tên channel phải có ít nhất 1 kí tự.",
+        "URL_LABEL": "URL:",
+        "EDIT_URL": "Edit",
+        "SAVE_URL": "Save",
+        "PUBLIC_TITLE": "Channel chung",
+        "PUBLIC_DESC": "Bất kỳ ai đều có thể tham gia",
+        "PRIVATE_TITLE": "Channel Riêng",
+        "PRIVATE_DESC": "Chỉ những thành viên được mời",
+        "DESCRIPTION_LABEL": "Mô tả",
+        "OPTIONAL": "(optional)",
+        "DESCRIPTION_PLACEHOLDER": "Nhập mô tả cho channel này",
+        "CANCEL": "Hủy",
+        "CREATE": "Tạo",
+        "SUCCESS": "Tạo channel thành công!",
+        "EXISTS": "Channel đã tồn tại",
+        "ERROR": "Lỗi trong quá trình tạo"
+      },
+      "JOIN": {
+        "TITLE": "Tìm channel",
+        "SEARCH_PLACEHOLDER": "Nhập kí tự để tìm",
+        "SEARCH": "Tìm",
+        "EMPTY": "Trống"
+      },
+      "USERS": {
+        "TITLE": "Danh sách thành viên",
+        "TAB_MEMBERS": "Thành viên",
+        "TAB_ADD": "Thêm thành viên",
+        "NO_MEMBERS": "Không có thành viên nào",
+        "SEARCH_PLACEHOLDER": "Tìm theo tên hoặc email...",
+        "SEARCH": "Tìm",
+        "NOT_FOUND": "Không tìm thấy",
+        "CLOSE": "Đóng",
+        "CONFIRM": "Xác nhận"
+      }
+    },
+    "TRANSLATE_MODAL": {
+      "TITLE": "Translate",
+      "SOURCE_LABEL": "Văn bản nguồn",
+      "SOURCE_PLACEHOLDER": "Nhập văn bản...",
+      "TRANSLATE_BUTTON": "Dịch",
+      "RESULT_PLACEHOLDER": "Bản dịch sẽ hiển thị ở đây",
+      "CLOSE": "Đóng",
+      "CONFIRM": "Xác nhận",
+      "ERROR": "Có lỗi xảy ra vui lòng thử lại"
+    },
+    "THEME_TOGGLE": {
+      "SWITCH_TO_LIGHT": "Chuyển sang chế độ sáng",
+      "SWITCH_TO_DARK": "Chuyển sang chế độ tối"
     }
+  },
+  "AUTH": {
+    "LOGIN": {
+      "TITLE": "Đăng nhập",
+      "ACCOUNT_LABEL": "Tài khoản",
+      "ACCOUNT_PLACEHOLDER": "Nhập tên đăng nhập của bạn",
+      "PASSWORD_LABEL": "Mật khẩu",
+      "PASSWORD_PLACEHOLDER": "Nhập mật khẩu của bạn",
+      "REMEMBER_ME": "Ghi nhớ đăng nhập",
+      "FORGOT_PASSWORD": "Quên mật khẩu?",
+      "BUTTON": "Đăng nhập",
+      "BUTTON_LOADING": "Đang đăng nhập...",
+      "NO_ACCOUNT": "Chưa có tài khoản?",
+      "REGISTER_LINK": "Đăng ký ngay",
+      "ERROR": "Có lỗi xảy ra khi đăng nhập"
+    },
+    "REGISTER": {
+      "TITLE": "Đăng ký tài khoản",
+      "NAME_LABEL": "Họ và tên",
+      "NAME_PLACEHOLDER": "Nhập họ và tên",
+      "AVATAR_LABEL": "Ảnh đại diện",
+      "CHANGE_AVATAR": "Thay đổi ảnh",
+      "SELECT_AVATAR": "Chọn ảnh",
+      "EMAIL_LABEL": "Email",
+      "EMAIL_PLACEHOLDER": "Nhập email của bạn",
+      "PHONE_LABEL": "Số điện thoại",
+      "PHONE_PLACEHOLDER": "Nhập số điện thoại",
+      "PASSWORD_LABEL": "Mật khẩu",
+      "PASSWORD_PLACEHOLDER": "Nhập mật khẩu",
+      "CONFIRM_PASSWORD_LABEL": "Xác nhận mật khẩu",
+      "CONFIRM_PASSWORD_PLACEHOLDER": "Nhập lại mật khẩu",
+      "BUTTON": "Đăng ký",
+      "BUTTON_LOADING": "Đang đăng ký...",
+      "HAS_ACCOUNT": "Đã có tài khoản?",
+      "LOGIN_LINK": "Đăng nhập",
+      "AVATAR_SIZE_ERROR": "Kích thước ảnh không được vượt quá 5MB",
+      "PASSWORD_MISMATCH": "Mật khẩu xác nhận không khớp",
+      "PHONE_INVALID": "Số điện thoại phải có 10 chữ số",
+      "SUCCESS": "Đăng ký thành công! Vui lòng đăng nhập.",
+      "ERROR": "Đăng ký thất bại",
+      "ERROR_GENERAL": "Có lỗi xảy ra khi đăng ký"
+    }
+  },
+  "PROFILE": {
+    "TITLE": "Thông tin cá nhân",
+    "AVATAR_LABEL": "Ảnh đại diện",
+    "CHANGE_AVATAR": "Thay đổi ảnh",
+    "SELECT_AVATAR": "Chọn ảnh",
+    "USERNAME_LABEL": "Tên đăng nhập",
+    "EMAIL_LABEL": "Email",
+    "PHONE_LABEL": "Số điện thoại",
+    "ROLE_LABEL": "Vai trò",
+    "LOGOUT_BUTTON": "Đăng xuất"
+  },
+  "ERROR": {
+    "404": {
+      "TITLE": "404",
+      "HEADING": "Không tìm thấy trang",
+      "MESSAGE": "Trang bạn đang tìm kiếm không tồn tại hoặc đã bị di chuyển.",
+      "HOME_LINK": "Về trang chủ"
+    },
+    "403": {
+      "TITLE": "403",
+      "HEADING": "Không thể truy cập",
+      "MESSAGE": "Bạn không có quyền để truy cập trang này.",
+      "HOME_LINK": "Về trang chủ"
+    }
+  },
+  "HOME": {
+    "TITLE": "Welcome to LiveStream",
+    "VIEWERS": "viewers"
   },
   "USER_MANAGEMENT": {
     "TITLE": "Quản lý người dùng",
@@ -57,11 +240,22 @@
       "SELECT_ROLE": "Chọn vai trò",
       "NO_DATA": "Không có dữ liệu",
       "LOADING": "Đang tải...",
-      "PROCESSING": "Đang xử lý..."
+      "PROCESSING": "Đang xử lý...",
+      "DEPARTMENT": "Phòng ban",
+      "ACTIONS": "Thao tác",
+      "STT": "STT",
+      "USERNAME_COLUMN": "Tên người dùng",
+      "NA": "N/A"
     },
     "MODAL": {
       "CREATE_TITLE": "Tạo người dùng mới",
-      "EDIT_TITLE": "Chỉnh sửa người dùng"
+      "EDIT_TITLE": "Chỉnh sửa người dùng",
+      "USERNAME_PLACEHOLDER": "Nhập tên đăng nhập",
+      "EMAIL_PLACEHOLDER": "Nhập email",
+      "PHONE_PLACEHOLDER": "Nhập số điện thoại",
+      "PASSWORD_PLACEHOLDER": "Nhập mật khẩu",
+      "ROLE_USER": "User",
+      "ROLE_ADMIN": "Admin"
     },
     "MESSAGE": {
       "CREATE_SUCCESS": "Tạo người dùng thành công",
@@ -94,12 +288,21 @@
       "LOADING": "Đang tải...",
       "PROCESSING": "Đang xử lý...",
       "NO_DEPARTMENT": "Không có phòng ban",
-      "ALL_DEPARTMENTS": "Tất cả phòng ban"
+      "ALL_DEPARTMENTS": "Tất cả phòng ban",
+      "ALL_ORGANIZATIONS": "Tất cả tổ chức",
+      "ORGANIZATION": "Tổ chức",
+      "ID": "ID",
+      "ACTIONS": "Thao tác"
     },
     "MODAL": {
       "CREATE_TITLE": "Tạo phòng ban mới",
       "EDIT_TITLE": "Chỉnh sửa phòng ban",
-      "VIEW_USERS_TITLE": "Danh sách nhân viên"
+      "VIEW_USERS_TITLE": "Danh sách nhân viên",
+      "ORGANIZATION_LABEL": "Tổ chức *",
+      "NAME_LABEL": "Tên phòng ban *",
+      "NAME_PLACEHOLDER": "Nhập tên phòng ban",
+      "DESCRIPTION_LABEL": "Mô tả",
+      "DESCRIPTION_PLACEHOLDER": "Nhập mô tả phòng ban"
     },
     "MESSAGE": {
       "CREATE_SUCCESS": "Tạo phòng ban thành công",
@@ -135,12 +338,22 @@
       "PROCESSING": "Đang xử lý...",
       "NO_ORGANIZATION": "Không có tổ chức",
       "ALL_ORGANIZATIONS": "Tất cả tổ chức",
-      "SELECT_ORGANIZATION": "Chọn tổ chức"
+      "SELECT_ORGANIZATION": "Chọn tổ chức",
+      "ID": "ID",
+      "COUNTRY": "Quốc gia",
+      "USER_COUNT": "Số lượng nhân sự",
+      "ACTIONS": "Thao tác"
     },
     "MODAL": {
       "CREATE_TITLE": "Tạo tổ chức mới",
       "EDIT_TITLE": "Chỉnh sửa tổ chức",
-      "VIEW_DEPARTMENTS_TITLE": "Danh sách phòng ban"
+      "VIEW_DEPARTMENTS_TITLE": "Danh sách phòng ban",
+      "NAME_LABEL": "Tên tổ chức *",
+      "NAME_PLACEHOLDER": "Nhập tên tổ chức",
+      "COUNTRY_LABEL": "Quốc gia *",
+      "DESCRIPTION_LABEL": "Mô tả",
+      "DESCRIPTION_PLACEHOLDER": "Nhập mô tả tổ chức",
+      "NO_DESCRIPTION": "Không có mô tả"
     },
     "MESSAGE": {
       "CREATE_SUCCESS": "Tạo tổ chức thành công",
@@ -151,7 +364,11 @@
       "DELETE_ERROR": "Không thể xóa tổ chức",
       "FETCH_ERROR": "Không thể tải danh sách tổ chức",
       "FETCH_DEPARTMENTS_ERROR": "Không thể tải danh sách phòng ban",
-      "NO_DEPARTMENTS": "Không có phòng ban nào trong tổ chức này"
+      "NO_DEPARTMENTS": "Không có phòng ban nào trong tổ chức này",
+      "GENERAL_ERROR": "Xảy ra lỗi vui lòng thử lại"
     }
+  },
+  "language": {
+    "selectLanguage": "Chọn ngôn ngữ"
   }
 }

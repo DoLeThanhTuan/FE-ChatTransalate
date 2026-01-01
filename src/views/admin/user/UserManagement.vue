@@ -3,9 +3,9 @@
     <AppHeader />
     <div class="user-management-container">
       <div class="header">
-        <h1>Quản lý người dùng</h1>
+        <h1>{{ $t('USER_MANAGEMENT.TITLE') }}</h1>
         <button @click="openCreateModal" class="btn-create">
-          <i class="fas fa-plus"></i> Tạo người dùng mới
+          <i class="fas fa-plus"></i> {{ $t('USER_MANAGEMENT.BUTTON.CREATE_USER') }}
         </button>
       </div>
 
@@ -16,17 +16,17 @@
           <input
             v-model="searchQuery"
             type="text"
-            placeholder="Tìm kiếm theo tên, email..."
+            :placeholder="$t('USER_MANAGEMENT.LABEL.SEARCH_PLACEHOLDER')"
             class="search-input"
           />
         </div>
         <select v-model="roleFilter" class="filter-select">
-          <option value="">Tất cả vai trò</option>
+          <option value="">{{ $t('USER_MANAGEMENT.LABEL.ALL_ROLES') }}</option>
           <option value="ADMIN">Admin</option>
           <option value="USER">User</option>
         </select>
         <select v-model="departmentFilter" class="filter-select">
-          <option value="">Tất cả phòng ban</option>
+          <option value="">{{ $t('DEPARTMENT_MANAGEMENT.LABEL.ALL_DEPARTMENTS') }}</option>
           <option v-for="dept in departments" :key="dept.id" :value="dept.id">
             {{ dept.name }}
           </option>
@@ -36,7 +36,7 @@
       <!-- Loading -->
       <div v-if="loading" class="loading-container">
         <div class="spinner"></div>
-        <p>Đang tải...</p>
+        <p>{{ $t('USER_MANAGEMENT.LABEL.LOADING') }}</p>
       </div>
 
       <!-- Users Table -->
@@ -44,13 +44,13 @@
         <table class="users-table">
           <thead>
             <tr>
-              <th>STT</th>
-              <th>Tên người dùng</th>
-              <th>Email</th>
-              <th>Số điện thoại</th>
-              <th>Vai trò</th>
-              <th>Phòng ban</th>
-              <th>Thao tác</th>
+              <th>{{ $t('USER_MANAGEMENT.LABEL.STT') }}</th>
+              <th>{{ $t('USER_MANAGEMENT.LABEL.USERNAME_COLUMN') }}</th>
+              <th>{{ $t('USER_MANAGEMENT.LABEL.EMAIL') }}</th>
+              <th>{{ $t('USER_MANAGEMENT.LABEL.PHONE') }}</th>
+              <th>{{ $t('USER_MANAGEMENT.LABEL.ROLE') }}</th>
+              <th>{{ $t('USER_MANAGEMENT.LABEL.DEPARTMENT') }}</th>
+              <th>{{ $t('USER_MANAGEMENT.LABEL.ACTIONS') }}</th>
             </tr>
           </thead>
           <tbody>
@@ -65,28 +65,28 @@
                 <span>{{ user.name }}</span>
               </td>
               <td>{{ user.email }}</td>
-              <td>{{ user.phone || 'N/A' }}</td>
+              <td>{{ user.phone || $t('USER_MANAGEMENT.LABEL.NA') }}</td>
               <td>
                 <span :class="['role-badge', user.role?.toLowerCase()]">
                   {{ user.role }}
                 </span>
               </td>
               <td>
-                {{ getDepartmentName(user.departmentId) || 'N/A' }}
+                {{ getDepartmentName(user.departmentId) || $t('USER_MANAGEMENT.LABEL.NA') }}
               </td>
               <td>
                 <div class="action-buttons">
                   <button
                     @click="openEditModal(user)"
                     class="btn-action btn-edit"
-                    title="Chỉnh sửa"
+                    :title="$t('USER_MANAGEMENT.BUTTON.EDIT')"
                   >
                     <font-awesome-icon :icon="['fas', 'edit']" />
                   </button>
                   <button
                     @click="openDeleteModal(user)"
                     class="btn-action btn-delete"
-                    title="Chặn"
+                    :title="$t('USER_MANAGEMENT.BUTTON.DELETE')"
                   >
                     <font-awesome-icon :icon="['fas', 'ban']" />
                   </button>
@@ -94,7 +94,7 @@
               </td>
             </tr>
             <tr v-if="filteredUsers.length === 0">
-              <td colspan="8" class="no-data">Không có dữ liệu</td>
+              <td colspan="8" class="no-data">{{ $t('USER_MANAGEMENT.LABEL.NO_DATA') }}</td>
             </tr>
           </tbody>
         </table>
@@ -124,6 +124,7 @@
 
 <script setup>
 import { ref, computed, onMounted } from 'vue'
+import { useI18n } from 'vue-i18n'
 import AppHeader from '@/components/common/AppHeader.vue'
 import { userApi } from '@/axios/api-services/userApi'
 import { useUserStore } from '@/stores/userStore'
@@ -133,6 +134,8 @@ import UserFormModal from '@/components/admin/modals/UserFormModal.vue'
 import defaultAvatarImg from '@/assets/default-avatar.png'
 import { getURLAvatar } from '@/utils/image'
 import { toast } from 'vue3-toastify'
+
+const { t } = useI18n()
 
 const userStore = useUserStore()
 const departmentStore = useDepartmentStore()
@@ -201,7 +204,7 @@ const fetchUsers = async () => {
     users.value = response.data || []
   } catch (error) {
     console.error('Error fetching users:', error)
-    toast.error('Không thể tải danh sách người dùng')
+    toast.error(t('USER_MANAGEMENT.MESSAGE.FETCH_ERROR'))
   } finally {
     loading.value = false
   }
@@ -258,10 +261,10 @@ const handleSubmit = async (payload) => {
         delete payload.password
       }
       await userApi.updateUser(selectedUser.value.id, payload)
-      toast.success('Cập nhật người dùng thành công')
+      toast.success(t('USER_MANAGEMENT.MESSAGE.UPDATE_SUCCESS'))
     } else {
       await userApi.createUser(payload)
-      toast.success('Tạo người dùng thành công')
+      toast.success(t('USER_MANAGEMENT.MESSAGE.CREATE_SUCCESS'))
     }
     closeModal()
     await fetchUsers()
@@ -271,8 +274,8 @@ const handleSubmit = async (payload) => {
     toast.error(
       error.response?.data?.message ||
         (isEditMode.value
-          ? 'Không thể cập nhật người dùng'
-          : 'Không thể tạo người dùng')
+          ? t('USER_MANAGEMENT.MESSAGE.UPDATE_ERROR')
+          : t('USER_MANAGEMENT.MESSAGE.CREATE_ERROR'))
     )
   } finally {
     submitting.value = false
@@ -282,13 +285,13 @@ const handleSubmit = async (payload) => {
 const handleDelete = async (id) => {
   try {
     await userApi.deleteUser(id)
-    toast.success('Xóa người dùng thành công')
+    toast.success(t('USER_MANAGEMENT.MESSAGE.DELETE_SUCCESS'))
     closeDeleteModal()
     await fetchUsers()
     await userStore.fetchUsers() // Refresh store
   } catch (error) {
     console.error('Error deleting user:', error)
-    toast.error('Không thể xóa người dùng')
+    toast.error(t('USER_MANAGEMENT.MESSAGE.DELETE_ERROR'))
   }
 }
 
