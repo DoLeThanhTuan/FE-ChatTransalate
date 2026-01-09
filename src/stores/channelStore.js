@@ -4,6 +4,7 @@ import { computed, ref } from 'vue'
 import { toast } from 'vue3-toastify'
 import { send } from '@/socket/socketService'
 import { Status, URLMessage } from '@/config/enum'
+import { fileApi } from '@/axios/api-services/fileApi'
 
 export const useChannelStore = defineStore('channel', () => {
   const channelCurrent = ref({})
@@ -19,6 +20,8 @@ export const useChannelStore = defineStore('channel', () => {
     try {
       const response = await channelApi.getChannelById(channelId)
       channelCurrent.value = response.data
+      const responseAdmin = await channelApi.getAdminInChannel(channelId)
+      channelCurrent.value.admin = responseAdmin.data
       return response.data
     } catch (e) {
       console.error(e)
@@ -65,24 +68,39 @@ export const useChannelStore = defineStore('channel', () => {
     }
   }
 
-  // const addMemberIntoChannel = async (channelId, userIds) => {
-  //   try {
-  //     const params = {
-  //       channelId: channelId,
-  //       userIds: userIds,
-  //     }
-  //     const res = await channelApi.addMemberIntoChannel(params)
-  //     await sendMessageToChannel({
-  //       content: `{${Status.LEAVE_CHANNEL}}`,
-  //       channelId: channelCurrent.value.id,
-  //       type: Status.LEAVE_CHANNEL,
-  //     })
-  //     await fetchChannel()
-  //     return res.data
-  //   } catch (e) {
-  //     console.error(e)
-  //   }
-  // }
+  const breakChannel = async () => {
+    try {
+      const res = await channelApi.breakChannel(channelCurrent.value.id)
+      await sendMessageToChannel({
+        content: `{${Status.BREAK_CHANNEL}}`,
+        channelId: channelCurrent.value.id,
+        type: Status.BREAK_CHANNEL,
+      })
+      await fetchChannel()
+      return res.data
+    } catch (e) {
+      console.error(e)
+    }
+  }
+
+  const addMemberIntoChannel = async (channelId, userIds) => {
+    try {
+      const params = {
+        channelId: channelId,
+        userIds: userIds,
+      }
+      const res = await channelApi.addMemberIntoChannel(params)
+      await sendMessageToChannel({
+        content: `{${Status.ADD_MEMBER}}${userIds.join(',')}`,
+        channelId: channelCurrent.value.id,
+        type: Status.ADD_MEMBER,
+        userIds: userIds,
+      })
+      return res.data
+    } catch (e) {
+      console.error(e)
+    }
+  }
 
   const removeMemberFromChannel = async (channelId, userIds) => {
     try {
@@ -124,6 +142,10 @@ export const useChannelStore = defineStore('channel', () => {
       channelCurrent.value.members = channelCurrent.value.members.filter(
         (member) => member !== message.fromUser
       )
+    } else if (message.type == Status.BREAK_CHANNEL) {
+      channels.value = channels.value.filter(
+        (channel) => channel.id !== message.channelId
+      )
     }
   }
 
@@ -157,6 +179,23 @@ export const useChannelStore = defineStore('channel', () => {
     return found ? found.name : email
   }
 
+  const addChannelToListChannel = (channel) => {
+    const index = channels.value.findIndex((c) => c.id === channel.id)
+    if (index !== -1) {
+      channels.value[index].name = channel.name
+      channels.value[index].description = channel.description
+    } else {
+      channels.value.push(channel)
+    }
+  }
+
+  const setNewMessage = (channelId, newMessage) => {
+    const index = channels.value.findIndex((c) => c.id === channelId)
+    if (index !== -1) {
+      channels.value[index].newMessage = newMessage
+    }
+  }
+
   const sendMessageToChannel = async ({
     id = null,
     content,
@@ -165,6 +204,7 @@ export const useChannelStore = defineStore('channel', () => {
     uploadFiles,
     type = Status.MESSAGE,
     messageReplyId = null,
+    userIds = null,
   }) => {
     if (content.trim() || files.length > 0) {
       try {
@@ -180,6 +220,7 @@ export const useChannelStore = defineStore('channel', () => {
           messageReply: {
             id: messageReplyId,
           },
+          userIds: userIds,
         }
         send(`${URLMessage.CHANNEL}/${channelId}`, messageData)
         return true
@@ -191,6 +232,26 @@ export const useChannelStore = defineStore('channel', () => {
     return false
   }
 
+  const downloadFile = async (fileNameActual, fileNameExpected) => {
+    const params = {
+      fileNameActual: fileNameActual,
+      fileNameExpected: fileNameExpected,
+    }
+    const res = await fileApi.downloadFile(params)
+
+    const blob = new Blob([res.data])
+    const url = window.URL.createObjectURL(blob)
+
+    const link = document.createElement('a')
+    link.href = url
+    link.download = params.fileNameExpected
+    document.body.appendChild(link)
+    link.click()
+
+    document.body.removeChild(link)
+    window.URL.revokeObjectURL(url)
+  }
+
   return {
     channelCurrent,
     channels,
@@ -199,11 +260,16 @@ export const useChannelStore = defineStore('channel', () => {
     fetchChannel,
     createChannel,
     leaveChannel,
+    breakChannel,
     removeMemberFromChannel,
+    addMemberIntoChannel,
     updateMemberChannel,
     searchChannel,
     joinChannel,
     getUserName,
+    addChannelToListChannel,
+    setNewMessage,
     sendMessageToChannel,
+    downloadFile,
   }
 })

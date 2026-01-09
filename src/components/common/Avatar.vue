@@ -63,7 +63,7 @@ const status = computed(() => {
     return props.status
   }
   // Nếu truyền user object thì lấy status từ object
-  if (typeof props.avatar === 'object' && props.avatar.status) {
+  if (typeof props.avatar === 'object' && props.avatar?.status) {
     return props.avatar.status
   }
   return null

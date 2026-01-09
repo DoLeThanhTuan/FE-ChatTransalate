@@ -24,6 +24,11 @@ export const channelApi = {
       headers: { ...setHeader() },
     })
   },
+  breakChannel: async (channelId) => {
+    return await axiosClient.get(ENDPOINT + `/break/${channelId}`, {
+      headers: { ...setHeader() },
+    })
+  },
   addMemberIntoChannel: async (params) => {
     return await axiosClient.post(
       ENDPOINT + `/member/add/${params.channelId}`,
@@ -54,6 +59,20 @@ export const channelApi = {
   },
   getChannelDefault: async () => {
     return await axiosClient.get(ENDPOINT + `/default`, {
+      headers: { ...setHeader() },
+    })
+  },
+  readNewMessage: async (params) => {
+    return await axiosClient.put(
+      ENDPOINT + `/read-new-message/${params.channelId}`,
+      null,
+      {
+        headers: { ...setHeader() },
+      }
+    )
+  },
+  getAdminInChannel: async (channelId) => {
+    return await axiosClient.get(ENDPOINT + `/admin/${channelId}`, {
       headers: { ...setHeader() },
     })
   },

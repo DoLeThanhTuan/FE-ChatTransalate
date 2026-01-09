@@ -6,7 +6,9 @@
         <span class="close-btn" @click="$emit('close')">×</span>
       </div>
       <div class="modal-body">
-        <label class="modal-label">{{ $t('COMPONENT.CHANNEL.CREATE.NAME_LABEL') }}</label>
+        <label class="modal-label">{{
+          $t('COMPONENT.CHANNEL.CREATE.NAME_LABEL')
+        }}</label>
         <div>
           <input
             v-model="channelName"
@@ -18,40 +20,97 @@
           </div>
         </div>
 
-        <div class="modal-url-row">
-          <span class="modal-url-label">{{ $t('COMPONENT.CHANNEL.CREATE.URL_LABEL') }}</span>
-          <span v-if="!editingUrl" class="modal-url">{{ url }}</span>
-          <input v-else v-model="urlEdit" class="modal-url-edit dark" />
-          <span class="modal-url-edit-btn" @click="toggleEditUrl">{{
-            editingUrl ? $t('COMPONENT.CHANNEL.CREATE.SAVE_URL') : $t('COMPONENT.CHANNEL.CREATE.EDIT_URL')
-          }}</span>
-        </div>
-        <div class="modal-section modal-public-group">
+        <div class="modal-section modal-channel-types">
           <button
-            :class="['public-btn', isPublic ? 'active' : null]"
-            @click="isPublic = true"
+            :class="[
+              'channel-type-btn',
+              channelType === ChannelType.CUSTOM ? 'active' : null,
+            ]"
+            @click="channelType = ChannelType.CUSTOM"
+          >
+            <span class="icon">⚙️</span>
+            <div>
+              <div class="channel-type-title">
+                {{ $t('COMPONENT.CHANNEL.CREATE.TYPE_CUSTOM_TITLE') }}
+              </div>
+              <div class="channel-type-desc">
+                {{ $t('COMPONENT.CHANNEL.CREATE.TYPE_CUSTOM_DESC') }}
+              </div>
+            </div>
+            <span v-if="channelType === ChannelType.CUSTOM" class="checkmark"
+              >✔</span
+            >
+          </button>
+          <button
+            :class="[
+              'channel-type-btn',
+              channelType === ChannelType.DEPARTMENT ? 'active' : null,
+            ]"
+            @click="channelType = ChannelType.DEPARTMENT"
+          >
+            <span class="icon">🏢</span>
+            <div>
+              <div class="channel-type-title">
+                {{ $t('COMPONENT.CHANNEL.CREATE.TYPE_DEPARTMENT_TITLE') }}
+              </div>
+              <div class="channel-type-desc">
+                {{ $t('COMPONENT.CHANNEL.CREATE.TYPE_DEPARTMENT_DESC') }}
+              </div>
+            </div>
+            <span
+              v-if="channelType === ChannelType.DEPARTMENT"
+              class="checkmark"
+              >✔</span
+            >
+          </button>
+          <button
+            :class="[
+              'channel-type-btn',
+              channelType === ChannelType.ORGANIZATION ? 'active' : null,
+            ]"
+            @click="channelType = ChannelType.ORGANIZATION"
+          >
+            <span class="icon">🏛️</span>
+            <div>
+              <div class="channel-type-title">
+                {{ $t('COMPONENT.CHANNEL.CREATE.TYPE_ORGANIZATION_TITLE') }}
+              </div>
+              <div class="channel-type-desc">
+                {{ $t('COMPONENT.CHANNEL.CREATE.TYPE_ORGANIZATION_DESC') }}
+              </div>
+            </div>
+            <span
+              v-if="channelType === ChannelType.ORGANIZATION"
+              class="checkmark"
+              >✔</span
+            >
+          </button>
+          <button
+            :class="[
+              'channel-type-btn',
+              channelType === ChannelType.GENERAL ? 'active' : null,
+            ]"
+            @click="channelType = ChannelType.GENERAL"
           >
             <span class="icon">🌐</span>
             <div>
-              <div class="public-title">{{ $t('COMPONENT.CHANNEL.CREATE.PUBLIC_TITLE') }}</div>
-              <div class="public-desc">{{ $t('COMPONENT.CHANNEL.CREATE.PUBLIC_DESC') }}</div>
+              <div class="channel-type-title">
+                {{ $t('COMPONENT.CHANNEL.CREATE.TYPE_ALL_USERS_TITLE') }}
+              </div>
+              <div class="channel-type-desc">
+                {{ $t('COMPONENT.CHANNEL.CREATE.TYPE_ALL_USERS_DESC') }}
+              </div>
             </div>
-            <span v-if="isPublic" class="checkmark">✔</span>
-          </button>
-          <button
-            :class="['private-btn', !isPublic ? 'active' : null]"
-            @click="isPublic = false"
-          >
-            <span class="icon">🔒</span>
-            <div>
-              <div class="public-title">{{ $t('COMPONENT.CHANNEL.CREATE.PRIVATE_TITLE') }}</div>
-              <div class="public-desc">{{ $t('COMPONENT.CHANNEL.CREATE.PRIVATE_DESC') }}</div>
-            </div>
-            <span v-if="!isPublic" class="checkmark">✔</span>
+            <span v-if="channelType === ChannelType.GENERAL" class="checkmark"
+              >✔</span
+            >
           </button>
         </div>
         <label class="modal-label" style="margin-top: 0.5rem"
-          >{{ $t('COMPONENT.CHANNEL.CREATE.DESCRIPTION_LABEL') }} <span class="optional">{{ $t('COMPONENT.CHANNEL.CREATE.OPTIONAL') }}</span></label
+          >{{ $t('COMPONENT.CHANNEL.CREATE.DESCRIPTION_LABEL') }}
+          <span class="optional">{{
+            $t('COMPONENT.CHANNEL.CREATE.OPTIONAL')
+          }}</span></label
         >
         <textarea
           v-model="purpose"
@@ -62,7 +121,9 @@
         <div class="modal-checkbox-row"></div>
       </div>
       <div class="modal-actions">
-        <button class="modal-cancel-btn" @click="$emit('close')">{{ $t('COMPONENT.CHANNEL.CREATE.CANCEL') }}</button>
+        <button class="modal-cancel-btn" @click="$emit('close')">
+          {{ $t('COMPONENT.CHANNEL.CREATE.CANCEL') }}
+        </button>
         <button
           class="modal-create-btn"
           :disabled="!channelName.trim()"
@@ -80,9 +141,10 @@
 import { ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useChannelStore } from '@/stores/channelStore'
+import { useAuthStore } from '@/stores/authStore'
 import { toast } from 'vue3-toastify'
 import { useRouter } from 'vue-router'
-import { TypeChat } from '@/config/enum'
+import { ChannelType, Status, TypeChat } from '@/config/enum'
 
 const { t } = useI18n()
 const props = defineProps({
@@ -90,28 +152,18 @@ const props = defineProps({
 })
 const router = useRouter()
 const channelStore = useChannelStore()
+const authStore = useAuthStore()
 const emit = defineEmits(['close'])
+
 const channelName = ref('')
-const isPublic = ref(true)
+const channelType = ref(ChannelType.CUSTOM) // CUSTOM, DEPARTMENT, ORGANIZATION, ALL_USERS
 const purpose = ref('')
-const url = ref('https://techchat.techzen.vn/chemgio/channels/')
-const editingUrl = ref(false)
-const urlEdit = ref('')
 const showError = ref(false)
 const isLoading = ref(false)
 
-function toggleEditUrl() {
-  if (editingUrl.value) {
-    url.value = urlEdit.value || url.value
-  } else {
-    urlEdit.value = url.value
-  }
-  editingUrl.value = !editingUrl.value
-}
-
 const resetForm = () => {
   channelName.value = ''
-  isPublic.value = true
+  channelType.value = ChannelType.GENERAL
   purpose.value = ''
   showError.value = false
 }
@@ -121,16 +173,24 @@ const handleCreate = async () => {
     showError.value = true
     return
   }
+
   isLoading.value = true
   const data = {
     name: channelName.value.trim(),
-    isPublic: isPublic.value,
+    type: channelType.value,
     description: purpose.value,
-    url: url.value,
+    isPublic: true,
   }
+
   try {
     const res = await channelStore.createChannel(data)
     if (res) {
+      await channelStore.sendMessageToChannel({
+        content: `{${Status.CREATE_CHANNEL}}`,
+        channelId: res.id,
+        type: Status.CREATE_CHANNEL,
+        userIds: res.members,
+      })
       resetForm()
       await router.push(`/chat-view/${TypeChat.CHANNEL}/${res.id}`)
       toast.success(t('COMPONENT.CHANNEL.CREATE.SUCCESS'))
@@ -149,10 +209,8 @@ watch(
   (v) => {
     if (!v) {
       channelName.value = ''
-      isPublic.value = true
+      channelType.value = ChannelType.CUSTOM
       purpose.value = ''
-      editingUrl.value = false
-      urlEdit.value = ''
       showError.value = false
     }
   }
@@ -233,7 +291,6 @@ watch(
 }
 
 .modal-input,
-.modal-url-edit,
 textarea.modal-input {
   background: var(--bg-tertiary);
   color: var(--text-primary);
@@ -247,7 +304,6 @@ textarea.modal-input {
   transition: border 0.2s, box-shadow 0.2s;
 }
 .modal-input:focus,
-.modal-url-edit:focus,
 textarea.modal-input:focus {
   border: 1.5px solid var(--special-text-color);
   outline: none;
@@ -269,44 +325,15 @@ textarea.modal-input::placeholder,
   opacity: 1;
 }
 
-.modal-url-row {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  font-size: 0.97rem;
-  margin-bottom: 0.2rem;
-}
-.modal-url-label {
-  color: var(--text-secondary);
-}
-.modal-url {
-  color: var(--special-text-color);
-  word-break: break-all;
-}
-.modal-url-edit-btn {
-  color: var(--special-text-color);
-  cursor: pointer;
-  font-size: 0.97rem;
-  font-weight: 500;
-  margin-left: 0.2rem;
-  user-select: none;
-}
-.modal-url-edit-btn:hover {
-  text-decoration: underline;
-}
-
-.modal-section.modal-public-group {
-  display: flex;
+.modal-section.modal-channel-types {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
   gap: 1rem;
   margin: 1rem 0 0.5rem 0;
-  flex-wrap: wrap;
 }
 
-.public-btn,
-.private-btn {
+.channel-type-btn {
   min-width: 120px;
-  flex: 1 1 0;
-  max-width: 48%;
   box-sizing: border-box;
   justify-content: flex-start;
   background: var(--bg-tertiary);
@@ -323,24 +350,30 @@ textarea.modal-input::placeholder,
   font-size: 1rem;
   outline: none;
 }
-.public-btn.active,
-.private-btn.active {
-  border: 2px solid var(--special-text-color, #53ac5a);
-  background: var(--bg-active, #f4f4f4);
-  color: var(--special-text-color, #53ac5a);
+
+.channel-type-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
 }
-.public-btn:hover,
-.private-btn:hover {
+
+.channel-type-btn.active {
   border: 2px solid var(--special-text-color, #53ac5a);
   background: var(--bg-active, #f4f4f4);
   color: var(--special-text-color, #53ac5a);
 }
 
-.public-title {
+.channel-type-btn:hover:not(:disabled) {
+  border: 2px solid var(--special-text-color, #53ac5a);
+  background: var(--bg-active, #f4f4f4);
+  color: var(--special-text-color, #53ac5a);
+}
+
+.channel-type-title {
   font-weight: 600;
   font-size: 1.05rem;
 }
-.public-desc {
+
+.channel-type-desc {
   font-size: 0.93rem;
   color: var(--text-secondary, #666);
 }
@@ -427,21 +460,16 @@ textarea.modal-input::placeholder,
     font-size: 1.1rem;
   }
   .modal-label,
-  .public-title,
-  .public-desc,
-  .modal-url-label,
-  .modal-url,
-  .modal-url-edit-btn {
+  .channel-type-title,
+  .channel-type-desc {
     font-size: 0.9rem;
   }
   .modal-create-btn,
   .modal-cancel-btn {
     font-size: 0.95rem;
   }
-  .public-btn,
-  .private-btn,
+  .channel-type-btn,
   .modal-input,
-  .modal-url-edit,
   textarea.modal-input {
     font-size: 0.92rem;
   }
@@ -462,12 +490,11 @@ textarea.modal-input::placeholder,
     width: 100%;
     box-sizing: border-box;
   }
-  .modal-section.modal-public-group {
-    flex-direction: column;
+  .modal-section.modal-channel-types {
+    grid-template-columns: 1fr;
     gap: 0.7rem;
   }
-  .public-btn,
-  .private-btn {
+  .channel-type-btn {
     max-width: 100%;
     min-width: 0;
     width: 100%;
@@ -489,8 +516,7 @@ textarea.modal-input::placeholder,
     gap: 0.7rem;
   }
   textarea.modal-input,
-  .modal-input,
-  .modal-url-edit {
+  .modal-input {
     padding: 0.6rem 0.7rem;
   }
 }

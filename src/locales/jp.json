@@ -5,7 +5,7 @@
         "BUTTON": {
           "BTN_EDIT": "編集",
           "BTN_DELETE": "削除",
-          "BTN_DETAIL": "詳細を表示",
+          "BTN_DETAIL": "詳細",
           "BTN_TRANSLATE": "翻訳",
           "BTN_ORIGINAL": "原文"
         }
@@ -13,15 +13,15 @@
       "MODAL_CONFIRM_DELETE": {
         "LABEL": {
           "HEADER": "削除の確認",
-          "MESSAGE": "本当に削除してもよろしいですか？"
+          "MESSAGE": "本当に削除しますか？"
         },
         "BUTTON": {
           "BTN_CANCEL": "キャンセル",
-          "BTN_DELETE": "削除を実行"
+          "BTN_DELETE": "削除"
         }
       },
       "APP_HEADER": {
-        "LOGO": "エンタープライズチャットシステム",
+        "LOGO": "チャットアプリ",
         "NAV": {
           "USER_MANAGEMENT": "ユーザー管理",
           "ORGANIZATION_MANAGEMENT": "組織管理",
@@ -30,12 +30,13 @@
         },
         "USER_MENU": {
           "PROFILE": "プロフィール",
-          "LOGOUT": "ログアウト"
+          "LOGOUT": "ログアウト",
+          "MANAGEMENT": "管理ページ"
         }
       },
       "DROPDOWN_USER": {
         "REMOVE_FROM_GROUP": "グループから削除",
-        "PRIVATE_MESSAGE": "個別メッセージを送信"
+        "PRIVATE_MESSAGE": "個別メッセージ"
       }
     },
     "CHAT_VIEW": {
@@ -45,36 +46,42 @@
           "USERS": "ユーザー"
         },
         "BUTTON": {
-          "CREATE_CHANNEL": "チャンネルを作成",
-          "SEARCH_CHANNEL": "チャンネルを検索",
+          "CREATE_CHANNEL": "チャンネル作成",
+          "SEARCH_CHANNEL": "チャンネル参加",
           "BTN_TRANSLATE": "翻訳"
         },
-        "LOGO": "Smart Chat"
+        "LOGO": "スマートチャット",
+        "CHANNEL_GROUP": {
+          "GENERAL": "一般チャンネル",
+          "DEPARTMENT": "部署",
+          "ORGANIZATION": "組織",
+          "CUSTOM": "プライベート"
+        }
       },
       "CHANNEL_HEADER": {
         "LOADING": "読み込み中...",
-        "CHANNEL_DETAILS": "チャンネル情報",
+        "CHANNEL_DETAILS": "チャンネル詳細",
         "LEAVE_CHANNEL": "チャンネルを退出",
-        "INFO": "詳細",
+        "INFO": "情報",
         "BLOCK": "ブロック",
-        "LOCATION": "Huntsville"
+        "LOCATION": "ハンツビル"
       },
       "MESSAGE_INPUT": {
-        "PLACEHOLDER": "メッセージを入力してください...",
-        "TRANSLATE": "メッセージを翻訳",
+        "PLACEHOLDER": "メッセージを入力...",
+        "TRANSLATE": "翻訳",
         "SEARCH_EMOJI": "絵文字を検索...",
         "SEND_FILE": "ファイルを送信",
-        "FILES_COUNT": "件のファイル",
-        "REMOVE_ALL_FILES": "すべてのファイルを削除",
+        "FILES_COUNT": "ファイル",
+        "REMOVE_ALL_FILES": "すべて削除",
         "REMOVE_FILE": "ファイルを削除",
-        "MAX_FILES_ERROR": "アップロードできるファイルは最大 {max} 件までです。",
+        "MAX_FILES_ERROR": "最大 {max} 個のファイルまで選択できます",
         "UPLOAD_ERROR": "ファイルのアップロード中にエラーが発生しました。"
       },
       "MESSAGE_LIST": {
         "CONNECTING": "接続中...",
         "RETRY": "再試行",
         "LOADING_MORE": "さらに読み込み中...",
-        "EDITED": "（編集済み）",
+        "EDITED": "(編集済み)",
         "SAVE": "保存",
         "CANCEL": "キャンセル",
         "REPLY_MESSAGE": "メッセージに返信",
@@ -82,65 +89,72 @@
         "MESSAGE_DELETED": "このメッセージは削除されました",
         "CANCEL_REPLY": "返信をキャンセル",
         "DELETE_MESSAGE_CONFIRM": "このメッセージを削除してもよろしいですか？",
-        "ERROR_LOADING_MESSAGES": "初期メッセージを読み込めませんでした。",
-        "ERROR_CONNECTING": "接続できませんでした。",
-        "ERROR_NO_CHANNEL": "チャンネルが選択されていません。",
-        "ERROR_LOAD_CHANNEL_MESSAGES": "チャンネルのメッセージを読み込めませんでした。",
-        "ERROR_NO_USER": "ユーザーが選択されていません。",
-        "ERROR_LOAD_USER_MESSAGES": "ユーザーのメッセージを読み込めませんでした。",
-        "ERROR_UPDATE_MESSAGE": "メッセージを更新できませんでした。再度お試しください。",
-        "TRANSLATE_ERROR": "翻訳中にエラーが発生しました。再度お試しください。"
+        "ERROR_LOADING_MESSAGES": "初期メッセージを読み込めませんでした",
+        "ERROR_CONNECTING": "接続できません...",
+        "ERROR_NO_CHANNEL": "チャンネルが選択されていません",
+        "ERROR_LOAD_CHANNEL_MESSAGES": "チャンネルメッセージを読み込めませんでした",
+        "ERROR_NO_USER": "ユーザーが選択されていません",
+        "ERROR_LOAD_USER_MESSAGES": "ユーザーメッセージを読み込めませんでした",
+        "ERROR_UPDATE_MESSAGE": "メッセージを編集できませんでした。もう一度お試しください。",
+        "TRANSLATE_ERROR": "エラーが発生しました。もう一度お試しください"
       }
     },
     "CHANNEL": {
       "CREATE": {
         "TITLE": "新規チャンネル作成",
         "NAME_LABEL": "チャンネル名",
-        "NAME_PLACEHOLDER": "チャンネル名を入力してください",
-        "NAME_ERROR": "チャンネル名は1文字以上で入力してください。",
-        "URL_LABEL": "チャンネルURL：",
+        "NAME_PLACEHOLDER": "新しいチャンネル名を入力",
+        "NAME_ERROR": "チャンネル名は1文字以上である必要があります。",
+        "URL_LABEL": "URL:",
         "EDIT_URL": "編集",
         "SAVE_URL": "保存",
-        "PUBLIC_TITLE": "公開チャンネル",
-        "PUBLIC_DESC": "すべてのユーザーが参加できます。",
-        "PRIVATE_TITLE": "非公開チャンネル",
-        "PRIVATE_DESC": "招待されたメンバーのみ参加できます。",
+        "TYPE_CUSTOM_TITLE": "カスタム",
+        "TYPE_CUSTOM_DESC": "メンバーを個別に選択",
+        "TYPE_DEPARTMENT_TITLE": "現在の部署",
+        "TYPE_DEPARTMENT_DESC": "部署の全メンバー",
+        "TYPE_ORGANIZATION_TITLE": "現在の組織",
+        "TYPE_ORGANIZATION_DESC": "組織の全メンバー",
+        "TYPE_ALL_USERS_TITLE": "全ユーザー",
+        "TYPE_ALL_USERS_DESC": "システムの全ユーザー",
         "DESCRIPTION_LABEL": "説明",
-        "OPTIONAL": "（任意）",
-        "DESCRIPTION_PLACEHOLDER": "チャンネルの説明を入力してください",
+        "OPTIONAL": "(任意)",
+        "DESCRIPTION_PLACEHOLDER": "このチャンネルの説明を入力",
         "CANCEL": "キャンセル",
         "CREATE": "作成",
-        "SUCCESS": "チャンネルが正常に作成されました。",
-        "EXISTS": "同じ名前のチャンネルが既に存在します。",
-        "ERROR": "チャンネル作成中にエラーが発生しました。"
+        "SUCCESS": "チャンネルを作成しました！",
+        "EXISTS": "チャンネルは既に存在します",
+        "ERROR": "作成中にエラーが発生しました",
+        "ERROR_NO_DEPARTMENT": "所属している部署がありません",
+        "ERROR_NO_ORGANIZATION": "所属している組織がありません"
       },
       "JOIN": {
         "TITLE": "チャンネル検索",
-        "SEARCH_PLACEHOLDER": "検索キーワードを入力してください",
+        "SEARCH_PLACEHOLDER": "検索キーワードを入力",
         "SEARCH": "検索",
-        "EMPTY": "該当するチャンネルがありません"
+        "EMPTY": "データなし"
       },
       "USERS": {
-        "TITLE": "メンバー一覧",
+        "TITLE": "メンバーリスト",
         "TAB_MEMBERS": "メンバー",
+        "ADMIN": "管理者",
         "TAB_ADD": "メンバーを追加",
         "NO_MEMBERS": "メンバーがいません",
-        "SEARCH_PLACEHOLDER": "名前またはメールアドレスで検索...",
+        "SEARCH_PLACEHOLDER": "名前またはメールで検索...",
         "SEARCH": "検索",
-        "NOT_FOUND": "該当する結果がありません",
+        "NOT_FOUND": "見つかりません",
         "CLOSE": "閉じる",
         "CONFIRM": "確認"
       }
     },
     "TRANSLATE_MODAL": {
       "TITLE": "翻訳",
-      "SOURCE_LABEL": "元のテキスト",
-      "SOURCE_PLACEHOLDER": "テキストを入力してください",
+      "SOURCE_LABEL": "原文",
+      "SOURCE_PLACEHOLDER": "テキストを入力...",
       "TRANSLATE_BUTTON": "翻訳",
       "RESULT_PLACEHOLDER": "翻訳結果がここに表示されます",
       "CLOSE": "閉じる",
       "CONFIRM": "確認",
-      "ERROR": "翻訳中にエラーが発生しました。"
+      "ERROR": "エラーが発生しました。もう一度お試しください"
     },
     "THEME_TOGGLE": {
       "SWITCH_TO_LIGHT": "ライトモードに切り替え",
@@ -150,47 +164,47 @@
   "AUTH": {
     "LOGIN": {
       "TITLE": "ログイン",
-      "ACCOUNT_LABEL": "ユーザー名",
-      "ACCOUNT_PLACEHOLDER": "ユーザー名を入力してください",
+      "ACCOUNT_LABEL": "アカウント",
+      "ACCOUNT_PLACEHOLDER": "ユーザー名を入力",
       "PASSWORD_LABEL": "パスワード",
-      "PASSWORD_PLACEHOLDER": "パスワードを入力してください",
+      "PASSWORD_PLACEHOLDER": "パスワードを入力",
       "REMEMBER_ME": "ログイン状態を保持",
       "FORGOT_PASSWORD": "パスワードをお忘れですか？",
       "BUTTON": "ログイン",
       "BUTTON_LOADING": "ログイン中...",
-      "NO_ACCOUNT": "アカウントをお持ちでない場合",
-      "REGISTER_LINK": "新規登録",
-      "ERROR": "ログインに失敗しました。"
+      "NO_ACCOUNT": "アカウントをお持ちでないですか？",
+      "REGISTER_LINK": "今すぐ登録",
+      "ERROR": "ログイン中にエラーが発生しました"
     },
     "REGISTER": {
-      "TITLE": "ユーザー登録",
+      "TITLE": "アカウント登録",
       "NAME_LABEL": "氏名",
-      "NAME_PLACEHOLDER": "氏名を入力してください",
+      "NAME_PLACEHOLDER": "氏名を入力",
       "AVATAR_LABEL": "プロフィール画像",
       "CHANGE_AVATAR": "画像を変更",
       "SELECT_AVATAR": "画像を選択",
       "EMAIL_LABEL": "メールアドレス",
-      "EMAIL_PLACEHOLDER": "メールアドレスを入力してください",
+      "EMAIL_PLACEHOLDER": "メールアドレスを入力",
       "PHONE_LABEL": "電話番号",
-      "PHONE_PLACEHOLDER": "電話番号を入力してください",
+      "PHONE_PLACEHOLDER": "電話番号を入力",
       "PASSWORD_LABEL": "パスワード",
-      "PASSWORD_PLACEHOLDER": "パスワードを入力してください",
-      "CONFIRM_PASSWORD_LABEL": "パスワード（確認）",
-      "CONFIRM_PASSWORD_PLACEHOLDER": "もう一度パスワードを入力してください",
+      "PASSWORD_PLACEHOLDER": "パスワードを入力",
+      "CONFIRM_PASSWORD_LABEL": "パスワード（確認用）",
+      "CONFIRM_PASSWORD_PLACEHOLDER": "パスワードを再入力",
       "BUTTON": "登録",
       "BUTTON_LOADING": "登録中...",
-      "HAS_ACCOUNT": "既にアカウントをお持ちの場合",
+      "HAS_ACCOUNT": "既にアカウントをお持ちですか？",
       "LOGIN_LINK": "ログイン",
-      "AVATAR_SIZE_ERROR": "画像サイズは5MB以内にしてください。",
-      "PASSWORD_MISMATCH": "パスワードが一致しません。",
-      "PHONE_INVALID": "電話番号は10桁で入力してください。",
-      "SUCCESS": "登録が完了しました。ログインしてください。",
-      "ERROR": "登録に失敗しました。",
-      "ERROR_GENERAL": "登録中に予期しないエラーが発生しました。"
+      "AVATAR_SIZE_ERROR": "画像のサイズは5MB以下にしてください",
+      "PASSWORD_MISMATCH": "パスワードが一致しません",
+      "PHONE_INVALID": "電話番号は10桁で入力してください",
+      "SUCCESS": "登録が完了しました！ログインしてください。",
+      "ERROR": "登録に失敗しました",
+      "ERROR_GENERAL": "登録中にエラーが発生しました"
     }
   },
   "PROFILE": {
-    "TITLE": "プロフィール情報",
+    "TITLE": "個人情報",
     "AVATAR_LABEL": "プロフィール画像",
     "CHANGE_AVATAR": "画像を変更",
     "SELECT_AVATAR": "画像を選択",
@@ -204,19 +218,191 @@
     "404": {
       "TITLE": "404",
       "HEADING": "ページが見つかりません",
-      "MESSAGE": "指定されたページは存在しないか、移動された可能性があります。",
-      "HOME_LINK": "ホームへ戻る"
+      "MESSAGE": "お探しのページは存在しないか、移動した可能性があります。",
+      "HOME_LINK": "ホームに戻る"
     },
     "403": {
       "TITLE": "403",
-      "HEADING": "アクセス拒否",
+      "HEADING": "アクセス権限がありません",
       "MESSAGE": "このページにアクセスする権限がありません。",
-      "HOME_LINK": "ホームへ戻る"
+      "HOME_LINK": "ホームに戻る"
     }
   },
   "HOME": {
     "TITLE": "LiveStreamへようこそ",
     "VIEWERS": "視聴者"
+  },
+  "USER_MANAGEMENT": {
+    "TITLE": "ユーザー管理",
+    "BUTTON": {
+      "CREATE_USER": "新規ユーザー作成",
+      "EDIT": "編集",
+      "DELETE": "削除",
+      "UPDATE": "更新",
+      "CREATE": "作成",
+      "CANCEL": "キャンセル"
+    },
+    "LABEL": {
+      "SEARCH_PLACEHOLDER": "名前、メールなどで検索...",
+      "ALL_ROLES": "すべての役割",
+      "USERNAME": "氏名",
+      "EMAIL": "メールアドレス",
+      "PHONE": "電話番号",
+      "ROLE": "役割",
+      "PASSWORD": "パスワード",
+      "AVATAR": "プロフィール画像",
+      "SELECT_ROLE": "役割を選択",
+      "NO_DATA": "データなし",
+      "LOADING": "読み込み中...",
+      "PROCESSING": "処理中...",
+      "DEPARTMENT": "部署",
+      "NO_DEPARTMENT": "部署なし",
+      "ACTIONS": "操作",
+      "STT": "No.",
+      "USERNAME_COLUMN": "ユーザー名",
+      "NA": "N/A",
+      "LANGUAGE": "言語",
+      "SELECT_LANGUAGE": "言語を選択",
+      "THEME": "テーマ",
+      "SELECT_THEME": "テーマを選択",
+      "SELECT_DEPARTMENT": "部署を選択"
+    },
+    "MODAL": {
+      "CREATE_TITLE": "新規ユーザー作成",
+      "EDIT_TITLE": "ユーザー編集",
+      "USERNAME_PLACEHOLDER": "氏名を入力",
+      "EMAIL_PLACEHOLDER": "メールアドレスを入力",
+      "PHONE_PLACEHOLDER": "電話番号を入力",
+      "PASSWORD_PLACEHOLDER": "パスワードを入力",
+      "USE_DEFAULT_PASSWORD": "デフォルトパスワードを使用",
+      "JOIN_ALL_CHANNEL": "関連するチャンネル（部署、組織）に自動追加",
+      "ROLE_USER": "一般ユーザー",
+      "ROLE_ADMIN": "管理者",
+      "CHANGE_AVATAR": "画像を変更",
+      "SELECT_AVATAR": "画像を選択",
+      "THEME_LIGHT": "ライト",
+      "THEME_DARK": "ダーク"
+    },
+    "MESSAGE": {
+      "CREATE_SUCCESS": "ユーザーを作成しました",
+      "UPDATE_SUCCESS": "ユーザーを更新しました",
+      "DELETE_SUCCESS": "ユーザーを削除しました",
+      "CREATE_ERROR": "ユーザーを作成できませんでした",
+      "EXISTS_ERROR": "このユーザーは既にシステムに存在します",
+      "UPDATE_ERROR": "ユーザーを更新できませんでした",
+      "DELETE_ERROR": "ユーザーを削除できませんでした",
+      "FETCH_ERROR": "ユーザーリストを読み込めませんでした"
+    },
+    "VALIDATION": {
+      "NAME_REQUIRED": "氏名を入力してください",
+      "EMAIL_REQUIRED": "メールアドレスを入力してください",
+      "EMAIL_INVALID": "メールアドレスが正しくありません",
+      "ROLE_REQUIRED": "役割を選択してください",
+      "DEPARTMENT_REQUIRED": "部署を選択してください",
+      "PASSWORD_REQUIRED": "パスワードを入力してください",
+      "PASSWORD_MIN_LENGTH": "パスワードは6文字以上で入力してください"
+    }
+  },
+  "DEPARTMENT_MANAGEMENT": {
+    "TITLE": "部署管理",
+    "BUTTON": {
+      "CREATE_DEPARTMENT": "新規部署作成",
+      "EDIT": "編集",
+      "DELETE": "削除",
+      "VIEW_USERS": "社員を表示",
+      "UPDATE": "更新",
+      "CREATE": "作成",
+      "CANCEL": "キャンセル"
+    },
+    "LABEL": {
+      "SEARCH_PLACEHOLDER": "部署名で検索...",
+      "NAME": "部署名",
+      "DESCRIPTION": "説明",
+      "USER_COUNT": "社員数",
+      "CREATED_DATE": "作成日",
+      "NO_DATA": "データなし",
+      "LOADING": "読み込み中...",
+      "PROCESSING": "処理中...",
+      "NO_DEPARTMENT": "部署なし",
+      "ALL_DEPARTMENTS": "すべての部署",
+      "ALL_ORGANIZATIONS": "すべての組織",
+      "ORGANIZATION": "組織",
+      "ID": "ID",
+      "ACTIONS": "操作"
+    },
+    "MODAL": {
+      "CREATE_TITLE": "新規部署作成",
+      "EDIT_TITLE": "部署編集",
+      "VIEW_USERS_TITLE": "社員リスト",
+      "ORGANIZATION_LABEL": "組織 *",
+      "NAME_LABEL": "部署名 *",
+      "NAME_PLACEHOLDER": "部署名を入力",
+      "DESCRIPTION_LABEL": "説明",
+      "DESCRIPTION_PLACEHOLDER": "部署の説明を入力"
+    },
+    "MESSAGE": {
+      "CREATE_SUCCESS": "部署を作成しました",
+      "UPDATE_SUCCESS": "部署を更新しました",
+      "DELETE_SUCCESS": "部署を削除しました",
+      "CREATE_ERROR": "部署を作成できませんでした",
+      "UPDATE_ERROR": "部署を更新できませんでした",
+      "DELETE_ERROR": "部署を削除できませんでした",
+      "FETCH_ERROR": "部署リストを読み込めませんでした",
+      "FETCH_USERS_ERROR": "社員リストを読み込めませんでした",
+      "NO_USERS": "この部署に社員はいません"
+    }
+  },
+  "ORGANIZATION_MANAGEMENT": {
+    "TITLE": "組織管理",
+    "BUTTON": {
+      "CREATE_ORGANIZATION": "新規組織作成",
+      "EDIT": "編集",
+      "DELETE": "削除",
+      "VIEW_DEPARTMENTS": "部署を表示",
+      "UPDATE": "更新",
+      "CREATE": "作成",
+      "CANCEL": "キャンセル"
+    },
+    "LABEL": {
+      "SEARCH_PLACEHOLDER": "組織名で検索...",
+      "NAME": "組織名",
+      "DESCRIPTION": "説明",
+      "DEPARTMENT_COUNT": "部署数",
+      "CREATED_DATE": "作成日",
+      "NO_DATA": "データなし",
+      "LOADING": "読み込み中...",
+      "PROCESSING": "処理中...",
+      "NO_ORGANIZATION": "組織なし",
+      "ALL_ORGANIZATIONS": "すべての組織",
+      "SELECT_ORGANIZATION": "組織を選択",
+      "ID": "ID",
+      "COUNTRY": "国",
+      "USER_COUNT": "人員数",
+      "ACTIONS": "操作"
+    },
+    "MODAL": {
+      "CREATE_TITLE": "新規組織作成",
+      "EDIT_TITLE": "組織編集",
+      "VIEW_DEPARTMENTS_TITLE": "部署リスト",
+      "NAME_LABEL": "組織名 *",
+      "NAME_PLACEHOLDER": "組織名を入力",
+      "COUNTRY_LABEL": "国 *",
+      "DESCRIPTION_LABEL": "説明",
+      "DESCRIPTION_PLACEHOLDER": "組織の説明を入力",
+      "NO_DESCRIPTION": "説明なし"
+    },
+    "MESSAGE": {
+      "CREATE_SUCCESS": "組織を作成しました",
+      "UPDATE_SUCCESS": "組織を更新しました",
+      "DELETE_SUCCESS": "組織を削除しました",
+      "CREATE_ERROR": "組織を作成できませんでした",
+      "UPDATE_ERROR": "組織を更新できませんでした",
+      "DELETE_ERROR": "組織を削除できませんでした",
+      "FETCH_ERROR": "組織リストを読み込めませんでした",
+      "FETCH_DEPARTMENTS_ERROR": "部署リストを読み込めませんでした",
+      "NO_DEPARTMENTS": "この組織に部署はありません",
+      "GENERAL_ERROR": "エラーが発生しました。もう一度お試しください"
+    }
   },
   "language": {
     "selectLanguage": "言語を選択"

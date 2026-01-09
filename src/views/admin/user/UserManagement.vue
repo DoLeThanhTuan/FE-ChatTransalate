@@ -5,7 +5,8 @@
       <div class="header">
         <h1>{{ $t('USER_MANAGEMENT.TITLE') }}</h1>
         <button @click="openCreateModal" class="btn-create">
-          <i class="fas fa-plus"></i> {{ $t('USER_MANAGEMENT.BUTTON.CREATE_USER') }}
+          <i class="fas fa-plus"></i>
+          {{ $t('USER_MANAGEMENT.BUTTON.CREATE_USER') }}
         </button>
       </div>
 
@@ -26,7 +27,9 @@
           <option value="USER">User</option>
         </select>
         <select v-model="departmentFilter" class="filter-select">
-          <option value="">{{ $t('DEPARTMENT_MANAGEMENT.LABEL.ALL_DEPARTMENTS') }}</option>
+          <option value="">
+            {{ $t('DEPARTMENT_MANAGEMENT.LABEL.ALL_DEPARTMENTS') }}
+          </option>
           <option v-for="dept in departments" :key="dept.id" :value="dept.id">
             {{ dept.name }}
           </option>
@@ -72,7 +75,10 @@
                 </span>
               </td>
               <td>
-                {{ getDepartmentName(user.departmentId) || $t('USER_MANAGEMENT.LABEL.NA') }}
+                {{
+                  getDepartmentName(user.departmentId) ||
+                  $t('USER_MANAGEMENT.LABEL.NA')
+                }}
               </td>
               <td>
                 <div class="action-buttons">
@@ -94,7 +100,9 @@
               </td>
             </tr>
             <tr v-if="filteredUsers.length === 0">
-              <td colspan="8" class="no-data">{{ $t('USER_MANAGEMENT.LABEL.NO_DATA') }}</td>
+              <td colspan="8" class="no-data">
+                {{ $t('USER_MANAGEMENT.LABEL.NO_DATA') }}
+              </td>
             </tr>
           </tbody>
         </table>
@@ -158,6 +166,9 @@ const formData = ref({
   role: '',
   password: '',
   departmentId: '',
+  avatar: null,
+  language: '',
+  theme: '',
 })
 
 const defaultAvatar = defaultAvatarImg
@@ -218,7 +229,10 @@ const openCreateModal = () => {
     phone: '',
     role: 'USER',
     password: '',
-    departmentId: departmentStore.departments[0].id,
+    departmentId: departmentStore.departments[0]?.id || '',
+    avatar: null,
+    language: 'VI',
+    theme: 'light',
   }
   showModal.value = true
 }
@@ -232,6 +246,9 @@ const openEditModal = (user) => {
     role: user.role || '',
     password: '',
     departmentId: user.departmentId || '',
+    avatar: user.avatar || null,
+    language: user.language || 'VI',
+    theme: user.theme || 'light',
   }
   selectedUser.value = user
   showModal.value = true
@@ -255,20 +272,37 @@ const closeDeleteModal = () => {
 const handleSubmit = async (payload) => {
   submitting.value = true
   try {
+    // If there's an avatar file, use FormData
+    const formData = new FormData()
+    formData.append('name', payload.name)
+    formData.append('email', payload.email)
+    formData.append('joinChannel', payload.joinChannel)
+    formData.append('phone', payload.phone)
+    formData.append('role', payload.role)
+    formData.append('password', payload.password)
+    formData.append('departmentId', payload.departmentId)
+    formData.append('language', payload.language)
+    formData.append('theme', payload.theme)
+    if (payload.avatarFile) formData.append('avatar', payload.avatarFile)
+
     if (isEditMode.value) {
-      // Don't send password if it's empty in edit mode
-      if (!payload.password) {
-        delete payload.password
-      }
-      await userApi.updateUser(selectedUser.value.id, payload)
+      await userApi.updateUser(selectedUser.value.id, formData)
       toast.success(t('USER_MANAGEMENT.MESSAGE.UPDATE_SUCCESS'))
+      closeModal()
+      await fetchUsers()
     } else {
-      await userApi.createUser(payload)
-      toast.success(t('USER_MANAGEMENT.MESSAGE.CREATE_SUCCESS'))
+      const res = await userApi.createUser(formData)
+      if (res.status == 200) {
+        if (res.data) {
+          toast.success(t('USER_MANAGEMENT.MESSAGE.CREATE_SUCCESS'))
+          closeModal()
+          await fetchUsers()
+          await userStore.fetchUsers() // Refresh store
+        } else {
+          toast.error(t('USER_MANAGEMENT.MESSAGE.EXISTS_ERROR'))
+        }
+      }
     }
-    closeModal()
-    await fetchUsers()
-    await userStore.fetchUsers() // Refresh store
   } catch (error) {
     console.error('Error saving user:', error)
     toast.error(
@@ -323,6 +357,7 @@ onMounted(() => {
   flex: 1;
   padding: 2rem;
   background-color: var(--bg-tertiary);
+  color: var(--text-primary, #333);
   transition: background-color 0.3s ease;
 }
 

@@ -7,28 +7,34 @@
         </router-link>
         <nav class="nav-menu">
           <router-link
-            to="/user-management"
+            to="/admin/user-management"
             class="nav-item"
             :class="{ active: $route.name === 'UserManagement' }"
           >
             <i class="fas fa-users"></i>
-            <span>{{ $t('COMPONENT.COMMON.APP_HEADER.NAV.USER_MANAGEMENT') }}</span>
+            <span>{{
+              $t('COMPONENT.COMMON.APP_HEADER.NAV.USER_MANAGEMENT')
+            }}</span>
           </router-link>
           <router-link
-            to="/organization-management"
+            to="/admin/organization-management"
             class="nav-item"
             :class="{ active: $route.name === 'OrganizationManagement' }"
           >
             <i class="fas fa-building"></i>
-            <span>{{ $t('COMPONENT.COMMON.APP_HEADER.NAV.ORGANIZATION_MANAGEMENT') }}</span>
+            <span>{{
+              $t('COMPONENT.COMMON.APP_HEADER.NAV.ORGANIZATION_MANAGEMENT')
+            }}</span>
           </router-link>
           <router-link
-            to="/department-management"
+            to="/admin/department-management"
             class="nav-item"
             :class="{ active: $route.name === 'DepartmentManagement' }"
           >
             <i class="fas fa-sitemap"></i>
-            <span>{{ $t('COMPONENT.COMMON.APP_HEADER.NAV.DEPARTMENT_MANAGEMENT') }}</span>
+            <span>{{
+              $t('COMPONENT.COMMON.APP_HEADER.NAV.DEPARTMENT_MANAGEMENT')
+            }}</span>
           </router-link>
           <router-link
             to="/profile"
@@ -62,11 +68,15 @@
               @click="closeUserMenu"
             >
               <i class="fas fa-user"></i>
-              <span>{{ $t('COMPONENT.COMMON.APP_HEADER.USER_MENU.PROFILE') }}</span>
+              <span>{{
+                $t('COMPONENT.COMMON.APP_HEADER.USER_MENU.PROFILE')
+              }}</span>
             </router-link>
             <button @click="handleLogout" class="dropdown-item logout-item">
               <i class="fas fa-sign-out-alt"></i>
-              <span>{{ $t('COMPONENT.COMMON.APP_HEADER.USER_MENU.LOGOUT') }}</span>
+              <span>{{
+                $t('COMPONENT.COMMON.APP_HEADER.USER_MENU.LOGOUT')
+              }}</span>
             </button>
           </div>
         </div>

@@ -9,7 +9,9 @@
 
       <div v-if="error" class="error-message">
         <span>{{ error }}</span>
-        <button @click="retryFetch" class="retry-btn">{{ $t('COMPONENT.CHAT_VIEW.MESSAGE_LIST.RETRY') }}</button>
+        <button @click="retryFetch" class="retry-btn">
+          {{ $t('COMPONENT.CHAT_VIEW.MESSAGE_LIST.RETRY') }}
+        </button>
       </div>
 
       <div v-if="loading && messages.length > 0" class="load-more-indicator">
@@ -36,7 +38,9 @@
                 }}</span>
                 <span class="msg-time">
                   {{ formatDate(msg.createdAt) }}
-                  <span v-if="msg.isEdit" class="msg-edited">({{ $t('COMPONENT.CHAT_VIEW.MESSAGE_LIST.EDITED') }})</span>
+                  <span v-if="msg.isEdit" class="msg-edited"
+                    >({{ $t('COMPONENT.CHAT_VIEW.MESSAGE_LIST.EDITED') }})</span
+                  >
                 </span>
               </div>
 
@@ -91,14 +95,41 @@
               </template>
 
               <div v-if="msg.files && msg.files.length > 0" class="msg-files">
-                <div v-for="file in msg.files" :key="file.id" class="msg-file">
-                  <div class="file-icon">📎</div>
-                  <div class="file-info">
-                    <a :href="file.path" target="_blank" class="file-name">{{
-                      file.name
-                    }}</a>
-                    <div class="file-size">{{ formatFileSize(file.size) }}</div>
-                  </div>
+                <div
+                  v-for="file in msg.files"
+                  :key="file.id"
+                  class="msg-file w-fit"
+                >
+                  <!-- IMAGE PREVIEW -->
+                  <template v-if="isImageFile(file)">
+                    <div class="flex flex-col items-center gap-2">
+                      <img
+                        :src="`${API_BASE_URL}/files/view/${file.path}`"
+                        class="image-preview"
+                        @click="openImagePreview(file)"
+                      />
+                      <span
+                        @click="handleDownloadFile(file)"
+                        class="file-name"
+                        >{{ file.name }}</span
+                      >
+                    </div>
+                  </template>
+
+                  <!-- FILE DOWNLOAD -->
+                  <template v-else>
+                    <div class="file-icon">
+                      <font-awesome-icon :icon="['fa', 'file']" />
+                    </div>
+                    <div class="file-info">
+                      <div class="file-name" @click="handleDownloadFile(file)">
+                        {{ file.name }}
+                      </div>
+                      <div class="file-size">
+                        {{ formatFileSize(file.size) }}
+                      </div>
+                    </div>
+                  </template>
                 </div>
               </div>
               <div class="msg-reactions">
@@ -204,6 +235,7 @@
         <template v-else>
           <div class="system-message">
             <Avatar
+              class="mr-2"
               :avatar="msg.avatar"
               :status="userStore.usersDict[msg.fromUser]?.status"
               size="medium"
@@ -261,6 +293,12 @@
     />
     <VueLoading v-model:active="isLoading" :can-cancel="false" loader="dots" />
   </div>
+  <div v-if="previewImage" class="image-modal" @click="closePreview">
+    <img
+      :src="`${API_BASE_URL}/files/view/${previewImage.path}`"
+      class="image-modal-content"
+    />
+  </div>
 </template>
 
 <script setup>
@@ -302,7 +340,7 @@ const userStore = useUserStore()
 const route = useRoute()
 const router = useRouter()
 const isLoading = ref(false)
-
+const API_BASE_URL = import.meta.env.VITE_API_URL
 // Reactive state
 const messages = ref([])
 const loading = ref(false)
@@ -364,6 +402,28 @@ const retryFetch = async () => {
   } else if (isUserChat.value && currentChatKey.value) {
     await fetchMessagesUser(true)
   }
+}
+
+const previewImage = ref(null)
+
+const openImagePreview = (file) => {
+  previewImage.value = file
+}
+
+const closePreview = () => {
+  previewImage.value = null
+}
+
+const isImageFile = (file) => {
+  const imageTypes = ['image/jpeg', 'image/png', 'image/webp', 'image/gif']
+  return (
+    imageTypes.includes(file.type) ||
+    /\.(jpg|jpeg|png|gif|webp)$/i.test(file.name)
+  )
+}
+
+const handleDownloadFile = (file) => {
+  channelStore.downloadFile(file.path, file.name)
 }
 
 const handleDisconnect = () => {
@@ -479,12 +539,21 @@ const handleReceiveMessage = (message) => {
       ) {
         messages.value.push(message)
       }
-      scrollToBottom()
+      if (message.fromUser == authStore.userInfo().id) {
+        scrollToBottom()
+      }
     }
   }
 }
 
 const handleNotification = (message) => {
+  if (
+    (message.type == Status.CREATE_CHANNEL ||
+      message.type == Status.ADD_MEMBER) &&
+    message.userIds.includes(authStore.userInfo().id)
+  ) {
+    channelStore.addChannelToListChannel(message.channelInfo)
+  }
   if (
     message.type != Status.REACTION_MESSAGE &&
     message.isNew &&
@@ -501,9 +570,17 @@ const handleNotification = (message) => {
       if (message.type != Status.MESSAGE) {
         message.content = convertMessageMultilanguage(message)
       }
+      if (message.channelId) {
+        channelStore.setNewMessage(message.channelId, 1)
+      } else {
+        userStore.setNewMessage(message.toUser, 1)
+      }
       showChatNotification(message, (typeChat, chatKey) => {
         router.push(`/chat-view/${typeChat}/${chatKey}`)
       })
+      if (message.type == Status.BREAK_CHANNEL) {
+        channelStore.updateMemberChannel(message)
+      }
     }
   }
 }
@@ -609,7 +686,9 @@ const fetchMessagesChannel = async (isInitial = false) => {
     }
   } catch (err) {
     console.error('Error fetching channel messages:', err)
-    error.value = t('COMPONENT.CHAT_VIEW.MESSAGE_LIST.ERROR_LOAD_CHANNEL_MESSAGES')
+    error.value = t(
+      'COMPONENT.CHAT_VIEW.MESSAGE_LIST.ERROR_LOAD_CHANNEL_MESSAGES'
+    )
   } finally {
     loading.value = false
   }
@@ -768,7 +847,7 @@ const handleTranslate = async (msg) => {
     { value: 'JAPAN', label: 'JP' },
   ]
   const language = langs.find(
-    (l) => l.label === localStorageUtils.get('language').toUpperCase()
+    (l) => l.label === localStorage.getItem('language').toUpperCase()
   )
   try {
     const params = {
@@ -1303,6 +1382,7 @@ watch(
   display: flex;
   align-items: center;
   gap: 0.7rem;
+  border: 1px solid #d0d0d0;
   background: #f3f4f8;
   border-radius: 6px;
   padding: 0.4rem 0.8rem;
@@ -1311,6 +1391,10 @@ watch(
 
 .msg-file:hover {
   background: #e8eaf6;
+}
+
+.file-name:hover {
+  cursor: pointer;
 }
 
 .file-icon {
@@ -1640,6 +1724,36 @@ html.dark .system-content {
   font-weight: 500;
 }
 
+.image-preview {
+  max-width: 220px;
+  max-height: 220px;
+  border-radius: 8px;
+  cursor: pointer;
+  object-fit: cover;
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.image-preview:hover {
+  transform: scale(1.03);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.image-modal {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.85);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999;
+}
+
+.image-modal-content {
+  max-width: 90%;
+  max-height: 90%;
+  border-radius: 8px;
+}
+
 .cancel-btn:hover:not(:disabled) {
   opacity: 0.9;
 }
@@ -1695,6 +1809,7 @@ html.dark .system-content {
   .msg-file {
     padding: 0.3rem 0.5rem;
     gap: 0.4rem;
+    width: 12rem;
   }
 
   .file-icon {

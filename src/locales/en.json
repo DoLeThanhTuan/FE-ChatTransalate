@@ -12,8 +12,8 @@
       },
       "MODAL_CONFIRM_DELETE": {
         "LABEL": {
-          "HEADER": "Confirm Deletion",
-          "MESSAGE": "Are you sure you want to delete this item?"
+          "HEADER": "Confirm Delete",
+          "MESSAGE": "Are you sure you want to delete this?"
         },
         "BUTTON": {
           "BTN_CANCEL": "Cancel",
@@ -30,12 +30,13 @@
         },
         "USER_MENU": {
           "PROFILE": "Profile",
-          "LOGOUT": "Logout"
+          "LOGOUT": "Logout",
+          "MANAGEMENT": "Admin Panel"
         }
       },
       "DROPDOWN_USER": {
-        "REMOVE_FROM_GROUP": "Remove from Group",
-        "PRIVATE_MESSAGE": "Private Message"
+        "REMOVE_FROM_GROUP": "Remove from group",
+        "PRIVATE_MESSAGE": "Private message"
       }
     },
     "CHAT_VIEW": {
@@ -45,11 +46,17 @@
           "USERS": "Users"
         },
         "BUTTON": {
-          "CREATE_CHANNEL": "Create Channel",
-          "SEARCH_CHANNEL": "Join Channel",
+          "CREATE_CHANNEL": "Create channel",
+          "SEARCH_CHANNEL": "Join channel",
           "BTN_TRANSLATE": "Translate"
         },
-        "LOGO": "Smart Chat"
+        "LOGO": "Smart Chat",
+        "CHANNEL_GROUP": {
+          "GENERAL": "General",
+          "DEPARTMENT": "Department",
+          "ORGANIZATION": "Organization",
+          "CUSTOM": "Private"
+        }
       },
       "CHANNEL_HEADER": {
         "LOADING": "Loading...",
@@ -60,15 +67,15 @@
         "LOCATION": "Huntsville"
       },
       "MESSAGE_INPUT": {
-        "PLACEHOLDER": "Type a message...",
+        "PLACEHOLDER": "Message...",
         "TRANSLATE": "Translate",
         "SEARCH_EMOJI": "Search emoji...",
         "SEND_FILE": "Send file",
         "FILES_COUNT": "file(s)",
-        "REMOVE_ALL_FILES": "Remove all files",
+        "REMOVE_ALL_FILES": "Remove all",
         "REMOVE_FILE": "Remove file",
-        "MAX_FILES_ERROR": "You can select up to {max} files only",
-        "UPLOAD_ERROR": "An error occurred during file upload."
+        "MAX_FILES_ERROR": "You can only select a maximum of {max} files",
+        "UPLOAD_ERROR": "There was an error during the file upload process."
       },
       "MESSAGE_LIST": {
         "CONNECTING": "Connecting...",
@@ -82,49 +89,56 @@
         "MESSAGE_DELETED": "This message has been deleted",
         "CANCEL_REPLY": "Cancel reply",
         "DELETE_MESSAGE_CONFIRM": "Are you sure you want to delete this message?",
-        "ERROR_LOADING_MESSAGES": "Unable to load initial messages",
+        "ERROR_LOADING_MESSAGES": "Could not load initial messages",
         "ERROR_CONNECTING": "Unable to connect...",
         "ERROR_NO_CHANNEL": "No channel selected",
-        "ERROR_LOAD_CHANNEL_MESSAGES": "Unable to load channel messages",
+        "ERROR_LOAD_CHANNEL_MESSAGES": "Could not load channel messages",
         "ERROR_NO_USER": "No user selected",
-        "ERROR_LOAD_USER_MESSAGES": "Unable to load user messages",
-        "ERROR_UPDATE_MESSAGE": "Unable to update message. Please try again.",
-        "TRANSLATE_ERROR": "An error occurred. Please try again."
+        "ERROR_LOAD_USER_MESSAGES": "Could not load user messages",
+        "ERROR_UPDATE_MESSAGE": "Could not edit message. Please try again.",
+        "TRANSLATE_ERROR": "An error occurred, please try again"
       }
     },
     "CHANNEL": {
       "CREATE": {
-        "TITLE": "Create New Channel",
-        "NAME_LABEL": "Channel Name",
-        "NAME_PLACEHOLDER": "Enter a name for the new channel",
-        "NAME_ERROR": "Channel name must contain at least 1 character.",
+        "TITLE": "Create new channel",
+        "NAME_LABEL": "Channel name",
+        "NAME_PLACEHOLDER": "Enter name for new channel",
+        "NAME_ERROR": "Channel name must be at least 1 character.",
         "URL_LABEL": "URL:",
         "EDIT_URL": "Edit",
         "SAVE_URL": "Save",
-        "PUBLIC_TITLE": "Public Channel",
-        "PUBLIC_DESC": "Anyone can join this channel",
-        "PRIVATE_TITLE": "Private Channel",
-        "PRIVATE_DESC": "Only invited members can join",
+        "TYPE_CUSTOM_TITLE": "Custom",
+        "TYPE_CUSTOM_DESC": "Manually select members",
+        "TYPE_DEPARTMENT_TITLE": "Current Department",
+        "TYPE_DEPARTMENT_DESC": "All members in the department",
+        "TYPE_ORGANIZATION_TITLE": "Current Organization",
+        "TYPE_ORGANIZATION_DESC": "All members in the organization",
+        "TYPE_ALL_USERS_TITLE": "All Users",
+        "TYPE_ALL_USERS_DESC": "All users in the system",
         "DESCRIPTION_LABEL": "Description",
         "OPTIONAL": "(optional)",
-        "DESCRIPTION_PLACEHOLDER": "Enter a description for this channel",
+        "DESCRIPTION_PLACEHOLDER": "Enter description for this channel",
         "CANCEL": "Cancel",
         "CREATE": "Create",
         "SUCCESS": "Channel created successfully!",
         "EXISTS": "Channel already exists",
-        "ERROR": "An error occurred during channel creation"
+        "ERROR": "Error during creation",
+        "ERROR_NO_DEPARTMENT": "You do not belong to any department",
+        "ERROR_NO_ORGANIZATION": "You do not belong to any organization"
       },
       "JOIN": {
         "TITLE": "Find Channel",
-        "SEARCH_PLACEHOLDER": "Enter keywords to search",
+        "SEARCH_PLACEHOLDER": "Type to search",
         "SEARCH": "Search",
-        "EMPTY": "No results"
+        "EMPTY": "Empty"
       },
       "USERS": {
         "TITLE": "Member List",
         "TAB_MEMBERS": "Members",
-        "TAB_ADD": "Add Members",
-        "NO_MEMBERS": "No members",
+        "ADMIN": "Admin",
+        "TAB_ADD": "Add members",
+        "NO_MEMBERS": "No members found",
         "SEARCH_PLACEHOLDER": "Search by name or email...",
         "SEARCH": "Search",
         "NOT_FOUND": "Not found",
@@ -134,23 +148,23 @@
     },
     "TRANSLATE_MODAL": {
       "TITLE": "Translate",
-      "SOURCE_LABEL": "Source Text",
+      "SOURCE_LABEL": "Source text",
       "SOURCE_PLACEHOLDER": "Enter text...",
       "TRANSLATE_BUTTON": "Translate",
-      "RESULT_PLACEHOLDER": "Translated text will appear here",
+      "RESULT_PLACEHOLDER": "Translation will appear here",
       "CLOSE": "Close",
       "CONFIRM": "Confirm",
-      "ERROR": "An error occurred. Please try again."
+      "ERROR": "An error occurred, please try again"
     },
     "THEME_TOGGLE": {
-      "SWITCH_TO_LIGHT": "Switch to Light Mode",
-      "SWITCH_TO_DARK": "Switch to Dark Mode"
+      "SWITCH_TO_LIGHT": "Switch to light mode",
+      "SWITCH_TO_DARK": "Switch to dark mode"
     }
   },
   "AUTH": {
     "LOGIN": {
       "TITLE": "Login",
-      "ACCOUNT_LABEL": "Username",
+      "ACCOUNT_LABEL": "Account",
       "ACCOUNT_PLACEHOLDER": "Enter your username",
       "PASSWORD_LABEL": "Password",
       "PASSWORD_PLACEHOLDER": "Enter your password",
@@ -167,24 +181,24 @@
       "NAME_LABEL": "Full Name",
       "NAME_PLACEHOLDER": "Enter your full name",
       "AVATAR_LABEL": "Avatar",
-      "CHANGE_AVATAR": "Change avatar",
-      "SELECT_AVATAR": "Select avatar",
+      "CHANGE_AVATAR": "Change photo",
+      "SELECT_AVATAR": "Select photo",
       "EMAIL_LABEL": "Email",
       "EMAIL_PLACEHOLDER": "Enter your email",
-      "PHONE_LABEL": "Phone Number",
-      "PHONE_PLACEHOLDER": "Enter your phone number",
+      "PHONE_LABEL": "Phone number",
+      "PHONE_PLACEHOLDER": "Enter phone number",
       "PASSWORD_LABEL": "Password",
-      "PASSWORD_PLACEHOLDER": "Enter your password",
+      "PASSWORD_PLACEHOLDER": "Enter password",
       "CONFIRM_PASSWORD_LABEL": "Confirm Password",
-      "CONFIRM_PASSWORD_PLACEHOLDER": "Re-enter your password",
+      "CONFIRM_PASSWORD_PLACEHOLDER": "Re-enter password",
       "BUTTON": "Register",
       "BUTTON_LOADING": "Registering...",
       "HAS_ACCOUNT": "Already have an account?",
       "LOGIN_LINK": "Login",
-      "AVATAR_SIZE_ERROR": "Avatar size must not exceed 5MB",
-      "PASSWORD_MISMATCH": "Passwords do not match",
+      "AVATAR_SIZE_ERROR": "Image size must not exceed 5MB",
+      "PASSWORD_MISMATCH": "Confirm password does not match",
       "PHONE_INVALID": "Phone number must be 10 digits",
-      "SUCCESS": "Registration successful! Please log in.",
+      "SUCCESS": "Registration successful! Please login.",
       "ERROR": "Registration failed",
       "ERROR_GENERAL": "An error occurred during registration"
     }
@@ -192,11 +206,11 @@
   "PROFILE": {
     "TITLE": "Personal Information",
     "AVATAR_LABEL": "Avatar",
-    "CHANGE_AVATAR": "Change avatar",
-    "SELECT_AVATAR": "Select avatar",
+    "CHANGE_AVATAR": "Change photo",
+    "SELECT_AVATAR": "Select photo",
     "USERNAME_LABEL": "Username",
     "EMAIL_LABEL": "Email",
-    "PHONE_LABEL": "Phone Number",
+    "PHONE_LABEL": "Phone number",
     "ROLE_LABEL": "Role",
     "LOGOUT_BUTTON": "Logout"
   },
@@ -205,20 +219,192 @@
       "TITLE": "404",
       "HEADING": "Page Not Found",
       "MESSAGE": "The page you are looking for does not exist or has been moved.",
-      "HOME_LINK": "Back to Home"
+      "HOME_LINK": "Go to home"
     },
     "403": {
       "TITLE": "403",
       "HEADING": "Access Denied",
       "MESSAGE": "You do not have permission to access this page.",
-      "HOME_LINK": "Back to Home"
+      "HOME_LINK": "Go to home"
     }
   },
   "HOME": {
     "TITLE": "Welcome to LiveStream",
     "VIEWERS": "viewers"
   },
+  "USER_MANAGEMENT": {
+    "TITLE": "User Management",
+    "BUTTON": {
+      "CREATE_USER": "Create new user",
+      "EDIT": "Edit",
+      "DELETE": "Delete",
+      "UPDATE": "Update",
+      "CREATE": "Create",
+      "CANCEL": "Cancel"
+    },
+    "LABEL": {
+      "SEARCH_PLACEHOLDER": "Search by name, email...",
+      "ALL_ROLES": "All roles",
+      "USERNAME": "Full Name",
+      "EMAIL": "Email",
+      "PHONE": "Phone number",
+      "ROLE": "Role",
+      "PASSWORD": "Password",
+      "AVATAR": "Avatar",
+      "SELECT_ROLE": "Select role",
+      "NO_DATA": "No data",
+      "LOADING": "Loading...",
+      "PROCESSING": "Processing...",
+      "DEPARTMENT": "Department",
+      "NO_DEPARTMENT": "No department",
+      "ACTIONS": "Actions",
+      "STT": "No.",
+      "USERNAME_COLUMN": "Username",
+      "NA": "N/A",
+      "LANGUAGE": "Language",
+      "SELECT_LANGUAGE": "Select language",
+      "THEME": "Theme",
+      "SELECT_THEME": "Select theme",
+      "SELECT_DEPARTMENT": "Select department"
+    },
+    "MODAL": {
+      "CREATE_TITLE": "Create New User",
+      "EDIT_TITLE": "Edit User",
+      "USERNAME_PLACEHOLDER": "Enter full name",
+      "EMAIL_PLACEHOLDER": "Enter email",
+      "PHONE_PLACEHOLDER": "Enter phone number",
+      "PASSWORD_PLACEHOLDER": "Enter password",
+      "USE_DEFAULT_PASSWORD": "Use default password",
+      "JOIN_ALL_CHANNEL": "Automatically add to related channels (department, organization)",
+      "ROLE_USER": "User",
+      "ROLE_ADMIN": "Admin",
+      "CHANGE_AVATAR": "Change photo",
+      "SELECT_AVATAR": "Select photo",
+      "THEME_LIGHT": "Light",
+      "THEME_DARK": "Dark"
+    },
+    "MESSAGE": {
+      "CREATE_SUCCESS": "User created successfully",
+      "UPDATE_SUCCESS": "User updated successfully",
+      "DELETE_SUCCESS": "User deleted successfully",
+      "CREATE_ERROR": "Could not create user",
+      "EXISTS_ERROR": "User already exists in the system",
+      "UPDATE_ERROR": "Could not update user",
+      "DELETE_ERROR": "Could not delete user",
+      "FETCH_ERROR": "Could not load user list"
+    },
+    "VALIDATION": {
+      "NAME_REQUIRED": "Please enter full name",
+      "EMAIL_REQUIRED": "Please enter email",
+      "EMAIL_INVALID": "Invalid email",
+      "ROLE_REQUIRED": "Please select a role",
+      "DEPARTMENT_REQUIRED": "Please select a department",
+      "PASSWORD_REQUIRED": "Please enter password",
+      "PASSWORD_MIN_LENGTH": "Password must be at least 6 characters"
+    }
+  },
+  "DEPARTMENT_MANAGEMENT": {
+    "TITLE": "Department Management",
+    "BUTTON": {
+      "CREATE_DEPARTMENT": "Create new department",
+      "EDIT": "Edit",
+      "DELETE": "Delete",
+      "VIEW_USERS": "View employees",
+      "UPDATE": "Update",
+      "CREATE": "Create",
+      "CANCEL": "Cancel"
+    },
+    "LABEL": {
+      "SEARCH_PLACEHOLDER": "Search by department name...",
+      "NAME": "Department Name",
+      "DESCRIPTION": "Description",
+      "USER_COUNT": "Employee count",
+      "CREATED_DATE": "Created date",
+      "NO_DATA": "No data",
+      "LOADING": "Loading...",
+      "PROCESSING": "Processing...",
+      "NO_DEPARTMENT": "No department",
+      "ALL_DEPARTMENTS": "All departments",
+      "ALL_ORGANIZATIONS": "All organizations",
+      "ORGANIZATION": "Organization",
+      "ID": "ID",
+      "ACTIONS": "Actions"
+    },
+    "MODAL": {
+      "CREATE_TITLE": "Create New Department",
+      "EDIT_TITLE": "Edit Department",
+      "VIEW_USERS_TITLE": "Employee List",
+      "ORGANIZATION_LABEL": "Organization *",
+      "NAME_LABEL": "Department Name *",
+      "NAME_PLACEHOLDER": "Enter department name",
+      "DESCRIPTION_LABEL": "Description",
+      "DESCRIPTION_PLACEHOLDER": "Enter department description"
+    },
+    "MESSAGE": {
+      "CREATE_SUCCESS": "Department created successfully",
+      "UPDATE_SUCCESS": "Department updated successfully",
+      "DELETE_SUCCESS": "Department deleted successfully",
+      "CREATE_ERROR": "Could not create department",
+      "UPDATE_ERROR": "Could not update department",
+      "DELETE_ERROR": "Could not delete department",
+      "FETCH_ERROR": "Could not load department list",
+      "FETCH_USERS_ERROR": "Could not load employee list",
+      "NO_USERS": "No employees in this department"
+    }
+  },
+  "ORGANIZATION_MANAGEMENT": {
+    "TITLE": "Organization Management",
+    "BUTTON": {
+      "CREATE_ORGANIZATION": "Create new organization",
+      "EDIT": "Edit",
+      "DELETE": "Delete",
+      "VIEW_DEPARTMENTS": "View departments",
+      "UPDATE": "Update",
+      "CREATE": "Create",
+      "CANCEL": "Cancel"
+    },
+    "LABEL": {
+      "SEARCH_PLACEHOLDER": "Search by organization name...",
+      "NAME": "Organization Name",
+      "DESCRIPTION": "Description",
+      "DEPARTMENT_COUNT": "Department count",
+      "CREATED_DATE": "Created date",
+      "NO_DATA": "No data",
+      "LOADING": "Loading...",
+      "PROCESSING": "Processing...",
+      "NO_ORGANIZATION": "No organization",
+      "ALL_ORGANIZATIONS": "All organizations",
+      "SELECT_ORGANIZATION": "Select organization",
+      "ID": "ID",
+      "COUNTRY": "Country",
+      "USER_COUNT": "Total personnel",
+      "ACTIONS": "Actions"
+    },
+    "MODAL": {
+      "CREATE_TITLE": "Create New Organization",
+      "EDIT_TITLE": "Edit Organization",
+      "VIEW_DEPARTMENTS_TITLE": "Department List",
+      "NAME_LABEL": "Organization Name *",
+      "NAME_PLACEHOLDER": "Enter organization name",
+      "COUNTRY_LABEL": "Country *",
+      "DESCRIPTION_LABEL": "Description",
+      "DESCRIPTION_PLACEHOLDER": "Enter organization description",
+      "NO_DESCRIPTION": "No description"
+    },
+    "MESSAGE": {
+      "CREATE_SUCCESS": "Organization created successfully",
+      "UPDATE_SUCCESS": "Organization updated successfully",
+      "DELETE_SUCCESS": "Organization deleted successfully",
+      "CREATE_ERROR": "Could not create organization",
+      "UPDATE_ERROR": "Could not update organization",
+      "DELETE_ERROR": "Could not delete organization",
+      "FETCH_ERROR": "Could not load organization list",
+      "FETCH_DEPARTMENTS_ERROR": "Could not load department list",
+      "NO_DEPARTMENTS": "No departments in this organization",
+      "GENERAL_ERROR": "An error occurred, please try again"
+    }
+  },
   "language": {
-    "selectLanguage": "Select Language"
+    "selectLanguage": "Select language"
   }
 }

@@ -1,18 +1,18 @@
 import { createI18n } from 'vue-i18n'
-import vi from '../locales/vi.json'
-import en from '../locales/en.json'
-import jp from '../locales/jp.json'
+import VI from '../locales/vi.json'
+import EN from '../locales/en.json'
+import JP from '../locales/jp.json'
 import localStorageUtils from '@/utils/localStorageUtils'
 
 const i18n = createI18n({
   legacy: false,
-  locale: localStorageUtils.get('language') || 'vi',
-  fallbackLocale: 'en',
+  locale: localStorageUtils.get('language') || 'VI',
+  fallbackLocale: 'EN',
   warnHtmlInMessage: 'off',
   messages: {
-    vi,
-    en,
-    jp,
+    VI,
+    EN,
+    JP,
   },
 })
 

@@ -68,19 +68,19 @@ const defaultLanguage = ref({
 
 const languages = [
   {
-    code: 'vi',
+    code: 'VI',
     name: 'Viet Nam',
     nativeName: 'Viet Nam',
     flag: '🇻🇳',
   },
   {
-    code: 'en',
+    code: 'EN',
     name: 'English',
     nativeName: 'English',
     flag: '🇺🇸',
   },
   {
-    code: 'jp',
+    code: 'JP',
     name: 'Japan',
     nativeName: 'Japan',
     flag: 'jp',
@@ -93,7 +93,7 @@ const toggleDropdown = () => {
 
 const changeLanguage = (langCode) => {
   locale.value = langCode
-  localStorageUtils.set('language', langCode)
+  localStorage.setItem('language', langCode)
   isDropdownOpen.value = false
 }
 
@@ -101,7 +101,7 @@ const getCurrentLanguageName = () => {
   const currentLang = languages.find(
     (lang) => lang.code === currentLocale.value
   )
-  return currentLang ? currentLang.nativeName : defaultLanguage.value.code
+  return currentLang ? currentLang.nativeName : defaultLanguage.value.nativeName
 }
 
 const closeDropdown = (event) => {
@@ -111,8 +111,8 @@ const closeDropdown = (event) => {
 }
 
 onMounted(() => {
-  if (localStorageUtils.get('language') == null) {
-    localStorageUtils.set('language', defaultLanguage.value.code)
+  if (localStorage.getItem('language') == null) {
+    localStorage.setItem('language', defaultLanguage.value.code)
   }
   document.addEventListener('click', closeDropdown)
 })

@@ -16,7 +16,8 @@
             :class="{ active: activeTab === 'members' }"
             @click="activeTab = 'members'"
           >
-            <font-awesome-icon :icon="['fas', 'user-tie']" /> {{ $t('COMPONENT.CHANNEL.USERS.TAB_MEMBERS') }}
+            <font-awesome-icon :icon="['fas', 'user-tie']" />
+            {{ $t('COMPONENT.CHANNEL.USERS.TAB_MEMBERS') }}
           </button>
           <button
             type="button"
@@ -44,13 +45,24 @@
                     :show-status="true"
                   />
                   <div class="flex flex-col gap-1">
-                    <span class="member-name">{{ user.name }}</span>
+                    <span class="member-name">{{ user.name }} </span>
                     <small class="member-username">{{ user.email }}</small>
                   </div>
                 </div>
+                <div
+                  class="icon-right"
+                  v-if="user.id == channelStore.channelCurrent.admin?.id"
+                >
+                  <span class="new-message-badge">
+                    {{ $t('COMPONENT.CHANNEL.USERS.ADMIN') }}
+                  </span>
+                </div>
                 <DropdownMenu
                   :data="user"
-                  :can-remove="!channelStore.channelCurrent?.isDefault"
+                  :can-remove="
+                    channelStore.channelCurrent.admin?.id ==
+                    authStore.userInfo().id
+                  "
                   @remove="handleRemove"
                   @chat="handleChatPrive"
                 />
@@ -59,7 +71,9 @@
           </template>
 
           <template v-else>
-            <p class="text-center text-secondary">{{ $t('COMPONENT.CHANNEL.USERS.NO_MEMBERS') }}</p>
+            <p class="text-center text-secondary">
+              {{ $t('COMPONENT.CHANNEL.USERS.NO_MEMBERS') }}
+            </p>
           </template>
         </div>
 
@@ -70,7 +84,9 @@
               type="text"
               :placeholder="$t('COMPONENT.CHANNEL.USERS.SEARCH_PLACEHOLDER')"
             />
-            <button class="btn primary" type="button">{{ $t('COMPONENT.CHANNEL.USERS.SEARCH') }}</button>
+            <button class="btn primary" type="button">
+              {{ $t('COMPONENT.CHANNEL.USERS.SEARCH') }}
+            </button>
           </div>
           <div class="divider"></div>
 
@@ -87,18 +103,22 @@
               />
               <Avatar :avatar="user" size="small" />
               <div class="candidate-info">
-                <span class="candidate-name">{{ user.name }}</span>
+                <span class="candidate-name">{{ user.name }} </span>
                 <small class="candidate-email">{{ user.email }}</small>
               </div>
             </label>
           </div>
-          <p v-else class="empty-state">{{ $t('COMPONENT.CHANNEL.USERS.NOT_FOUND') }}</p>
+          <p v-else class="empty-state">
+            {{ $t('COMPONENT.CHANNEL.USERS.NOT_FOUND') }}
+          </p>
         </div>
       </div>
 
       <!-- Footer -->
       <div class="modal-actions gap-2">
-        <button class="modal-cancel-btn" @click="$emit('close')">{{ $t('COMPONENT.CHANNEL.USERS.CLOSE') }}</button>
+        <button class="modal-cancel-btn" @click="$emit('close')">
+          {{ $t('COMPONENT.CHANNEL.USERS.CLOSE') }}
+        </button>
         <button
           class="btn primary"
           type="button"
@@ -165,9 +185,11 @@ const handleChatPrive = (user) => {
   emit('close')
 }
 
-const handleAddMembers = () => {
-  emit('add-members', [...selectedCandidateIds.value])
-  selectedCandidateIds.value = []
+const handleAddMembers = async () => {
+  const res = await channelStore.addMemberIntoChannel(props.channelId, [
+    ...selectedCandidateIds.value,
+  ])
+  emit('close')
 }
 
 watch(
@@ -212,6 +234,12 @@ watch(
   flex-direction: column;
   max-height: 90vh;
   overflow-y: auto;
+}
+
+.candidate-info {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
 }
 
 /* Header */
@@ -419,5 +447,22 @@ watch(
   .modal-body {
     padding: 1rem;
   }
+}
+
+.new-message-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, #1ed760 0%, #17b34a 100%);
+  color: #fff;
+  font-size: 0.65rem;
+  font-weight: 700;
+  padding: 0.15rem 0.5rem;
+  border-radius: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  box-shadow: 0 2px 4px rgba(30, 215, 96, 0.3);
+  animation: pulse 2s infinite;
+  flex-shrink: 0;
 }
 </style>

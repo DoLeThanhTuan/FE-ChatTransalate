@@ -3,7 +3,11 @@
     <div class="modal-content">
       <div class="modal-header">
         <h2>
-          {{ id ? $t('ORGANIZATION_MANAGEMENT.MODAL.EDIT_TITLE') : $t('ORGANIZATION_MANAGEMENT.MODAL.CREATE_TITLE') }}
+          {{
+            id
+              ? $t('ORGANIZATION_MANAGEMENT.MODAL.EDIT_TITLE')
+              : $t('ORGANIZATION_MANAGEMENT.MODAL.CREATE_TITLE')
+          }}
         </h2>
         <button @click="$emit('close')" class="btn-close">
           <i class="fas fa-times"></i>
@@ -35,11 +39,15 @@
         </div>
 
         <div class="form-group">
-          <label>{{ $t('ORGANIZATION_MANAGEMENT.MODAL.DESCRIPTION_LABEL') }}</label>
+          <label>{{
+            $t('ORGANIZATION_MANAGEMENT.MODAL.DESCRIPTION_LABEL')
+          }}</label>
           <textarea
             v-model="organization.description"
             rows="4"
-            :placeholder="$t('ORGANIZATION_MANAGEMENT.MODAL.DESCRIPTION_PLACEHOLDER')"
+            :placeholder="
+              $t('ORGANIZATION_MANAGEMENT.MODAL.DESCRIPTION_PLACEHOLDER')
+            "
           ></textarea>
         </div>
 
@@ -80,24 +88,24 @@ const emit = defineEmits(['close', 'submit'])
 const isLoading = ref(false)
 const organization = ref({
   name: '',
-  country: '',
+  country: 'VI',
   description: '',
 })
 const languages = [
   {
-    code: 'vi',
+    code: 'VI',
     name: 'Viet Nam',
     nativeName: 'Viet Nam',
     flag: '🇻🇳',
   },
   {
-    code: 'en',
+    code: 'EN',
     name: 'English',
     nativeName: 'English',
     flag: '🇺🇸',
   },
   {
-    code: 'jp',
+    code: 'JP',
     name: 'Japan',
     nativeName: 'Japan',
     flag: 'jp',
@@ -117,7 +125,7 @@ watch(
         isLoading.value = false
       } else {
         organization.value.name = ''
-        organization.value.country = ''
+        organization.value.country = 'VI'
         organization.value.description = ''
       }
       isLoading.value = false
@@ -286,4 +294,3 @@ const handleClose = () => {
   cursor: not-allowed;
 }
 </style>
-

@@ -2,12 +2,20 @@ const Status = Object.freeze({
   MESSAGE: 'MESSAGE',
   CREATE_CHANNEL: 'CREATE_CHANNEL',
   LEAVE_CHANNEL: 'LEAVE_CHANNEL',
+  BREAK_CHANNEL: 'BREAK_CHANNEL',
   JOIN_CHANNEL: 'JOIN_CHANNEL',
   ADD_MEMBER: 'ADD_MEMBER',
   CHANGE_NAME: 'CHANGE_NAME',
   REMOVE_MEMBER: 'REMOVE_MEMBER',
   DELETE_MESSAGE: 'DELETE_MESSAGE',
   REACTION_MESSAGE: 'REACTION_MESSAGE',
+})
+
+const ChannelType = Object.freeze({
+  GENERAL: 'GENERAL',
+  CUSTOM: 'CUSTOM',
+  DEPARTMENT: 'DEPARTMENT',
+  ORGANIZATION: 'ORGANIZATION',
 })
 
 const URLMessage = Object.freeze({
@@ -39,4 +47,4 @@ const TypeChat = Object.freeze({
   USER: 'user',
 })
 
-export { Status, URLMessage, TypeChat, Language }
+export { Status, URLMessage, TypeChat, Language, ChannelType }
