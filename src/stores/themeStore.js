@@ -1,3 +1,4 @@
+import { userApi } from '@/axios/api-services/userApi'
 import { defineStore } from 'pinia'
 import { ref } from 'vue'
 
@@ -17,7 +18,8 @@ export const useThemeStore = defineStore('theme', () => {
   }
 
   // Toggle theme
-  const toggleTheme = () => {
+  const toggleTheme = async () => {
+    await userApi.changeTheme({ theme: isDark.value ? 'light' : 'dark' })
     isDark.value = !isDark.value
     applyTheme()
   }
@@ -50,6 +52,6 @@ export const useThemeStore = defineStore('theme', () => {
     initTheme,
     toggleTheme,
     applyTheme,
-    watchSystemTheme
+    watchSystemTheme,
   }
-}) 
+})

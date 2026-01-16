@@ -39,11 +39,38 @@ export const userApi = {
       },
     })
   },
-  deleteUser: async (id) => {
-    return await axiosClient.delete(`${ENDPOINT}/${id}`, {
+  changeStatusUser: async (id) => {
+    return await axiosClient.get(`${ENDPOINT}/${id}/status`, {
       headers: {
         ...setHeader(),
       },
     })
+  },
+  resetPassword: async (id, params) => {
+    return await axiosClient.post(`${ENDPOINT}/${id}/reset-password`, params, {
+      headers: {
+        ...setHeader(),
+      },
+    })
+  },
+  changeLanguage: async (params) => {
+    return await axiosClient.get(
+      `${ENDPOINT}/change-language?language=${params.language}`,
+      {
+        headers: {
+          ...setHeader(),
+        },
+      }
+    )
+  },
+  changeTheme: async (params) => {
+    return await axiosClient.get(
+      `${ENDPOINT}/change-theme?theme=${params.theme}`,
+      {
+        headers: {
+          ...setHeader(),
+        },
+      }
+    )
   },
 }

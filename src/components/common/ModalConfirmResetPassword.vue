@@ -8,16 +8,23 @@
       style="background: var(--bg-active); color: var(--text-primary)"
     >
       <!-- Title -->
-      <h2 class="text-xl font-semibold mb-3">
-        {{ $t('COMPONENT.COMMON.MODAL_CONFIRM_DELETE.LABEL.HEADER') }}
-      </h2>
+      <div class="flex items-center gap-3 mb-3">
+        <font-awesome-icon
+          :icon="['fas', 'key']"
+          class="text-[#10b981] text-xl"
+        />
+        <h2 class="text-xl font-semibold">
+          {{ $t('COMPONENT.COMMON.MODAL_CONFIRM_RESET_PASSWORD.LABEL.HEADER') }}
+        </h2>
+      </div>
 
       <!-- Message -->
-      <p class="text-[var(--text-secondary)] mb-6">
-        {{
-          message || $t('COMPONENT.COMMON.MODAL_CONFIRM_DELETE.LABEL.MESSAGE')
-        }}
-      </p>
+      <div class="text-[var(--text-secondary)] mb-6">
+        <p v-if="message" v-html="message"></p>
+        <p v-else>
+          {{ $t('COMPONENT.COMMON.MODAL_CONFIRM_RESET_PASSWORD.LABEL.MESSAGE') }}
+        </p>
+      </div>
 
       <!-- Actions -->
       <div class="flex justify-end gap-3">
@@ -29,14 +36,18 @@
           "
           @click="emit('cancel')"
         >
-          {{ $t('COMPONENT.COMMON.MODAL_CONFIRM_DELETE.BUTTON.BTN_CANCEL') }}
+          {{
+            $t('COMPONENT.COMMON.MODAL_CONFIRM_RESET_PASSWORD.BUTTON.BTN_CANCEL')
+          }}
         </button>
 
         <button
-          class="px-4 py-2 rounded-lg font-semibold text-white bg-red-600"
+          class="px-4 py-2 rounded-lg font-semibold text-white bg-[#10b981] hover:bg-[#059669] transition-colors"
           @click="emit('confirm', props.id)"
         >
-          {{ $t('COMPONENT.COMMON.MODAL_CONFIRM_DELETE.BUTTON.BTN_DELETE') }}
+          {{
+            $t('COMPONENT.COMMON.MODAL_CONFIRM_RESET_PASSWORD.BUTTON.BTN_RESET')
+          }}
         </button>
       </div>
     </div>
@@ -68,3 +79,4 @@ const emit = defineEmits(['confirm', 'cancel'])
   animation: fadeIn 0.18s ease-out;
 }
 </style>
+

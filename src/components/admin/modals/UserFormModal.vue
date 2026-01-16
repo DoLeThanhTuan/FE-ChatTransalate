@@ -97,7 +97,9 @@
                 v-model="useDefaultPassword"
                 @change="handleDefaultPassword"
               />
-              {{ $t('USER_MANAGEMENT.MODAL.USE_DEFAULT_PASSWORD') }} (123456789)
+              {{ $t('USER_MANAGEMENT.MODAL.USE_DEFAULT_PASSWORD') }} ({{
+                Password.DEFAULT
+              }})
             </label></label
           >
           <input
@@ -127,8 +129,8 @@
             <option value="USER">
               {{ $t('USER_MANAGEMENT.MODAL.ROLE_USER') }}
             </option>
-            <option value="ADMIN">
-              {{ $t('USER_MANAGEMENT.MODAL.ROLE_ADMIN') }}
+            <option value="MANAGER">
+              {{ $t('USER_MANAGEMENT.MODAL.ROLE_MANAGER') }}
             </option>
           </select>
           <span v-if="errors.role" class="error-msg">{{ errors.role }}</span>
@@ -220,7 +222,7 @@ import { ref, watch, computed } from 'vue'
 import { useI18n } from 'vue-i18n'
 import defaultAvatar from '@/assets/default-avatar.png'
 import { getURLAvatar } from '@/utils/image'
-import { Language } from '@/config/enum'
+import { Language, Password } from '@/config/enum'
 
 const { t } = useI18n()
 const languages = Language
@@ -303,7 +305,7 @@ watch(
 
 const handleDefaultPassword = () => {
   if (useDefaultPassword.value) {
-    localFormData.value.password = '123456789'
+    localFormData.value.password = Password.DEFAULT
     errors.value.password = ''
   } else {
     localFormData.value.password = ''
@@ -398,21 +400,26 @@ const handleSubmit = () => {
   left: 0;
   right: 0;
   bottom: 0;
-  background-color: rgba(0, 0, 0, 0.5);
+  background: rgba(0, 0, 0, 0.5);
   display: flex;
   align-items: center;
   justify-content: center;
-  z-index: 1000;
+  z-index: 2000;
+}
+
+:global(.dark) .modal-overlay {
+  background: rgba(10, 14, 22, 0.95);
 }
 
 .modal-content {
-  background: white;
-  border-radius: 8px;
+  background: var(--bg-active);
+  color: var(--text-primary);
+  border-radius: 14px;
   width: 90%;
   max-width: 600px;
   max-height: 90vh;
   overflow-y: auto;
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 2px 24px var(--shadow);
 }
 
 @media (min-width: 768px) {
@@ -431,14 +438,15 @@ const handleSubmit = () => {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 1.5rem;
-  border-bottom: 1px solid #ddd;
+  padding: 1.5rem 2rem 0.5rem 2rem;
+  border-bottom: 1px solid var(--border-primary);
 }
 
 .modal-header h2 {
   margin: 0;
-  color: #333;
-  font-size: 1.5rem;
+  color: var(--text-primary);
+  font-size: 2rem;
+  font-weight: 700;
   text-align: center;
   flex: 1;
 }
@@ -446,9 +454,10 @@ const handleSubmit = () => {
 .btn-close {
   background: none;
   border: none;
-  font-size: 1.5rem;
+  font-size: 2rem;
   cursor: pointer;
-  color: #666;
+  color: var(--text-primary);
+  opacity: 0.7;
   padding: 0.25rem;
   width: 32px;
   height: 32px;
@@ -456,16 +465,15 @@ const handleSubmit = () => {
   align-items: center;
   justify-content: center;
   border-radius: 4px;
-  transition: all 0.2s ease;
+  transition: opacity 0.2s;
 }
 
 .btn-close:hover {
-  background-color: #f5f5f5;
-  color: #333;
+  opacity: 1;
 }
 
 .user-form {
-  padding: 1.5rem;
+  padding: 0 2rem 0.5rem 2rem;
   display: flex;
   flex-direction: column;
   gap: 1rem;
@@ -478,40 +486,48 @@ const handleSubmit = () => {
 }
 
 .form-group label {
-  color: #666;
-  font-size: 0.9rem;
+  color: var(--text-primary);
+  font-size: 0.98rem;
+  font-weight: 600;
+  margin-bottom: 0.2rem;
+  letter-spacing: 0.01em;
 }
 
 .form-group input,
 .form-group select {
-  padding: 0.8rem;
-  border: 1px solid #ddd;
-  border-radius: 4px;
-  font-size: 1rem;
-  transition: border-color 0.3s;
+  padding: 0.7rem 1rem;
+  border: 1.5px solid var(--border-primary);
+  border-radius: 8px;
+  font-size: 0.875rem;
+  background: var(--bg-tertiary);
+  color: var(--text-primary);
+  transition: border 0.2s, box-shadow 0.2s;
+  box-sizing: border-box;
 }
 
 .form-group input:focus,
 .form-group select:focus {
-  border-color: #891c1c;
+  border: 1.5px solid var(--special-text-color);
   outline: none;
+  box-shadow: 0 0 0 2px var(--special-text-color);
 }
 
 .form-group input::placeholder {
-  color: #999;
+  color: var(--text-secondary);
+  opacity: 1;
 }
 
 .input-error {
-  border-color: #e74c3c !important;
+  border: 1.5px solid #e74c3c !important;
   box-shadow: 0 0 0 2px rgba(231, 76, 60, 0.1);
 }
 
 .error-msg {
   color: #e74c3c;
-  font-size: 0.875rem;
+  font-size: 0.93rem;
   margin-top: 0.4rem;
   display: block;
-  padding-left: 0.25rem;
+  padding-left: 2px;
   font-weight: 500;
   animation: slideDown 0.3s ease-out;
 }
@@ -539,7 +555,7 @@ const handleSubmit = () => {
   height: 100px;
   border-radius: 50%;
   object-fit: cover;
-  border: 2px solid #ddd;
+  border: 2px solid var(--border-primary);
 }
 
 .avatar-input {
@@ -547,59 +563,67 @@ const handleSubmit = () => {
 }
 
 .avatar-label {
-  background-color: #891c1c;
-  color: white !important;
+  background: var(--border-secondary);
+  color: var(--text-secondary) !important;
   padding: 0.5rem 1rem;
-  border-radius: 4px;
+  border-radius: 8px;
   cursor: pointer;
-  transition: background-color 0.3s;
+  transition: all 0.2s;
   text-align: center;
+  font-weight: 600;
+  font-size: 0.875rem;
 }
 
 .avatar-label:hover {
-  background-color: #6b1515;
+  filter: brightness(1.15);
 }
 
 .form-actions {
   display: flex;
   justify-content: flex-end;
-  gap: 1rem;
+  gap: 0.7rem;
   margin-top: 1rem;
+  padding: 1.2rem 2rem 1.5rem 2rem;
+  background: transparent;
 }
 
 .btn-cancel {
-  padding: 0.8rem 1.5rem;
-  border: 1px solid #ddd;
-  border-radius: 4px;
-  background: white;
-  color: #333;
+  padding: 0.7rem 1.5rem;
+  border: none;
+  border-radius: 8px;
+  background: var(--border-secondary);
+  color: var(--text-secondary);
   cursor: pointer;
-  font-size: 1rem;
-  transition: all 0.2s ease;
+  font-size: 0.875rem;
+  font-weight: 600;
+  transition: all 0.2s;
 }
 
 .btn-cancel:hover {
-  background-color: #f5f5f5;
+  filter: brightness(1.15);
 }
 
 .btn-submit {
-  padding: 0.8rem 1.5rem;
+  padding: 0.7rem 1.5rem;
   border: none;
-  border-radius: 4px;
-  background-color: #891c1c;
-  color: white;
+  border-radius: 8px;
+  background: var(--border-secondary);
+  color: var(--text-secondary);
   cursor: pointer;
-  font-size: 1rem;
-  transition: background-color 0.3s;
+  font-size: 0.875rem;
+  font-weight: 600;
+  transition: all 0.2s;
 }
 
 .btn-submit:hover:not(:disabled) {
-  background-color: #6b1515;
+  filter: brightness(1.15);
 }
 
 .btn-submit:disabled {
-  background-color: #ccc;
+  background: var(--border-secondary);
+  color: var(--text-secondary);
   cursor: not-allowed;
+  opacity: 0.5;
 }
 
 .theme-toggle-group {
@@ -624,26 +648,27 @@ const handleSubmit = () => {
   align-items: center;
   gap: 0.5rem;
   padding: 0.8rem 1rem;
-  border: 2px solid #ddd;
+  border: 2px solid var(--border-primary);
   border-radius: 8px;
   width: 100%;
   text-align: center;
   justify-content: center;
   transition: all 0.3s;
   font-size: 0.95rem;
-  color: #666;
+  color: var(--text-primary);
+  background: var(--bg-tertiary);
 }
 
 .theme-option input[type='radio']:checked + .theme-label {
-  border-color: #891c1c;
-  background-color: #f5f5f5;
-  color: #891c1c;
+  border-color: var(--special-text-color);
+  background-color: var(--bg-active);
+  color: var(--special-text-color);
   font-weight: 600;
 }
 
 .theme-option:hover .theme-label {
-  border-color: #891c1c;
-  background-color: #fafafa;
+  border-color: var(--special-text-color);
+  background-color: var(--bg-tertiary);
 }
 
 .theme-icon {

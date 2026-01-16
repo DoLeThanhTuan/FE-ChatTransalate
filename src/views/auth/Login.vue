@@ -91,6 +91,14 @@ const handleLogin = async () => {
       }
     }
   } catch (error) {
+    if (error.response?.status == 409) {
+      toast.error(t('AUTH.LOGIN.ERROR_USER_DISABLED'))
+      return
+    }
+    if (error.response?.status == 403) {
+      toast.error(t('AUTH.LOGIN.ERROR_USER_NOT_FOUND'))
+      return
+    }
     console.error('Login error:', error)
     toast.error(t('AUTH.LOGIN.ERROR'))
   } finally {

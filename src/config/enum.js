@@ -18,6 +18,12 @@ const ChannelType = Object.freeze({
   ORGANIZATION: 'ORGANIZATION',
 })
 
+const Role = Object.freeze({
+  USER: 'USER',
+  ADMIN: 'ADMIN',
+  MANAGER: 'MANAGER',
+})
+
 const URLMessage = Object.freeze({
   WS: '/ws',
   RECEIVE_CHANNEL_MESSAGE: '/topic/messages',
@@ -47,4 +53,8 @@ const TypeChat = Object.freeze({
   USER: 'user',
 })
 
-export { Status, URLMessage, TypeChat, Language, ChannelType }
+const Password = Object.freeze({
+  DEFAULT: '123456789',
+})
+
+export { Status, URLMessage, TypeChat, Language, ChannelType, Role, Password }

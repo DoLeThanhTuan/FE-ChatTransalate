@@ -2,7 +2,10 @@
   <div v-if="visible" class="modal-overlay" @click.self="$emit('close')">
     <div class="modal-content modal-large">
       <div class="modal-header">
-        <h2>{{ $t('DEPARTMENT_MANAGEMENT.MODAL.VIEW_USERS_TITLE') }} - {{ departmentName }}</h2>
+        <h2>
+          {{ $t('DEPARTMENT_MANAGEMENT.MODAL.VIEW_USERS_TITLE') }} -
+          {{ departmentName }}
+        </h2>
         <button @click="$emit('close')" class="btn-close">
           <i class="fas fa-times"></i>
         </button>
@@ -18,14 +21,22 @@
         </div>
         <div v-else class="users-list">
           <div v-for="user in users" :key="user.id" class="user-item">
-            <img
-              :src="user.avatar || defaultAvatar"
-              :alt="user.name"
-              class="user-avatar"
-            />
+            <Avatar :avatar="user.avatar" size="large" :show-status="false" />
             <div class="user-info">
-              <div class="user-name">{{ user.name || user.username }}</div>
+              <div class="user-name">
+                {{ user.name || user.username }}
+                <span class="role-info"
+                  >({{
+                    user.role == Role.USER
+                      ? $t('USER_MANAGEMENT.MODAL.ROLE_USER')
+                      : user.role == Role.MANAGER
+                      ? $t('USER_MANAGEMENT.MODAL.ROLE_MANAGER')
+                      : $t('USER_MANAGEMENT.MODAL.ROLE_ADMIN')
+                  }})</span
+                >
+              </div>
               <div class="user-email">{{ user.email }}</div>
+              <div class="user-email"></div>
             </div>
           </div>
         </div>
@@ -36,6 +47,8 @@
 
 <script setup>
 import defaultAvatarImg from '@/assets/default-avatar.png'
+import Avatar from '@/components/common/Avatar.vue'
+import { Role } from '@/config/enum'
 
 defineProps({
   visible: {
@@ -104,6 +117,10 @@ const defaultAvatar = defaultAvatarImg
   color: var(--text-primary);
   font-size: 1.5rem;
   transition: color 0.3s ease;
+}
+
+.role-info {
+  font-style: oblique;
 }
 
 .btn-close {
@@ -218,5 +235,3 @@ const defaultAvatar = defaultAvatarImg
   transition: color 0.3s ease;
 }
 </style>
-
-

@@ -290,11 +290,17 @@ const handleSubmit = async (payload) => {
 const handleDelete = async (id) => {
   try {
     const res = await organizationApi.delete(id)
-    if (res.status && res.data) {
-      toast.success(t('ORGANIZATION_MANAGEMENT.MESSAGE.DELETE_SUCCESS'))
-    } else {
+    if (res.status !== 200) {
       toast.error(t('ORGANIZATION_MANAGEMENT.MESSAGE.DELETE_ERROR'))
+      closeDeleteModal()
+      return
     }
+    if (res.status === 200 && res.data === false) {
+      toast.error(t('ORGANIZATION_MANAGEMENT.MESSAGE.DELETE_ERROR_USED'))
+      closeDeleteModal()
+      return
+    }
+    toast.success(t('ORGANIZATION_MANAGEMENT.MESSAGE.DELETE_SUCCESS'))
     closeDeleteModal()
     await fetchOrganizations()
     await organizationStore.fetchOrganizations()

@@ -13,11 +13,37 @@
       "MODAL_CONFIRM_DELETE": {
         "LABEL": {
           "HEADER": "削除の確認",
-          "MESSAGE": "本当に削除しますか？"
+          "MESSAGE": "本当に削除しますか？",
+          "ENABLE": "本当にユーザーを有効化しますか？",
+          "DISABLE": "本当にユーザーを無効化しますか？"
         },
         "BUTTON": {
           "BTN_CANCEL": "キャンセル",
-          "BTN_DELETE": "削除"
+          "BTN_DELETE": "削除",
+          "BTN_CONFIRM": "確認"
+        }
+      },
+      "MODAL_CONFIRM_RESET_PASSWORD": {
+        "LABEL": {
+          "HEADER": "パスワードリセットの確認",
+          "MESSAGE": "このユーザーのパスワードをリセットしてもよろしいですか？"
+        },
+        "BUTTON": {
+          "BTN_CANCEL": "キャンセル",
+          "BTN_RESET": "パスワードリセット"
+        }
+      },
+      "MODAL_CONFIRM_ENABLE_DISABLE": {
+        "LABEL": {
+          "HEADER_ENABLE": "有効化の確認",
+          "HEADER_DISABLE": "無効化の確認",
+          "MESSAGE_ENABLE": "このユーザーを有効にしてもよろしいですか？",
+          "MESSAGE_DISABLE": "このユーザーを無効にしてもよろしいですか？"
+        },
+        "BUTTON": {
+          "BTN_CANCEL": "キャンセル",
+          "BTN_ENABLE": "有効化",
+          "BTN_DISABLE": "無効化"
         }
       },
       "APP_HEADER": {
@@ -50,7 +76,7 @@
           "SEARCH_CHANNEL": "チャンネル参加",
           "BTN_TRANSLATE": "翻訳"
         },
-        "LOGO": "スマートチャット",
+        "LOGO": "Smart chat",
         "CHANNEL_GROUP": {
           "GENERAL": "一般チャンネル",
           "DEPARTMENT": "部署",
@@ -64,7 +90,8 @@
         "LEAVE_CHANNEL": "チャンネルを退出",
         "INFO": "情報",
         "BLOCK": "ブロック",
-        "LOCATION": "ハンツビル"
+        "LOCATION": "ハンツビル",
+        "BREAK": "グループを解散する"
       },
       "MESSAGE_INPUT": {
         "PLACEHOLDER": "メッセージを入力...",
@@ -96,7 +123,16 @@
         "ERROR_NO_USER": "ユーザーが選択されていません",
         "ERROR_LOAD_USER_MESSAGES": "ユーザーメッセージを読み込めませんでした",
         "ERROR_UPDATE_MESSAGE": "メッセージを編集できませんでした。もう一度お試しください。",
-        "TRANSLATE_ERROR": "エラーが発生しました。もう一度お試しください"
+        "TRANSLATE_ERROR": "エラーが発生しました。もう一度お試しください",
+        "LEAVE_ERROR_ADMIN": "あなたはこのチャットチャンネルの管理者です。退出できません。",
+        "SYSTEM_MESSAGE": {
+          "CREATE_CHANNEL": "チャンネルを作成しました",
+          "JOIN_CHANNEL": "チャンネルに参加しました",
+          "LEAVE_CHANNEL": "チャンネルから退出しました",
+          "BREAK_CHANNEL": "チャットチャンネルを解散しました",
+          "REMOVE_MEMBER": "削除しました",
+          "ADD_MEMBER": "追加しました"
+        }
       }
     },
     "CHANNEL": {
@@ -174,7 +210,9 @@
       "BUTTON_LOADING": "ログイン中...",
       "NO_ACCOUNT": "アカウントをお持ちでないですか？",
       "REGISTER_LINK": "今すぐ登録",
-      "ERROR": "ログイン中にエラーが発生しました"
+      "ERROR": "ログイン中にエラーが発生しました",
+      "ERROR_USER_DISABLED": "アカウントは無効化されています",
+      "ERROR_USER_NOT_FOUND": "メールアドレスまたはパスワードが間違っています"
     },
     "REGISTER": {
       "TITLE": "アカウント登録",
@@ -237,7 +275,9 @@
     "BUTTON": {
       "CREATE_USER": "新規ユーザー作成",
       "EDIT": "編集",
-      "DELETE": "削除",
+      "ENABLE": "有効化",
+      "DISABLE": "無効化",
+      "RESET_PASSWORD": "パスワードリセット",
       "UPDATE": "更新",
       "CREATE": "作成",
       "CANCEL": "キャンセル"
@@ -278,6 +318,7 @@
       "JOIN_ALL_CHANNEL": "関連するチャンネル（部署、組織）に自動追加",
       "ROLE_USER": "一般ユーザー",
       "ROLE_ADMIN": "管理者",
+      "ROLE_MANAGER": "マネージャー",
       "CHANGE_AVATAR": "画像を変更",
       "SELECT_AVATAR": "画像を選択",
       "THEME_LIGHT": "ライト",
@@ -286,12 +327,19 @@
     "MESSAGE": {
       "CREATE_SUCCESS": "ユーザーを作成しました",
       "UPDATE_SUCCESS": "ユーザーを更新しました",
-      "DELETE_SUCCESS": "ユーザーを削除しました",
+      "ENABLE_SUCCESS": "ユーザーを有効化しました",
+      "ENABLE_ERROR": "ユーザーを有効化できませんでした",
+      "DISABLE_SUCCESS": "ユーザーを無効化しました",
+      "DISABLE_ERROR": "ユーザーを無効化できませんでした",
       "CREATE_ERROR": "ユーザーを作成できませんでした",
       "EXISTS_ERROR": "このユーザーは既にシステムに存在します",
       "UPDATE_ERROR": "ユーザーを更新できませんでした",
-      "DELETE_ERROR": "ユーザーを削除できませんでした",
-      "FETCH_ERROR": "ユーザーリストを読み込めませんでした"
+      "FETCH_ERROR": "ユーザーリストを読み込めませんでした",
+      "RESET_PASSWORD_CONFIRM": "ユーザー「{name}」のパスワードをリセットしてもよろしいですか？",
+      "RESET_PASSWORD_CONFIRM_MESSAGE": "新しいパスワードは: {password}",
+      "RESET_PASSWORD_SUCCESS": "パスワードをリセットしました。",
+      "RESET_PASSWORD_ERROR": "パスワードリセット中にエラーが発生しました",
+      "UPDATE_USER_ADMIN_CHANNEL_ERROR": "ユーザーはまだ古い部署のいくつかのチャンネルの管理者です。"
     },
     "VALIDATION": {
       "NAME_REQUIRED": "氏名を入力してください",
@@ -349,7 +397,8 @@
       "DELETE_ERROR": "部署を削除できませんでした",
       "FETCH_ERROR": "部署リストを読み込めませんでした",
       "FETCH_USERS_ERROR": "社員リストを読み込めませんでした",
-      "NO_USERS": "この部署に社員はいません"
+      "NO_USERS": "この部署に社員はいません",
+      "DELETE_ERROR_USED": "この部署は使用中のため、削除できません"
     }
   },
   "ORGANIZATION_MANAGEMENT": {
@@ -401,7 +450,8 @@
       "FETCH_ERROR": "組織リストを読み込めませんでした",
       "FETCH_DEPARTMENTS_ERROR": "部署リストを読み込めませんでした",
       "NO_DEPARTMENTS": "この組織に部署はありません",
-      "GENERAL_ERROR": "エラーが発生しました。もう一度お試しください"
+      "GENERAL_ERROR": "エラーが発生しました。もう一度お試しください",
+      "DELETE_ERROR_USED": "この組織は使用中のため、削除できません"
     }
   },
   "language": {

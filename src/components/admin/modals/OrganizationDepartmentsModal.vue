@@ -2,7 +2,10 @@
   <div v-if="visible" class="modal-overlay" @click.self="$emit('close')">
     <div class="modal-content modal-large">
       <div class="modal-header">
-        <h2>{{ $t('ORGANIZATION_MANAGEMENT.MODAL.VIEW_DEPARTMENTS_TITLE') }} - {{ organizationName }}</h2>
+        <h2>
+          {{ $t('ORGANIZATION_MANAGEMENT.MODAL.VIEW_DEPARTMENTS_TITLE') }} -
+          {{ organizationName }}
+        </h2>
         <button @click="$emit('close')" class="btn-close">
           <i class="fas fa-times"></i>
         </button>
@@ -23,9 +26,15 @@
             class="department-item"
           >
             <div class="department-info">
-              <div class="department-name">{{ dept.name }}</div>
+              <div class="department-name">
+                <font-awesome-icon :icon="['fas', 'sitemap']" /> {{ dept.name }}
+              </div>
               <div class="department-description">
-                {{ dept.description || $t('ORGANIZATION_MANAGEMENT.MODAL.NO_DESCRIPTION') }}
+                {{ $t('DEPARTMENT_MANAGEMENT.MODAL.DESCRIPTION_LABEL') }}:
+                {{
+                  dept.description ||
+                  $t('ORGANIZATION_MANAGEMENT.MODAL.NO_DESCRIPTION')
+                }}
               </div>
             </div>
           </div>
@@ -184,6 +193,7 @@ defineEmits(['close'])
 }
 
 .department-name {
+  font-size: 1rem;
   font-weight: 600;
   color: var(--text-primary);
   margin-bottom: 0.25rem;
@@ -203,5 +213,3 @@ defineEmits(['close'])
   transition: color 0.3s ease;
 }
 </style>
-
-

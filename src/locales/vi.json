@@ -13,11 +13,37 @@
       "MODAL_CONFIRM_DELETE": {
         "LABEL": {
           "HEADER": "Xác nhận xóa",
-          "MESSAGE": "Bạn có chắc muốn xóa không?"
+          "MESSAGE": "Bạn có chắc muốn xóa không?",
+          "ENABLE": "Bạn có chắc muốn mở khóa người dùng này không?",
+          "DISABLE": "Bạn có chắc muốn khóa người dùng này không?"
         },
         "BUTTON": {
           "BTN_CANCEL": "Hủy",
-          "BTN_DELETE": "Xóa"
+          "BTN_DELETE": "Xóa",
+          "BTN_CONFIRM": "Xác nhận"
+        }
+      },
+      "MODAL_CONFIRM_RESET_PASSWORD": {
+        "LABEL": {
+          "HEADER": "Xác nhận đặt lại mật khẩu",
+          "MESSAGE": "Bạn có chắc muốn đặt lại mật khẩu cho người dùng này?"
+        },
+        "BUTTON": {
+          "BTN_CANCEL": "Hủy",
+          "BTN_RESET": "Đặt lại mật khẩu"
+        }
+      },
+      "MODAL_CONFIRM_ENABLE_DISABLE": {
+        "LABEL": {
+          "HEADER_ENABLE": "Xác nhận kích hoạt",
+          "HEADER_DISABLE": "Xác nhận vô hiệu hóa",
+          "MESSAGE_ENABLE": "Bạn có chắc muốn kích hoạt người dùng này?",
+          "MESSAGE_DISABLE": "Bạn có chắc muốn vô hiệu hóa người dùng này?"
+        },
+        "BUTTON": {
+          "BTN_CANCEL": "Hủy",
+          "BTN_ENABLE": "Kích hoạt",
+          "BTN_DISABLE": "Vô hiệu hóa"
         }
       },
       "APP_HEADER": {
@@ -42,7 +68,7 @@
     "CHAT_VIEW": {
       "SIDE_BAR": {
         "LABEL": {
-          "CHANNELS": "Channels",
+          "CHANNELS": "Kênh chat",
           "USERS": "Người dùng"
         },
         "BUTTON": {
@@ -50,7 +76,7 @@
           "SEARCH_CHANNEL": "Tham gia channel",
           "BTN_TRANSLATE": "Dịch"
         },
-        "LOGO": "Smart Chat",
+        "LOGO": "Smart chat",
         "CHANNEL_GROUP": {
           "GENERAL": "Kênh chung",
           "DEPARTMENT": "Phòng ban",
@@ -97,7 +123,16 @@
         "ERROR_NO_USER": "Không có người dùng được chọn",
         "ERROR_LOAD_USER_MESSAGES": "Không thể tải tin nhắn người dùng",
         "ERROR_UPDATE_MESSAGE": "Không thể sửa tin nhắn. Vui lòng thử lại.",
-        "TRANSLATE_ERROR": "Có lỗi xảy ra vui lòng thử lại"
+        "TRANSLATE_ERROR": "Có lỗi xảy ra vui lòng thử lại",
+        "LEAVE_ERROR_ADMIN": "Bạn là quản trị viên của kênh chat này, không thể rời.",
+        "SYSTEM_MESSAGE": {
+          "CREATE_CHANNEL": "đã tạo channel",
+          "JOIN_CHANNEL": "đã tham gia channel",
+          "LEAVE_CHANNEL": "đã rời channel",
+          "BREAK_CHANNEL": "đã giải tán kênh chat",
+          "REMOVE_MEMBER": "đã xóa",
+          "ADD_MEMBER": "đã thêm"
+        }
       }
     },
     "CHANNEL": {
@@ -175,7 +210,9 @@
       "BUTTON_LOADING": "Đang đăng nhập...",
       "NO_ACCOUNT": "Chưa có tài khoản?",
       "REGISTER_LINK": "Đăng ký ngay",
-      "ERROR": "Có lỗi xảy ra khi đăng nhập"
+      "ERROR": "Có lỗi xảy ra khi đăng nhập",
+      "ERROR_USER_DISABLED": "Tài khoản đã bị vô hiệu hóa",
+      "ERROR_USER_NOT_FOUND": "Sai email đăng nhập hoặc mật khẩu"
     },
     "REGISTER": {
       "TITLE": "Đăng ký tài khoản",
@@ -238,7 +275,9 @@
     "BUTTON": {
       "CREATE_USER": "Tạo người dùng mới",
       "EDIT": "Chỉnh sửa",
-      "DELETE": "Xóa",
+      "ENABLE": "Kích hoạt",
+      "DISABLE": "Vô hiệu hóa",
+      "RESET_PASSWORD": "Đặt lại mật khẩu",
       "UPDATE": "Cập nhật",
       "CREATE": "Tạo mới",
       "CANCEL": "Hủy"
@@ -277,8 +316,9 @@
       "PASSWORD_PLACEHOLDER": "Nhập mật khẩu",
       "USE_DEFAULT_PASSWORD": "Sử dụng mật khẩu mặc định",
       "JOIN_ALL_CHANNEL": "Tự động hêm vào các channel liên quan (phòng ban, tổ chức)",
-      "ROLE_USER": "User",
-      "ROLE_ADMIN": "Admin",
+      "ROLE_USER": "Nhân viên",
+      "ROLE_ADMIN": "Quản trị viên",
+      "ROLE_MANAGER": "Quản lý",
       "CHANGE_AVATAR": "Thay đổi ảnh",
       "SELECT_AVATAR": "Chọn ảnh",
       "THEME_LIGHT": "Sáng",
@@ -287,12 +327,19 @@
     "MESSAGE": {
       "CREATE_SUCCESS": "Tạo người dùng thành công",
       "UPDATE_SUCCESS": "Cập nhật người dùng thành công",
-      "DELETE_SUCCESS": "Xóa người dùng thành công",
+      "ENABLE_SUCCESS": "Kích hoạt người dùng thành công",
+      "ENABLE_ERROR": "Không thể kích hoạt người dùng",
+      "DISABLE_SUCCESS": "Vô hiệu hóa người dùng thành công",
+      "DISABLE_ERROR": "Không thể vô hiệu hóa người dùng",
       "CREATE_ERROR": "Không thể tạo người dùng",
       "EXISTS_ERROR": "Người dùng đã tồn tại trong hệ thống",
       "UPDATE_ERROR": "Không thể cập nhật người dùng",
-      "DELETE_ERROR": "Không thể xóa người dùng",
-      "FETCH_ERROR": "Không thể tải danh sách người dùng"
+      "FETCH_ERROR": "Không thể tải danh sách người dùng",
+      "RESET_PASSWORD_CONFIRM": "Bạn có chắc muốn đặt lại mật khẩu cho người dùng \"{name}\"?",
+      "RESET_PASSWORD_CONFIRM_MESSAGE": "Mật khẩu mới sẽ là: {password}",
+      "RESET_PASSWORD_SUCCESS": "Đặt lại mật khẩu thành công.",
+      "RESET_PASSWORD_ERROR": "Có lỗi xảy ra khi đặt lại mật khẩu",
+      "UPDATE_USER_ADMIN_CHANNEL_ERROR": "Người dùng vẫn là trưởng nhóm của một số kênh thuộc phòng ban cũ."
     },
     "VALIDATION": {
       "NAME_REQUIRED": "Vui lòng nhập họ và tên",
@@ -350,7 +397,8 @@
       "DELETE_ERROR": "Không thể xóa phòng ban",
       "FETCH_ERROR": "Không thể tải danh sách phòng ban",
       "FETCH_USERS_ERROR": "Không thể tải danh sách nhân viên",
-      "NO_USERS": "Không có nhân viên nào trong phòng ban này"
+      "NO_USERS": "Không có nhân viên nào trong phòng ban này",
+      "DELETE_ERROR_USED": "Phòng ban này đang được sử dụng, không thể xóa"
     }
   },
   "ORGANIZATION_MANAGEMENT": {
@@ -402,7 +450,8 @@
       "FETCH_ERROR": "Không thể tải danh sách tổ chức",
       "FETCH_DEPARTMENTS_ERROR": "Không thể tải danh sách phòng ban",
       "NO_DEPARTMENTS": "Không có phòng ban nào trong tổ chức này",
-      "GENERAL_ERROR": "Xảy ra lỗi vui lòng thử lại"
+      "GENERAL_ERROR": "Xảy ra lỗi vui lòng thử lại",
+      "DELETE_ERROR_USED": "Tổ chức này đang hoạt động, không thể xóa"
     }
   },
   "language": {

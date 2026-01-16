@@ -1,44 +1,48 @@
 <template>
-  <div
-    v-if="visible"
-    class="reaction-picker"
-    :class="positionClass"
-    @click.stop
-  >
-    <div class="reaction-picker-header">
-      <input
-        type="text"
-        v-model="searchQuery"
-        :placeholder="$t('COMPONENT.CHAT_VIEW.MESSAGE_INPUT.SEARCH_EMOJI')"
-        class="reaction-search"
-      />
-      <div class="reaction-categories">
-        <button
-          v-for="(icons, category) in iconCategories"
-          :key="category"
-          :class="['category-btn', { active: currentCategory === category }]"
-          @click="currentCategory = category"
+  <Teleport to="body">
+    <div
+      v-if="visible"
+      ref="pickerRef"
+      class="reaction-picker"
+      :class="computedPositionClass"
+      :style="pickerStyle"
+      @click.stop
+    >
+      <div class="reaction-picker-header">
+        <input
+          type="text"
+          v-model="searchQuery"
+          :placeholder="$t('COMPONENT.CHAT_VIEW.MESSAGE_INPUT.SEARCH_EMOJI')"
+          class="reaction-search"
+        />
+        <div class="reaction-categories">
+          <button
+            v-for="(icons, category) in iconCategories"
+            :key="category"
+            :class="['category-btn', { active: currentCategory === category }]"
+            @click="currentCategory = category"
+          >
+            {{ icons[0]?.value || '📁' }}
+          </button>
+        </div>
+      </div>
+      <div class="reaction-grid">
+        <div
+          v-for="icon in filteredIcons"
+          :key="icon.id"
+          class="reaction-icon"
+          @click="handleSelectIcon(icon.id)"
+          :title="icon.key"
         >
-          {{ icons[0]?.value || '📁' }}
-        </button>
+          {{ icon.value }}
+        </div>
       </div>
     </div>
-    <div class="reaction-grid">
-      <div
-        v-for="icon in filteredIcons"
-        :key="icon.id"
-        class="reaction-icon"
-        @click="handleSelectIcon(icon.id)"
-        :title="icon.key"
-      >
-        {{ icon.value }}
-      </div>
-    </div>
-  </div>
+  </Teleport>
 </template>
 
 <script setup>
-import { ref, computed } from 'vue'
+import { ref, computed, watch, nextTick } from 'vue'
 import { getIcons } from '@/utils/iconUtils'
 
 const props = defineProps({
@@ -51,12 +55,19 @@ const props = defineProps({
     default: 'left',
     validator: (value) => ['left', 'right'].includes(value),
   },
+  containerRef: {
+    type: [Object, HTMLElement],
+    default: null,
+  },
 })
 
 const emit = defineEmits(['select', 'close'])
 
 const searchQuery = ref('')
 const currentCategory = ref('emotion')
+const pickerRef = ref(null)
+const pickerStyle = ref({})
+const computedPosition = ref(props.position)
 
 const iconCategories = computed(() => {
   const icons = getIcons()
@@ -93,9 +104,83 @@ const filteredIcons = computed(() => {
   return icons
 })
 
-const positionClass = computed(() => {
-  return props.position === 'right' ? 'reaction-picker-right' : ''
+const computedPositionClass = computed(() => {
+  return computedPosition.value === 'right' ? 'reaction-picker-right' : ''
 })
+
+const updatePosition = () => {
+  if (!props.containerRef || !pickerRef.value || !props.visible) return
+
+  try {
+    const containerRect = props.containerRef.getBoundingClientRect()
+    const pickerRect = pickerRef.value.getBoundingClientRect()
+    const viewportWidth = window.innerWidth
+    const viewportHeight = window.innerHeight
+    const padding = 8
+    const margin = 10
+
+    let top = containerRect.top - pickerRect.height - margin
+    let left = containerRect.left
+    let transform = 'translateX(0)'
+
+    // Kiểm tra nếu bị cắt phía trên
+    if (top < padding) {
+      // Hiển thị ở dưới
+      top = containerRect.bottom + margin
+    }
+
+    // Kiểm tra nếu bị cắt dưới đáy
+    if (top + pickerRect.height > viewportHeight - padding) {
+      top = viewportHeight - pickerRect.height - padding
+    }
+
+    // Xử lý vị trí ngang dựa trên position prop
+    if (props.position === 'right') {
+      left = containerRect.right - pickerRect.width
+      // Kiểm tra nếu bị cắt bên phải
+      if (left + pickerRect.width > viewportWidth - padding) {
+        left = viewportWidth - pickerRect.width - padding
+      }
+      // Kiểm tra nếu bị cắt bên trái
+      if (left < padding) {
+        left = padding
+      }
+    } else {
+      // position === 'left'
+      left = containerRect.left
+      // Kiểm tra nếu bị cắt bên trái
+      if (left < padding) {
+        left = padding
+      }
+      // Kiểm tra nếu bị cắt bên phải
+      if (left + pickerRect.width > viewportWidth - padding) {
+        left = viewportWidth - pickerRect.width - padding
+      }
+    }
+
+    pickerStyle.value = {
+      position: 'fixed',
+      top: `${top}px`,
+      left: `${left}px`,
+      transform: transform,
+    }
+  } catch (error) {
+    console.error('Error updating reaction picker position:', error)
+  }
+}
+
+watch(
+  () => props.visible,
+  async (newVal) => {
+    if (newVal) {
+      computedPosition.value = props.position
+      await nextTick()
+      if (pickerRef.value && props.containerRef) {
+        updatePosition()
+      }
+    }
+  }
+)
 
 const handleSelectIcon = (iconId) => {
   emit('select', iconId)
@@ -105,25 +190,17 @@ const handleSelectIcon = (iconId) => {
 
 <style scoped>
 .reaction-picker {
-  position: absolute;
-  bottom: 100%;
-  left: 0;
+  position: fixed;
   background: white;
   border: 1px solid #e0e0e0;
   border-radius: 8px;
   padding: 10px;
   box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
   z-index: 1000;
-  margin-bottom: 10px;
   width: 280px;
   max-height: 300px;
   display: flex;
   flex-direction: column;
-}
-
-.reaction-picker-right {
-  left: auto;
-  right: 0;
 }
 
 .reaction-picker-header {
@@ -136,7 +213,7 @@ const handleSelectIcon = (iconId) => {
   border: 1px solid #e0e0e0;
   border-radius: 4px;
   margin-bottom: 8px;
-  font-size: 0.9rem;
+  font-size: 0.8125rem;
   box-sizing: border-box;
 }
 
@@ -160,7 +237,7 @@ const handleSelectIcon = (iconId) => {
   border: none;
   cursor: pointer;
   padding: 5px;
-  font-size: 1.2rem;
+  font-size: 1rem;
   border-radius: 4px;
   transition: background-color 0.2s;
   flex-shrink: 0;

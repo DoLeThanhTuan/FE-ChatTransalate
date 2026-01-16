@@ -20,7 +20,5 @@ export const handleErrorNavigation = async (error) => {
     //     }
     // });
     toast.error('INTERNAL SERVER ERROR')
-  } else {
-    toast.error('ERROR COMMON')
   }
 }

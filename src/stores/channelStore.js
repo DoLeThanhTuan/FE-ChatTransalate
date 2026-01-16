@@ -96,10 +96,17 @@ export const useChannelStore = defineStore('channel', () => {
         type: Status.ADD_MEMBER,
         userIds: userIds,
       })
+      // channelCurrent.value.members = channelCurrent.value.members.push(
+      //   ...userIds
+      // )
       return res.data
     } catch (e) {
       console.error(e)
     }
+  }
+
+  const addMemberIntoChannelNotSendMessage = async (userIds) => {
+    channelCurrent.value.members.push(...userIds)
   }
 
   const removeMemberFromChannel = async (channelId, userIds) => {
@@ -131,6 +138,10 @@ export const useChannelStore = defineStore('channel', () => {
       channelCurrent.value.members = channelCurrent.value.members.filter(
         (member_id) => !actionUserIds.includes(member_id)
       )
+    } else if (message.type == Status.ADD_MEMBER) {
+      actionUserIds = message.content.replace(`{${Status.ADD_MEMBER}}`, '')
+      actionUserIds = actionUserIds.split(',')
+      addMemberIntoChannelNotSendMessage(actionUserIds)
     } else if (message.type == Status.JOIN_CHANNEL) {
       const index = channelCurrent.value.members.findIndex(
         (member) => member == message.fromUser
@@ -147,6 +158,12 @@ export const useChannelStore = defineStore('channel', () => {
         (channel) => channel.id !== message.channelId
       )
     }
+  }
+
+  const removeChannel = async (channelId) => {
+    channels.value = channels.value.filter(
+      (channel) => channel.id !== channelId
+    )
   }
 
   const joinChannel = async (channelId) => {
@@ -263,7 +280,9 @@ export const useChannelStore = defineStore('channel', () => {
     breakChannel,
     removeMemberFromChannel,
     addMemberIntoChannel,
+    addMemberIntoChannelNotSendMessage,
     updateMemberChannel,
+    removeChannel,
     searchChannel,
     joinChannel,
     getUserName,

@@ -38,6 +38,7 @@
             }}</span>
           </button>
           <button
+            v-if="!channelStore.channelCurrent?.isDefault"
             @click="handleBreakChannel"
             class="dropdown-item dropdown-item-danger"
           >
@@ -64,7 +65,17 @@
       }}</span>
     </div>
     <div v-if="isUserChat" class="header-left">
-      <div class="channel-menu-container" ref="menuContainer">
+      <div class="channel-menu-container flex" ref="menuContainer">
+        <Avatar
+          :avatar="
+            userStore.usersDict[userChatStore.userChatCurrent.id]?.avatar
+          "
+          :status="
+            userStore.usersDict[userChatStore.userChatCurrent.id]?.status
+          "
+          size="small"
+          :show-status="true"
+        />
         <button @click="toggleDropdown" class="channel-name-button">
           <span
             class="channel-name"
@@ -78,7 +89,6 @@
             }}</span
           >
           <font-awesome-icon
-            v-if="channelStore.channelCurrent?.name"
             :icon="['fas', 'chevron-down']"
             class="dropdown-icon"
           />
@@ -144,6 +154,9 @@ import { useRoute } from 'vue-router'
 import { useUserStore } from '@/stores/userStore'
 import UsersChannelModal from '../../../components/UsersChannelModal.vue'
 import { disconnectSocket } from '@/socket/socketService'
+import { useI18n } from 'vue-i18n'
+import { toast } from 'vue3-toastify'
+import Avatar from '@/components/common/Avatar.vue'
 const route = useRoute()
 const router = useRouter()
 const authStore = useAuthStore()
@@ -155,6 +168,7 @@ const menuContainer = ref(null)
 const isChannelChat = computed(() => route.params.typeChat === TypeChat.CHANNEL)
 const isUserChat = computed(() => route.params.typeChat === TypeChat.USER)
 const showMembers = ref(false)
+const { t } = useI18n()
 
 const toggleDropdown = () => {
   isDropdownOpen.value = !isDropdownOpen.value
@@ -178,8 +192,12 @@ const handleManagement = async () => {
 
 const handleLeaveChannel = async () => {
   try {
-    const res = await channelStore.leaveChannel()
-    router.push(`/chat-view/${TypeChat.CHANNEL}/${res}`)
+    if (channelStore.channelCurrent.admin?.id == authStore.userInfo().id) {
+      toast.error(t('COMPONENT.CHAT_VIEW.MESSAGE_LIST.LEAVE_ERROR_ADMIN'))
+      return
+    }
+    // const res = await channelStore.leaveChannel()
+    // router.push(`/chat-view/${TypeChat.CHANNEL}/${res}`)
   } catch (e) {
     console.error(e)
   } finally {

@@ -55,6 +55,7 @@
 import { ref, computed, onMounted, onUnmounted } from 'vue'
 import { useI18n } from 'vue-i18n'
 import localStorageUtils from '@/utils/localStorageUtils'
+import { userApi } from '@/axios/api-services/userApi'
 const { locale } = useI18n()
 const isDropdownOpen = ref(false)
 const currentLocale = computed(() => locale.value)
@@ -91,7 +92,8 @@ const toggleDropdown = () => {
   isDropdownOpen.value = !isDropdownOpen.value
 }
 
-const changeLanguage = (langCode) => {
+const changeLanguage = async (langCode) => {
+  await userApi.changeLanguage({ language: langCode })
   locale.value = langCode
   localStorage.setItem('language', langCode)
   isDropdownOpen.value = false

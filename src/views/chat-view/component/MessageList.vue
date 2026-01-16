@@ -24,13 +24,16 @@
             class="message"
             :class="{ 'message-own': msg.fromUser === authStore.userInfo().id }"
           >
-            <Avatar
-              v-if="msg.fromUser !== authStore.userInfo().id"
-              :avatar="msg.avatar"
-              :status="userStore.usersDict[msg.fromUser]?.status"
-              size="large"
-              :show-status="true"
-            />
+            <UserTooltip :user="userStore.usersDict[msg.fromUser]">
+              <Avatar
+                v-if="msg.fromUser !== authStore.userInfo().id"
+                :avatar="userStore.usersDict[msg.fromUser]?.avatar"
+                :status="userStore.usersDict[msg.fromUser]?.status"
+                size="large"
+                :show-status="true"
+              />
+            </UserTooltip>
+
             <div class="msg-content">
               <div class="msg-header">
                 <span class="msg-user">{{
@@ -150,13 +153,15 @@
                 </span>
               </div>
             </div>
-            <Avatar
-              v-if="msg.fromUser === authStore.userInfo().id"
-              :avatar="msg.avatar"
-              :status="userStore.usersDict[msg.fromUser]?.status"
-              size="large"
-              :show-status="true"
-            />
+            <UserTooltip :user="userStore.usersDict[msg.fromUser]">
+              <Avatar
+                v-if="msg.fromUser === authStore.userInfo().id"
+                :avatar="userStore.usersDict[msg.fromUser]?.avatar"
+                :status="userStore.usersDict[msg.fromUser]?.status"
+                size="large"
+                :show-status="true"
+              />
+            </UserTooltip>
             <div>
               <DropdownMenu
                 :is-own="msg.fromUser === authStore.userInfo().id"
@@ -178,7 +183,10 @@
               >
                 <font-awesome-icon :icon="['fa', 'reply']" />
               </button>
-              <div class="reaction-picker-container">
+              <div
+                :ref="(el) => setReactionPickerContainer(msg.id, el)"
+                class="reaction-picker-container"
+              >
                 <button
                   class="reaction-add-btn hover:bg-[#1ed760]"
                   @click.stop="toggleReactionPicker(msg.id)"
@@ -191,6 +199,7 @@
                   :position="
                     msg.fromUser === authStore.userInfo().id ? 'right' : 'left'
                   "
+                  :container-ref="reactionPickerContainers[msg.id]"
                   @select="(iconId) => selectReaction(msg, iconId)"
                   @close="showReactionPicker = null"
                 />
@@ -203,13 +212,15 @@
             class="message"
             :class="{ 'message-own': msg.fromUser === authStore.userInfo().id }"
           >
-            <Avatar
-              v-if="msg.fromUser !== authStore.userInfo().id"
-              :avatar="msg.avatar"
-              :status="userStore.usersDict[msg.fromUser]?.status"
-              size="large"
-              :show-status="true"
-            />
+            <UserTooltip :user="userStore.usersDict[msg.fromUser]">
+              <Avatar
+                v-if="msg.fromUser !== authStore.userInfo().id"
+                :avatar="userStore.usersDict[msg.fromUser]?.avatar"
+                :status="userStore.usersDict[msg.fromUser]?.status"
+                size="large"
+                :show-status="true"
+              />
+            </UserTooltip>
             <div class="msg-content">
               <div class="msg-header">
                 <span class="msg-user">{{
@@ -223,24 +234,28 @@
                 {{ $t('COMPONENT.CHAT_VIEW.MESSAGE_LIST.MESSAGE_DELETED') }}
               </div>
             </div>
-            <Avatar
-              v-if="msg.fromUser === authStore.userInfo().id"
-              :avatar="msg.avatar"
-              :status="userStore.usersDict[msg.fromUser]?.status"
-              size="large"
-              :show-status="true"
-            />
+            <UserTooltip :user="userStore.usersDict[msg.fromUser]">
+              <Avatar
+                v-if="msg.fromUser === authStore.userInfo().id"
+                :avatar="userStore.usersDict[msg.fromUser]?.avatar"
+                :status="userStore.usersDict[msg.fromUser]?.status"
+                size="large"
+                :show-status="true"
+              />
+            </UserTooltip>
           </div>
         </template>
         <template v-else>
           <div class="system-message">
-            <Avatar
-              class="mr-2"
-              :avatar="msg.avatar"
-              :status="userStore.usersDict[msg.fromUser]?.status"
-              size="medium"
-              :show-status="true"
-            />
+            <UserTooltip :user="userStore.usersDict[msg.fromUser]">
+              <Avatar
+                class="mr-2"
+                :avatar="userStore.usersDict[msg.fromUser]?.avatar"
+                :status="userStore.usersDict[msg.fromUser]?.status"
+                size="medium"
+                :show-status="true"
+              />
+            </UserTooltip>
             <span class="system-name">{{
               userStore.usersDict[msg.fromUser].name
             }}</span>
@@ -268,11 +283,31 @@
             </span>
           </div>
           <div class="reply-preview-text">
-            {{
-              replyingToMessage.content.length > 150
-                ? replyingToMessage.content.substring(0, 150) + '...'
-                : replyingToMessage.content
-            }}
+            <template v-if="replyingToMessage.content">
+              <div>
+                {{
+                  replyingToMessage.content.length > 150
+                    ? replyingToMessage.content.substring(0, 150) + '...'
+                    : replyingToMessage.content
+                }}
+              </div>
+            </template>
+            <template
+              v-if="
+                replyingToMessage.files && replyingToMessage.files.length > 0
+              "
+            >
+              <span class="reply-preview-files">
+                <font-awesome-icon
+                  :icon="['fa', 'file']"
+                  class="reply-preview-file-icon"
+                />
+                <span class="reply-preview-file-text">
+                  {{ replyingToMessage.files.length }}
+                  {{ replyingToMessage.files.length === 1 ? 'file' : 'files' }}
+                </span>
+              </span>
+            </template>
           </div>
         </div>
         <button
@@ -330,6 +365,7 @@ import { toast } from 'vue3-toastify'
 import { aiApi } from '@/axios/api-services/aiApi'
 import { showChatNotification } from '@/utils/notification'
 import { getIconById } from '@/utils/iconUtils'
+import UserTooltip from '@/components/common/UserTooltip.vue'
 
 const { t } = useI18n()
 
@@ -362,6 +398,15 @@ const reconnectTimeout = ref(null)
 
 // Reaction picker state
 const showReactionPicker = ref(null)
+const reactionPickerContainers = ref({})
+
+const setReactionPickerContainer = (messageId, el) => {
+  if (el && !reactionPickerContainers.value[messageId]) {
+    reactionPickerContainers.value[messageId] = el
+  } else if (!el && reactionPickerContainers.value[messageId]) {
+    delete reactionPickerContainers.value[messageId]
+  }
+}
 
 // Reply state
 const replyingToMessage = ref(null)
@@ -389,6 +434,13 @@ const scrollToBottom = async () => {
   if (messageListRef.value) {
     messageListRef.value.scrollTop = messageListRef.value.scrollHeight
   }
+}
+
+const isNearBottom = () => {
+  const el = messageListRef.value
+  if (!el) return false
+  const threshold = 100 // Khoảng cách cho phép từ đáy (px)
+  return el.scrollHeight - el.scrollTop - el.clientHeight <= threshold
 }
 
 const clearError = () => {
@@ -516,6 +568,17 @@ const handleReceiveMessage = (message) => {
   const index = messages.value.findIndex((m) => m.id === message.id)
   if (message.type == Status.REACTION_MESSAGE) {
     handleReceiveReactionMessage(message)
+  }
+  if (
+    message.type == Status.REMOVE_MEMBER &&
+    message.content.includes(authStore.userInfo().id)
+  ) {
+    if (isChannelChat.value && currentChannelId.value == message.channelId) {
+      router.push(
+        `/chat-view/${TypeChat.CHANNEL}/${channelStore.channels[0]?.id || ''}`
+      )
+    }
+    channelStore.removeChannel(message.channelId)
   } else {
     if (index !== -1) {
       messages.value[index].content = message.content
@@ -525,7 +588,8 @@ const handleReceiveMessage = (message) => {
       if (
         message.type == Status.REMOVE_MEMBER ||
         message.type == Status.JOIN_CHANNEL ||
-        message.type == Status.LEAVE_CHANNEL
+        message.type == Status.LEAVE_CHANNEL ||
+        message.type == Status.ADD_MEMBER
       ) {
         channelStore.updateMemberChannel(message)
       }
@@ -539,7 +603,7 @@ const handleReceiveMessage = (message) => {
       ) {
         messages.value.push(message)
       }
-      if (message.fromUser == authStore.userInfo().id) {
+      if (message.fromUser == authStore.userInfo().id || isNearBottom()) {
         scrollToBottom()
       }
     }
@@ -1113,7 +1177,7 @@ watch(
 <style>
 /* --- Styles for Edit Feature --- */
 .msg-edited {
-  font-size: 0.85rem;
+  font-size: 0.8125rem;
   color: #777;
   margin-left: 0.5rem;
   font-weight: 400;
@@ -1126,7 +1190,7 @@ watch(
   border: 1px solid var(--border-color);
   border-radius: 8px;
   margin-top: 0.5rem;
-  font-size: 1.05rem;
+  font-size: 0.9375rem;
   resize: vertical; /* Cho phép thay đổi kích thước theo chiều dọc */
   background: var(--bg-primary);
   color: var(--text-color);
@@ -1146,7 +1210,7 @@ watch(
 }
 
 .edit-hint {
-  font-size: 0.85rem;
+  font-size: 0.8125rem;
   color: #888;
   margin-right: auto; /* Đẩy hint sang trái */
 }
@@ -1164,7 +1228,7 @@ watch(
   border: none;
   border-radius: 4px;
   cursor: pointer;
-  font-size: 0.9rem;
+  font-size: 0.8125rem;
   transition: background-color 0.2s;
   font-weight: 500;
 }
@@ -1267,7 +1331,7 @@ watch(
   display: flex;
   align-items: center;
   gap: 0.7rem;
-  font-size: 1rem;
+  font-size: 0.875rem;
 }
 
 .msg-user {
@@ -1281,7 +1345,7 @@ watch(
 
 .msg-time {
   color: #888;
-  font-size: 0.95rem;
+  font-size: 0.875rem;
 }
 
 .msg-reply-preview {
@@ -1318,13 +1382,13 @@ watch(
   display: flex;
   align-items: center;
   gap: 0.5rem;
-  font-size: 0.85rem;
+  font-size: 0.8125rem;
   min-width: 0;
   flex-shrink: 0;
 }
 
 .msg-reply-icon {
-  font-size: 0.8rem;
+  font-size: 0.75rem;
   color: #1976d2;
 }
 
@@ -1338,7 +1402,7 @@ watch(
 }
 
 .msg-reply-preview-text {
-  font-size: 0.9rem;
+  font-size: 0.8125rem;
   color: var(--text-secondary);
   line-height: 1.4;
   overflow: hidden;
@@ -1355,7 +1419,7 @@ watch(
 .msg-text {
   margin: 0.2rem 0 0.1rem 0;
   color: var(--text-primary);
-  font-size: 1.05rem;
+  font-size: 0.9375rem;
   line-height: 1.5;
   white-space: pre-wrap;
   word-break: break-word;
@@ -1398,7 +1462,7 @@ watch(
 }
 
 .file-icon {
-  font-size: 1.3rem;
+  font-size: 1.125rem;
 }
 
 .file-info {
@@ -1423,7 +1487,7 @@ watch(
 
 .file-size {
   color: #888;
-  font-size: 0.92rem;
+  font-size: 0.8125rem;
 }
 
 .msg-reactions {
@@ -1437,7 +1501,7 @@ watch(
   background: #f3f4f8;
   border-radius: 12px;
   padding: 0.1rem 0.7rem;
-  font-size: 1rem;
+  font-size: 0.875rem;
   color: #23272f;
   border: 1px solid #e0e0e0;
   cursor: pointer;
@@ -1460,7 +1524,7 @@ watch(
 
 .reaction-add-btn {
   border-radius: 12px;
-  font-size: 1rem;
+  font-size: 0.875rem;
   color: var(--text-primary);
   cursor: pointer;
   transition: background-color 0.2s;
@@ -1476,7 +1540,7 @@ watch(
 }
 
 .reaction-add-icon {
-  font-size: 1.2rem;
+  font-size: 1rem;
   font-weight: bold;
   line-height: 1;
 }
@@ -1493,7 +1557,7 @@ watch(
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  font-size: 0.95rem;
+  font-size: 0.875rem;
 }
 
 .message-own .reply-btn {
@@ -1531,13 +1595,13 @@ watch(
   display: flex;
   align-items: center;
   gap: 0.6rem;
-  font-size: 0.85rem;
+  font-size: 0.8125rem;
   color: #7ee787;
   flex-wrap: wrap;
 }
 
 .reply-icon {
-  font-size: 0.85rem;
+  font-size: 0.8125rem;
 }
 
 .reply-preview-user {
@@ -1545,13 +1609,13 @@ watch(
 }
 
 .reply-preview-time {
-  font-size: 0.8rem;
+  font-size: 0.75rem;
   color: var(--text-secondary);
   margin-left: auto;
 }
 
 .reply-preview-text {
-  font-size: 0.9rem;
+  font-size: 0.8125rem;
   color: var(--text-primary);
   line-height: 1.5;
   overflow: hidden;
@@ -1560,6 +1624,23 @@ watch(
   -webkit-line-clamp: 2;
   line-clamp: 2;
   -webkit-box-orient: vertical;
+}
+
+.reply-preview-files {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.375rem;
+}
+
+.reply-preview-file-icon {
+  font-size: 0.75rem;
+  color: #1976d2;
+}
+
+.reply-preview-file-text {
+  font-size: 0.8125rem;
+  color: #1976d2;
+  font-weight: 500;
 }
 
 .reply-preview-cancel {
@@ -1573,7 +1654,7 @@ watch(
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  font-size: 0.9rem;
+  font-size: 0.8125rem;
   flex-shrink: 0;
   width: 28px;
   height: 28px;
@@ -1600,7 +1681,7 @@ watch(
   border-radius: 4px;
   background: #fff3cd;
   color: #856404;
-  font-size: 0.9rem;
+  font-size: 0.8125rem;
 }
 
 .status-message.error {
@@ -1616,7 +1697,7 @@ watch(
   gap: 0.5rem;
   padding: 1rem;
   color: #666;
-  font-size: 0.9rem;
+  font-size: 0.8125rem;
 }
 
 .loading-spinner {
@@ -1662,7 +1743,7 @@ watch(
   border: none;
   border-radius: 4px;
   cursor: pointer;
-  font-size: 0.9rem;
+  font-size: 0.8125rem;
   transition: background-color 0.2s;
 }
 
@@ -1685,7 +1766,7 @@ watch(
   padding: 0.6rem 2rem;
   margin: 0.7rem auto;
   width: fit-content;
-  font-size: 1rem;
+  font-size: 0.875rem;
   font-weight: 500;
   color: #23272f;
 }
@@ -1719,7 +1800,7 @@ html.dark .system-content {
   border: none;
   border-radius: 4px;
   cursor: pointer;
-  font-size: 0.9rem;
+  font-size: 0.8125rem;
   transition: background-color 0.2s;
   font-weight: 500;
 }
@@ -1789,15 +1870,15 @@ html.dark .system-content {
 
   .msg-header,
   .system-message {
-    font-size: 0.85rem;
+    font-size: 0.8125rem;
   }
 
   .msg-time {
-    font-size: 0.8rem;
+    font-size: 0.75rem;
   }
 
   .msg-text {
-    font-size: 0.9rem;
+    font-size: 0.8125rem;
     line-height: 1.4;
     margin: 0.1rem 0;
   }
@@ -1813,11 +1894,11 @@ html.dark .system-content {
   }
 
   .file-icon {
-    font-size: 1rem;
+    font-size: 0.875rem;
   }
 
   .file-name {
-    font-size: 0.85rem;
+    font-size: 0.8125rem;
   }
 
   .file-size {
@@ -1831,18 +1912,18 @@ html.dark .system-content {
 
   .reaction {
     padding: 0.1rem 0.4rem;
-    font-size: 0.85rem;
+    font-size: 0.8125rem;
   }
 
   .status-message {
-    font-size: 0.8rem;
+    font-size: 0.75rem;
     padding: 0.3rem 0.6rem;
   }
 
   .loading-indicator,
   .load-more-indicator {
     padding: 0.5rem;
-    font-size: 0.8rem;
+    font-size: 0.75rem;
   }
 
   .error-message {
@@ -1864,7 +1945,7 @@ html.dark .system-content {
   }
 
   .msg-reply-preview-header {
-    font-size: 0.8rem;
+    font-size: 0.75rem;
     gap: 0.4rem;
     flex-wrap: nowrap;
   }
@@ -1875,7 +1956,7 @@ html.dark .system-content {
   }
 
   .msg-reply-preview-text {
-    font-size: 0.85rem;
+    font-size: 0.8125rem;
     max-width: 100%;
     word-break: break-word;
     overflow-wrap: break-word;
@@ -1909,7 +1990,7 @@ html.dark .system-content {
 
   .msg-header,
   .system-message {
-    font-size: 0.8rem;
+    font-size: 0.75rem;
   }
 
   .msg-time {
@@ -1917,7 +1998,7 @@ html.dark .system-content {
   }
 
   .msg-text {
-    font-size: 0.85rem;
+    font-size: 0.8125rem;
     line-height: 1.3;
   }
 
@@ -1932,11 +2013,11 @@ html.dark .system-content {
   }
 
   .file-icon {
-    font-size: 0.9rem;
+    font-size: 0.8125rem;
   }
 
   .file-name {
-    font-size: 0.8rem;
+    font-size: 0.75rem;
   }
 
   .file-size {
@@ -1949,7 +2030,7 @@ html.dark .system-content {
 
   .reaction {
     padding: 0.1rem 0.3rem;
-    font-size: 0.8rem;
+    font-size: 0.75rem;
     border-radius: 10px;
   }
 
@@ -1967,12 +2048,12 @@ html.dark .system-content {
   .error-message {
     padding: 0.3rem;
     margin: 0.3rem 0;
-    font-size: 0.8rem;
+    font-size: 0.75rem;
   }
 
   .retry-btn {
     padding: 0.3rem 0.6rem;
-    font-size: 0.8rem;
+    font-size: 0.75rem;
   }
 
   .reply-preview-container {
@@ -1998,10 +2079,16 @@ html.dark .system-content {
   }
 
   .msg-reply-preview-text {
-    font-size: 0.8rem;
+    font-size: 0.75rem;
     max-width: 100%;
     word-break: break-word;
     overflow-wrap: break-word;
   }
+}
+</style>
+
+<style>
+.message-own .user-tooltip-wrapper {
+  order: 2;
 }
 </style>
