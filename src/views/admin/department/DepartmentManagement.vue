@@ -5,7 +5,8 @@
       <div class="header">
         <h1>{{ $t('DEPARTMENT_MANAGEMENT.TITLE') }}</h1>
         <button @click="openCreateModal" class="btn-create">
-          <i class="fas fa-plus"></i> {{ $t('DEPARTMENT_MANAGEMENT.BUTTON.CREATE_DEPARTMENT') }}
+          <i class="fas fa-plus"></i>
+          {{ $t('DEPARTMENT_MANAGEMENT.BUTTON.CREATE_DEPARTMENT') }}
         </button>
       </div>
 
@@ -21,7 +22,9 @@
           />
         </div>
         <select v-model="organizationFilter" class="filter-select">
-          <option value="">{{ $t('DEPARTMENT_MANAGEMENT.LABEL.ALL_ORGANIZATIONS') }}</option>
+          <option value="">
+            {{ $t('DEPARTMENT_MANAGEMENT.LABEL.ALL_ORGANIZATIONS') }}
+          </option>
           <option
             v-for="organization in organizations"
             :key="organization.id"
@@ -91,7 +94,9 @@
               </td>
             </tr>
             <tr v-if="filteredDepartments.length === 0">
-              <td colspan="7" class="no-data">{{ $t('DEPARTMENT_MANAGEMENT.LABEL.NO_DATA') }}</td>
+              <td colspan="7" class="no-data">
+                {{ $t('DEPARTMENT_MANAGEMENT.LABEL.NO_DATA') }}
+              </td>
             </tr>
           </tbody>
         </table>
@@ -341,6 +346,7 @@ onMounted(() => {
   flex: 1;
   padding: 2rem;
   background-color: var(--bg-tertiary);
+  color: var(--text-primary, #333);
   transition: background-color 0.3s ease;
 }
 

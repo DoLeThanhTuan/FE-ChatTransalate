@@ -16,6 +16,7 @@ export const useAuthStore = defineStore('auth', () => {
   const clearAuth = () => {
     localStorageUtils.remove('userInfo')
     localStorageUtils.remove('token')
+    localStorageUtils.remove('language')
   }
 
   const setUserInfo = (data) => {

@@ -30,17 +30,16 @@
             <input type="checkbox" v-model="form.remember" />
             <span>{{ $t('AUTH.LOGIN.REMEMBER_ME') }}</span>
           </label>
-          <a href="#" class="forgot-password">{{ $t('AUTH.LOGIN.FORGOT_PASSWORD') }}</a>
+          <a href="#" class="forgot-password">{{
+            $t('AUTH.LOGIN.FORGOT_PASSWORD')
+          }}</a>
         </div>
 
         <button type="submit" class="login-button" :disabled="loading">
-          {{ loading ? $t('AUTH.LOGIN.BUTTON_LOADING') : $t('AUTH.LOGIN.BUTTON') }}
+          {{
+            loading ? $t('AUTH.LOGIN.BUTTON_LOADING') : $t('AUTH.LOGIN.BUTTON')
+          }}
         </button>
-
-        <div class="register-link">
-          {{ $t('AUTH.LOGIN.NO_ACCOUNT') }}
-          <router-link to="/register">{{ $t('AUTH.LOGIN.REGISTER_LINK') }}</router-link>
-        </div>
       </form>
     </div>
   </div>
@@ -56,6 +55,10 @@ import { useAuthStore } from '@/stores/authStore'
 import { TypeChat } from '@/config/enum'
 import { channelApi } from '@/axios/api-services/channelApi'
 import { requestNotificationPermission } from '@/utils/notification'
+import { useThemeStore } from '@/stores/themeStore'
+
+const themeStore = useThemeStore()
+const { locale } = useI18n()
 
 const { t } = useI18n()
 
@@ -76,6 +79,10 @@ const handleLogin = async () => {
     const response = await authApi.login(form.value)
     authStore.setToken(response.data.accessToken)
     authStore.setUserInfo(response.data)
+    await localStorage.setItem('theme', response.data.theme)
+    themeStore.initTheme()
+    locale.value = response.data.language.toUpperCase()
+    await localStorage.setItem('language', response.data.language.toUpperCase())
     if (response.status == 200) {
       await requestNotificationPermission()
       const response = await channelApi.getChannelDefault()

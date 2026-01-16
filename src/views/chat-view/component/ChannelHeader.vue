@@ -9,7 +9,10 @@
               channelStore.channelCurrent?.name ||
               $t('COMPONENT.COMMON.MODAL_CONFIRM_DELETE.LABEL.MESSAGE')
             "
-            >{{ channelStore.channelCurrent?.name || $t('COMPONENT.CHAT_VIEW.CHANNEL_HEADER.LOADING') }}</span
+            >{{
+              channelStore.channelCurrent?.name ||
+              $t('COMPONENT.CHAT_VIEW.CHANNEL_HEADER.LOADING')
+            }}</span
           >
           <font-awesome-icon
             v-if="channelStore.channelCurrent?.name"
@@ -20,7 +23,9 @@
         <div v-if="isDropdownOpen" class="channel-dropdown">
           <button class="dropdown-item">
             <font-awesome-icon :icon="['fas', 'info-circle']" />
-            <span>{{ $t('COMPONENT.CHAT_VIEW.CHANNEL_HEADER.CHANNEL_DETAILS') }}</span>
+            <span>{{
+              $t('COMPONENT.CHAT_VIEW.CHANNEL_HEADER.CHANNEL_DETAILS')
+            }}</span>
           </button>
           <button
             v-if="!channelStore.channelCurrent?.isDefault"
@@ -28,7 +33,16 @@
             class="dropdown-item dropdown-item-danger"
           >
             <font-awesome-icon :icon="['fas', 'right-from-bracket']" />
-            <span>{{ $t('COMPONENT.CHAT_VIEW.CHANNEL_HEADER.LEAVE_CHANNEL') }}</span>
+            <span>{{
+              $t('COMPONENT.CHAT_VIEW.CHANNEL_HEADER.LEAVE_CHANNEL')
+            }}</span>
+          </button>
+          <button
+            @click="handleBreakChannel"
+            class="dropdown-item dropdown-item-danger"
+          >
+            <font-awesome-icon icon="fa-solid fa-ban" />
+            <span>{{ $t('COMPONENT.CHAT_VIEW.CHANNEL_HEADER.BREAK') }}</span>
           </button>
         </div>
       </div>
@@ -42,17 +56,26 @@
         :members="
           userStore.getUsersByIds(channelStore.channelCurrent?.members || [])
         "
+        :availableUsers="userStore.users"
         @close="showMembers = false"
       />
-      <span class="location">{{ $t('COMPONENT.CHAT_VIEW.CHANNEL_HEADER.LOCATION') }}</span>
+      <span class="location">{{
+        channelStore.channelCurrent.admin?.name
+      }}</span>
     </div>
     <div v-if="isUserChat" class="header-left">
       <div class="channel-menu-container" ref="menuContainer">
         <button @click="toggleDropdown" class="channel-name-button">
           <span
             class="channel-name"
-            :title="userChatStore.userChatCurrent?.name || $t('COMPONENT.CHAT_VIEW.CHANNEL_HEADER.LOADING')"
-            >{{ userChatStore.userChatCurrent?.name || $t('COMPONENT.CHAT_VIEW.CHANNEL_HEADER.LOADING') }}</span
+            :title="
+              userChatStore.userChatCurrent?.name ||
+              $t('COMPONENT.CHAT_VIEW.CHANNEL_HEADER.LOADING')
+            "
+            >{{
+              userChatStore.userChatCurrent?.name ||
+              $t('COMPONENT.CHAT_VIEW.CHANNEL_HEADER.LOADING')
+            }}</span
           >
           <font-awesome-icon
             v-if="channelStore.channelCurrent?.name"
@@ -74,7 +97,6 @@
           </button>
         </div>
       </div>
-      <span class="location">{{ $t('COMPONENT.CHAT_VIEW.CHANNEL_HEADER.LOCATION') }}</span>
     </div>
     <div class="header-right">
       <ThemeToggle />
@@ -87,9 +109,21 @@
           alt="avatar"
         />
         <div class="dropdown-content">
+          <div
+            v-if="authStore.userInfo().role == 'ADMIN'"
+            class="dropdown-item"
+            @click="handleManagement"
+          >
+            <font-awesome-icon :icon="['fas', 'gauge']" />
+            <span>{{
+              $t('COMPONENT.COMMON.APP_HEADER.USER_MENU.MANAGEMENT')
+            }}</span>
+          </div>
           <div class="dropdown-item" @click="handleLogout">
             <font-awesome-icon :icon="['fas', 'right-from-bracket']" />
-            <span>{{ $t('COMPONENT.COMMON.APP_HEADER.USER_MENU.LOGOUT') }}</span>
+            <span>{{
+              $t('COMPONENT.COMMON.APP_HEADER.USER_MENU.LOGOUT')
+            }}</span>
           </div>
         </div>
       </div>
@@ -138,9 +172,24 @@ const handleLogout = async () => {
   window.location.replace('/login')
 }
 
+const handleManagement = async () => {
+  router.push('/admin/user-management')
+}
+
 const handleLeaveChannel = async () => {
   try {
     const res = await channelStore.leaveChannel()
+    router.push(`/chat-view/${TypeChat.CHANNEL}/${res}`)
+  } catch (e) {
+    console.error(e)
+  } finally {
+    isDropdownOpen.value = false
+  }
+}
+
+const handleBreakChannel = async () => {
+  try {
+    const res = await channelStore.breakChannel()
     router.push(`/chat-view/${TypeChat.CHANNEL}/${res}`)
   } catch (e) {
     console.error(e)

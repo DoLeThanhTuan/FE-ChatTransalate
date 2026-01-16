@@ -60,6 +60,13 @@ export const useUserStore = defineStore('user', () => {
     }
   }
 
+  const setNewMessage = (userId, newMessage) => {
+    const index = users.value.findIndex((u) => u.id === userId)
+    if (index !== -1) {
+      users.value[index].newMessage = newMessage
+    }
+  }
+
   return {
     users,
     usersDict,
@@ -68,5 +75,6 @@ export const useUserStore = defineStore('user', () => {
     createUser,
     updateUser,
     deleteUser,
+    setNewMessage,
   }
 })

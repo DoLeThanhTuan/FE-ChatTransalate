@@ -5,7 +5,8 @@
       <div class="header">
         <h1>{{ $t('ORGANIZATION_MANAGEMENT.TITLE') }}</h1>
         <button @click="openCreateModal" class="btn-create">
-          <i class="fas fa-plus"></i> {{ $t('ORGANIZATION_MANAGEMENT.BUTTON.CREATE_ORGANIZATION') }}
+          <i class="fas fa-plus"></i>
+          {{ $t('ORGANIZATION_MANAGEMENT.BUTTON.CREATE_ORGANIZATION') }}
         </button>
       </div>
 
@@ -16,7 +17,9 @@
           <input
             v-model="searchQuery"
             type="text"
-            :placeholder="$t('ORGANIZATION_MANAGEMENT.LABEL.SEARCH_PLACEHOLDER')"
+            :placeholder="
+              $t('ORGANIZATION_MANAGEMENT.LABEL.SEARCH_PLACEHOLDER')
+            "
             class="search-input"
           />
         </div>
@@ -37,7 +40,9 @@
               <th>{{ $t('ORGANIZATION_MANAGEMENT.LABEL.NAME') }}</th>
               <th>{{ $t('ORGANIZATION_MANAGEMENT.LABEL.COUNTRY') }}</th>
               <th>{{ $t('ORGANIZATION_MANAGEMENT.LABEL.USER_COUNT') }}</th>
-              <th>{{ $t('ORGANIZATION_MANAGEMENT.LABEL.DEPARTMENT_COUNT') }}</th>
+              <th>
+                {{ $t('ORGANIZATION_MANAGEMENT.LABEL.DEPARTMENT_COUNT') }}
+              </th>
               <th>{{ $t('ORGANIZATION_MANAGEMENT.LABEL.ACTIONS') }}</th>
             </tr>
           </thead>
@@ -67,7 +72,9 @@
                   <button
                     @click="openViewDepartmentsModal(organization)"
                     class="btn-action btn-view"
-                    :title="$t('ORGANIZATION_MANAGEMENT.BUTTON.VIEW_DEPARTMENTS')"
+                    :title="
+                      $t('ORGANIZATION_MANAGEMENT.BUTTON.VIEW_DEPARTMENTS')
+                    "
                   >
                     <font-awesome-icon :icon="['fas', 'info']" />
                   </button>
@@ -82,7 +89,9 @@
               </td>
             </tr>
             <tr v-if="filteredOrganizations.length === 0">
-              <td colspan="6" class="no-data">{{ $t('ORGANIZATION_MANAGEMENT.LABEL.NO_DATA') }}</td>
+              <td colspan="6" class="no-data">
+                {{ $t('ORGANIZATION_MANAGEMENT.LABEL.NO_DATA') }}
+              </td>
             </tr>
           </tbody>
         </table>
@@ -142,19 +151,19 @@ const organizationDepartments = ref([])
 const departmentsLoading = ref(false)
 const languages = [
   {
-    code: 'vi',
+    code: 'VI',
     name: 'Viet Nam',
     nativeName: 'Viet Nam',
     flag: '🇻🇳',
   },
   {
-    code: 'en',
+    code: 'EN',
     name: 'English',
     nativeName: 'English',
     flag: '🇺🇸',
   },
   {
-    code: 'jp',
+    code: 'JP',
     name: 'Japan',
     nativeName: 'Japan',
     flag: 'jp',
@@ -322,6 +331,7 @@ onMounted(() => {
   flex: 1;
   padding: 2rem;
   background-color: var(--bg-tertiary);
+  color: var(--text-primary, #333);
   transition: background-color 0.3s ease;
 }
 

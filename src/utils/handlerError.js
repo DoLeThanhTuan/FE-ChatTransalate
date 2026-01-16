@@ -7,7 +7,7 @@ import localStorageUtils from '@/utils/localStorageUtils'
 const router = useRouter()
 export const handleErrorNavigation = async (error) => {
   if (error.response?.status === 401) {
-    toast.error('Lỗi 401')
+    toast.error('NOT AUTHENTICATED')
   } else if (error.response?.status === 403) {
     // localStorageUtils.remove('userInfo')
     // localStorageUtils.remove('token')
@@ -19,8 +19,8 @@ export const handleErrorNavigation = async (error) => {
     //         code: '500'
     //     }
     // });
-    toast.error('Lỗi 500')
+    toast.error('INTERNAL SERVER ERROR')
   } else {
-    toast.error('Lỗi chung')
+    toast.error('ERROR COMMON')
   }
 }

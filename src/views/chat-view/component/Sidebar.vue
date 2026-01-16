@@ -6,10 +6,10 @@
       <button class="create-channel-btn" @click="showModal = true">
         + {{ $t('COMPONENT.CHAT_VIEW.SIDE_BAR.BUTTON.CREATE_CHANNEL') }}
       </button>
-      <button class="create-channel-btn" @click="showJoinModal = true">
+      <!-- <button class="create-channel-btn" @click="showJoinModal = true">
         <font-awesome-icon :icon="['fas', 'users']" />
         {{ $t('COMPONENT.CHAT_VIEW.SIDE_BAR.BUTTON.SEARCH_CHANNEL') }}
-      </button>
+      </button> -->
     </div>
     <Teleport to="body">
       <CreateChannelModal :visible="showModal" @close="showModal = false" />
@@ -29,33 +29,51 @@
         /><font-awesome-icon v-else icon="fa-solid fa-chevron-up" />
         {{ $t('COMPONENT.CHAT_VIEW.SIDE_BAR.LABEL.CHANNELS') }}
       </div>
-      <ul v-if="isShowChannel">
-        <template v-for="channel in channelStore.channels">
-          <li
-            @click="handleChannelClick(channel.id)"
-            class="channel"
-            :class="{
-              active:
-                channel.id == channelStore.channelCurrent.id &&
-                route.params.typeChat == TypeChat.CHANNEL,
-            }"
-          >
-            <span class="channel-title" :title="channel.name">{{
-              channel.name
-            }}</span>
-            <font-awesome-icon
-              v-if="channel.isPublic"
-              :icon="['fas', 'globe']"
-              class="icon-right"
-            />
-            <font-awesome-icon
-              v-else
-              :icon="['fas', 'lock']"
-              class="icon-right"
-            />
-          </li>
+      <div v-if="isShowChannel">
+        <template v-for="(channels, type) in groupedChannels" :key="type">
+          <div v-if="channels.length > 0" class="channel-group">
+            <div class="channel-group-title" @click="toggleChannelGroup(type)">
+              <font-awesome-icon
+                v-if="expandedGroups[type]"
+                icon="fa-solid fa-chevron-down"
+                class="chevron-icon"
+              />
+              <font-awesome-icon
+                v-else
+                icon="fa-solid fa-chevron-up"
+                class="chevron-icon"
+              />
+              {{ $t(`COMPONENT.CHAT_VIEW.SIDE_BAR.CHANNEL_GROUP.${type}`) }}
+            </div>
+            <ul v-if="expandedGroups[type]">
+              <template v-for="channel in channels" :key="channel.id">
+                <li
+                  @click="handleChannelClick(channel.id)"
+                  class="channel"
+                  :class="{
+                    active:
+                      channel.id == channelStore.channelCurrent.id &&
+                      route.params.typeChat == TypeChat.CHANNEL,
+                  }"
+                >
+                  <span class="channel-title" :title="channel.name">
+                    {{ channel.name }}
+                  </span>
+                  <div class="icon-right">
+                    <span
+                      v-if="channel.newMessage == 1"
+                      class="new-message-badge"
+                    >
+                      new
+                    </span>
+                    <font-awesome-icon :icon="getChannelIcon(type)" class="" />
+                  </div>
+                </li>
+              </template>
+            </ul>
+          </div>
         </template>
-      </ul>
+      </div>
     </div>
     <div class="sidebar-section">
       <div class="section-title" @click="isShowUser = !isShowUser">
@@ -86,6 +104,9 @@
               />
               {{ user.name }}
             </div>
+            <div v-if="user.newMessage == 1" class="icon-right">
+              <span class="new-message-badge"> new </span>
+            </div>
           </li>
         </template>
       </ul>
@@ -94,16 +115,17 @@
 </template>
 
 <script setup>
-import { ref } from 'vue'
+import { ref, computed } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import CreateChannelModal from '../../../components/CreateChannelModal.vue'
 import JoinChannelModal from '../../../components/JoinChannelModal.vue'
 import LanguageSelector from '../../../components/LanguageSelector.vue'
 import { useChannelStore } from '@/stores/channelStore'
-import { TypeChat } from '@/config/enum'
+import { TypeChat, ChannelType } from '@/config/enum'
 import { useUserStore } from '@/stores/userStore'
 import { useAuthStore } from '@/stores/authStore'
 import Avatar from '@/components/common/Avatar.vue'
+import { channelApi } from '@/axios/api-services/channelApi'
 
 const route = useRoute()
 const router = useRouter()
@@ -115,7 +137,54 @@ const userStore = useUserStore()
 const isShowChannel = ref(true)
 const isShowUser = ref(true)
 
-const handleChannelClick = (channelId) => {
+// Expanded state for each channel group
+const expandedGroups = ref({
+  [ChannelType.GENERAL]: true,
+  [ChannelType.CUSTOM]: true,
+  [ChannelType.DEPARTMENT]: true,
+  [ChannelType.ORGANIZATION]: true,
+})
+
+// Group channels by type
+const groupedChannels = computed(() => {
+  const groups = {
+    [ChannelType.GENERAL]: [],
+    [ChannelType.CUSTOM]: [],
+    [ChannelType.DEPARTMENT]: [],
+    [ChannelType.ORGANIZATION]: [],
+  }
+
+  channelStore.channels.forEach((channel) => {
+    const type = channel.type || ChannelType.CUSTOM
+    if (groups[type]) {
+      groups[type].push(channel)
+    } else {
+      groups[ChannelType.CUSTOM].push(channel)
+    }
+  })
+
+  return groups
+})
+
+const toggleChannelGroup = (type) => {
+  expandedGroups.value[type] = !expandedGroups.value[type]
+}
+
+const getChannelIcon = (type) => {
+  const iconMap = {
+    [ChannelType.GENERAL]: ['fas', 'globe'],
+    [ChannelType.DEPARTMENT]: ['fas', 'building'],
+    [ChannelType.ORGANIZATION]: ['fas', 'sitemap'],
+    [ChannelType.CUSTOM]: ['fas', 'lock'],
+  }
+  return iconMap[type] || ['fas', 'lock']
+}
+
+const handleChannelClick = async (channelId) => {
+  if (channelStore.channelsDict[channelId].newMessage == 1) {
+    channelStore.setNewMessage(channelId, 0)
+    await channelApi.readNewMessage({ channelId: channelId })
+  }
   router.push(`/chat-view/${TypeChat.CHANNEL}/${channelId}`)
 }
 
@@ -136,6 +205,9 @@ const handleUserClick = (userId) => {
   min-width: 220px;
   box-shadow: 2px 0 8px var(--shadow);
   transition: all 0.3s ease;
+  height: 100vh;
+  overflow-y: auto;
+  overflow-x: hidden;
 }
 .sidebar-header {
   display: flex;
@@ -160,13 +232,53 @@ const handleUserClick = (userId) => {
 }
 .section-title {
   cursor: pointer;
-  font-size: 0.8rem;
-  color: var(--text-secondary);
-  margin: 1rem 0 0.3rem 1rem;
-  font-weight: 600;
+  font-size: 0.9rem;
+  color: var(--text-primary);
+  margin: 1rem 0.5rem 0.5rem 0.5rem;
+  padding: 0.6rem 1rem;
+  font-weight: 700;
   letter-spacing: 1px;
-  transition: color 0.3s ease;
-  width: fit-content;
+  text-align: center;
+  background: var(--bg-tertiary);
+  border: 1px solid var(--border-primary);
+  border-radius: 8px;
+  transition: all 0.3s ease;
+  width: auto;
+}
+
+.section-title:hover {
+  color: var(--special-text-color);
+  background: var(--bg-active);
+  border-color: var(--special-text-color);
+}
+
+.channel-group {
+  margin-bottom: 1rem;
+}
+
+.channel-group-title {
+  font-size: 0.75rem;
+  color: var(--text-secondary);
+  margin: 0.8rem 0 0.3rem 1rem;
+  font-weight: 600;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+  opacity: 0.8;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  transition: color 0.2s;
+}
+
+.channel-group-title:hover {
+  color: var(--special-text-color);
+  opacity: 1;
+}
+
+.chevron-icon {
+  font-size: 0.7rem;
+  transition: transform 0.2s;
 }
 ul {
   list-style: none;
@@ -203,6 +315,10 @@ ul {
   gap: 1rem;
 }
 .icon-right {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 0.3rem;
   font-size: 0.9rem;
   opacity: 0.8;
 }
@@ -224,9 +340,40 @@ ul {
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
-  display: block;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
   max-width: 80%;
   font-weight: 600;
+}
+
+.new-message-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, #1ed760 0%, #17b34a 100%);
+  color: #fff;
+  font-size: 0.65rem;
+  font-weight: 700;
+  padding: 0.15rem 0.5rem;
+  border-radius: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  box-shadow: 0 2px 4px rgba(30, 215, 96, 0.3);
+  animation: pulse 2s infinite;
+  flex-shrink: 0;
+}
+
+@keyframes pulse {
+  0%,
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.8;
+    transform: scale(0.95);
+  }
 }
 .channel.active {
   background: var(--bg-active);
@@ -237,5 +384,31 @@ ul {
   background: var(--bg-active);
   font-weight: 600;
   border-left: 4px solid #7ee787;
+}
+
+/* Custom scrollbar styling */
+.sidebar::-webkit-scrollbar {
+  width: 8px;
+}
+
+.sidebar::-webkit-scrollbar-track {
+  background: var(--bg-tertiary);
+  border-radius: 4px;
+}
+
+.sidebar::-webkit-scrollbar-thumb {
+  background: var(--border-secondary);
+  border-radius: 4px;
+  transition: background 0.2s;
+}
+
+.sidebar::-webkit-scrollbar-thumb:hover {
+  background: var(--text-secondary);
+}
+
+/* For Firefox */
+.sidebar {
+  scrollbar-width: thin;
+  scrollbar-color: var(--border-secondary) var(--bg-tertiary);
 }
 </style>

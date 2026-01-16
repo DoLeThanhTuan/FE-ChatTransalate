@@ -26,20 +26,20 @@ const routes = [
     meta: { requiresAuth: true },
   },
   {
-    path: '/user-management',
+    path: '/admin/user-management',
     name: 'UserManagement',
     component: () => import('../views/admin/user/UserManagement.vue'),
     meta: { requiresAuth: true },
   },
   {
-    path: '/department-management',
+    path: '/admin/department-management',
     name: 'DepartmentManagement',
     component: () =>
       import('../views/admin/department/DepartmentManagement.vue'),
     meta: { requiresAuth: true },
   },
   {
-    path: '/organization-management',
+    path: '/admin/organization-management',
     name: 'OrganizationManagement',
     component: () =>
       import('../views/admin/organization/OrganizationManagement.vue'),
@@ -71,10 +71,18 @@ const router = createRouter({
 router.beforeEach(async (to, from, next) => {
   const isAuthenticated =
     localStorageUtils.get('userInfo')?.accessToken == null ? false : true
+  const userRole = localStorageUtils.get('userInfo')?.role ?? null
   if (to.meta.requiresAuth && !isAuthenticated) {
     next({ name: 'Login', query: { redirect: to.fullPath } })
     return
-  } else if (!to.meta.requiresAuth && isAuthenticated) {
+  }
+  if (to.path.startsWith('/admin')) {
+    if (!isAuthenticated || userRole !== 'ADMIN') {
+      next({ name: '404', query: { redirect: to.fullPath } })
+      return
+    }
+  }
+  if (!to.meta.requiresAuth && isAuthenticated) {
     const response = await channelApi.getChannelDefault()
     if (response.status == 200) {
       next({
