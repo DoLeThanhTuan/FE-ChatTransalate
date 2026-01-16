@@ -46,6 +46,7 @@
               'channel-type-btn',
               channelType === ChannelType.DEPARTMENT ? 'active' : null,
             ]"
+            :disabled="authStore.userInfo()?.role != Role.MANAGER"
             @click="channelType = ChannelType.DEPARTMENT"
           >
             <span class="icon">🏢</span>
@@ -68,6 +69,7 @@
               'channel-type-btn',
               channelType === ChannelType.ORGANIZATION ? 'active' : null,
             ]"
+            :disabled="authStore.userInfo()?.role != Role.MANAGER"
             @click="channelType = ChannelType.ORGANIZATION"
           >
             <span class="icon">🏛️</span>
@@ -90,6 +92,7 @@
               'channel-type-btn',
               channelType === ChannelType.GENERAL ? 'active' : null,
             ]"
+            :disabled="authStore.userInfo()?.role != Role.ADMIN"
             @click="channelType = ChannelType.GENERAL"
           >
             <span class="icon">🌐</span>
@@ -144,7 +147,7 @@ import { useChannelStore } from '@/stores/channelStore'
 import { useAuthStore } from '@/stores/authStore'
 import { toast } from 'vue3-toastify'
 import { useRouter } from 'vue-router'
-import { ChannelType, Status, TypeChat } from '@/config/enum'
+import { ChannelType, Role, Status, TypeChat } from '@/config/enum'
 
 const { t } = useI18n()
 const props = defineProps({
@@ -297,7 +300,7 @@ textarea.modal-input {
   border: 1.5px solid var(--border-primary);
   border-radius: 8px;
   padding: 0.7rem 1rem;
-  font-size: 1rem;
+  font-size: 0.875rem;
   margin-bottom: 0.2rem;
   width: 100%;
   box-sizing: border-box;
@@ -347,7 +350,7 @@ textarea.modal-input::placeholder,
   cursor: pointer;
   position: relative;
   transition: border 0.2s, background 0.2s, color 0.2s;
-  font-size: 1rem;
+  font-size: 0.875rem;
   outline: none;
 }
 
@@ -370,7 +373,7 @@ textarea.modal-input::placeholder,
 
 .channel-type-title {
   font-weight: 600;
-  font-size: 1.05rem;
+  font-size: 0.9375rem;
 }
 
 .channel-type-desc {
@@ -382,10 +385,10 @@ textarea.modal-input::placeholder,
   top: 10px;
   right: 10px;
   color: var(--special-text-color, #53ac5a);
-  font-size: 1.2rem;
+  font-size: 1rem;
 }
 .icon {
-  font-size: 1.5rem;
+  font-size: 1.25rem;
 }
 
 .modal-checkbox-row {
@@ -421,7 +424,7 @@ textarea.modal-input::placeholder,
   border-radius: 8px;
   padding: 0.7rem 1.5rem;
   font-weight: 600;
-  font-size: 1rem;
+  font-size: 0.875rem;
   cursor: pointer;
   transition: background 0.2s;
 }
@@ -440,7 +443,7 @@ textarea.modal-input::placeholder,
   border-radius: 8px;
   padding: 0.7rem 1.5rem;
   font-weight: 600;
-  font-size: 1rem;
+  font-size: 0.875rem;
   cursor: pointer;
   transition: background 0.2s, color 0.2s;
 }
@@ -457,16 +460,16 @@ textarea.modal-input::placeholder,
     margin: 0 auto;
   }
   .modal-header h2 {
-    font-size: 1.1rem;
+    font-size: 0.9375rem;
   }
   .modal-label,
   .channel-type-title,
   .channel-type-desc {
-    font-size: 0.9rem;
+    font-size: 0.8125rem;
   }
   .modal-create-btn,
   .modal-cancel-btn {
-    font-size: 0.95rem;
+    font-size: 0.875rem;
   }
   .channel-type-btn,
   .modal-input,
@@ -498,19 +501,19 @@ textarea.modal-input::placeholder,
     max-width: 100%;
     min-width: 0;
     width: 100%;
-    font-size: 1.05rem;
+    font-size: 0.9375rem;
     padding: 1.1rem 1rem;
     flex-direction: row;
     align-items: center;
     justify-content: flex-start;
   }
   .icon {
-    font-size: 2rem;
+    font-size: 1.75rem;
     margin-right: 0.7rem;
   }
   .checkmark {
     right: 18px;
-    font-size: 1.3rem;
+    font-size: 1.125rem;
   }
   .modal-body {
     gap: 0.7rem;

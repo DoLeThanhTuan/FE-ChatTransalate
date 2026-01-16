@@ -23,6 +23,9 @@
             type="button"
             class="tab-btn"
             :class="{ active: activeTab === 'add' }"
+            :disabled="
+              authStore.userInfo()?.id !== channelStore.channelCurrent.admin?.id
+            "
             @click="activeTab = 'add'"
           >
             + {{ $t('COMPONENT.CHANNEL.USERS.TAB_ADD') }}
@@ -254,12 +257,12 @@ watch(
   z-index: 1;
 }
 .modal-header h2 {
-  font-size: 1.3rem;
+  font-size: 1.125rem;
   font-weight: 700;
   margin: 0;
 }
 .close-btn {
-  font-size: 1.8rem;
+  font-size: 1.5rem;
   cursor: pointer;
   color: var(--text-primary);
   opacity: 0.7;
@@ -292,6 +295,10 @@ watch(
   font-weight: 600;
   cursor: pointer;
   transition: background 0.2s, color 0.2s;
+}
+.tab-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
 }
 .tab-btn.active {
   background: var(--bg-secondary);

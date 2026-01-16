@@ -12,6 +12,8 @@ export const useUserChatStore = defineStore('userChat', () => {
     try {
       const response = await userApi.getUserById(userId)
       userChatCurrent.value = response.data
+      console.log(userChatCurrent.value)
+
       return response.data
     } catch (e) {
       console.error(e)

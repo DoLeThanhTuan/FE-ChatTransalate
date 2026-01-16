@@ -5,7 +5,10 @@
     </div>
     <div v-if="selectedFiles.length > 0" class="files-preview">
       <div class="files-header">
-        <span>{{ selectedFiles.length }} {{ $t('COMPONENT.CHAT_VIEW.MESSAGE_INPUT.FILES_COUNT') }}</span>
+        <span
+          >{{ selectedFiles.length }}
+          {{ $t('COMPONENT.CHAT_VIEW.MESSAGE_INPUT.FILES_COUNT') }}</span
+        >
         <button class="remove-all-files" @click="removeAllFiles">
           {{ $t('COMPONENT.CHAT_VIEW.MESSAGE_INPUT.REMOVE_ALL_FILES') }}
         </button>
@@ -87,7 +90,9 @@
               <input
                 type="text"
                 v-model="searchQuery"
-                :placeholder="$t('COMPONENT.CHAT_VIEW.MESSAGE_INPUT.SEARCH_EMOJI')"
+                :placeholder="
+                  $t('COMPONENT.CHAT_VIEW.MESSAGE_INPUT.SEARCH_EMOJI')
+                "
                 class="emoji-search"
               />
               <div class="emoji-categories">
@@ -116,7 +121,10 @@
             </div>
           </div>
         </div>
-        <label class="action-btn" :title="$t('COMPONENT.CHAT_VIEW.MESSAGE_INPUT.SEND_FILE')">
+        <label
+          class="action-btn"
+          :title="$t('COMPONENT.CHAT_VIEW.MESSAGE_INPUT.SEND_FILE')"
+        >
           📎
           <input
             type="file"
@@ -316,7 +324,9 @@ const removeAllFiles = () => {
 const handleFileUpload = (event) => {
   const files = Array.from(event.target.files)
   if (selectedFiles.value.length + files.length > MAX_FILES) {
-    alert(t('COMPONENT.CHAT_VIEW.MESSAGE_INPUT.MAX_FILES_ERROR', { max: MAX_FILES }))
+    alert(
+      t('COMPONENT.CHAT_VIEW.MESSAGE_INPUT.MAX_FILES_ERROR', { max: MAX_FILES })
+    )
     return
   }
   selectedFiles.value.push(...files)
@@ -466,7 +476,7 @@ function selectUser(user) {
   if (lastAt !== -1) {
     const before = value.slice(0, lastAt + 1)
     const after = value.slice(pos)
-    textarea.value = before + user.name + ' ' + after
+    textarea.value = before + user.id + ' ' + after
     message.value.content = textarea.value
     textarea.focus()
     showUserDropdown.value = false

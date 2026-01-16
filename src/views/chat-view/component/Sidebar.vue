@@ -2,7 +2,10 @@
   <aside class="sidebar">
     <div class="sidebar-header">
       <LanguageSelector />
-      <div class="logo">{{ $t('COMPONENT.CHAT_VIEW.SIDE_BAR.LOGO') }}</div>
+      <div class="logo flex items-center gap-1">
+        <img src="/src/assets/logo.png" alt="Logo" class="logo-img" />
+        {{ $t('COMPONENT.CHAT_VIEW.SIDE_BAR.LOGO') }}
+      </div>
       <button class="create-channel-btn" @click="showModal = true">
         + {{ $t('COMPONENT.CHAT_VIEW.SIDE_BAR.BUTTON.CREATE_CHANNEL') }}
       </button>
@@ -219,6 +222,11 @@ const handleUserClick = (userId) => {
   font-weight: bold;
   color: var(--special-text-color);
   letter-spacing: 1px;
+}
+.logo-img {
+  height: 40px;
+  width: auto;
+  object-fit: contain;
 }
 .search {
   padding: 0.5rem 1rem;

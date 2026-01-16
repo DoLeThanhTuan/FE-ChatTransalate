@@ -1,17 +1,18 @@
 <template>
   <header class="app-header">
     <div class="header-content">
+      <router-link to="/" class="logo-link flex items-center">
+        <img src="/src/assets/logo.png" alt="Logo" class="logo-img" />
+        <h1 class="logo">{{ $t('COMPONENT.CHAT_VIEW.SIDE_BAR.LOGO') }}</h1>
+      </router-link>
       <div class="header-left">
-        <router-link to="/" class="logo-link">
-          <h1 class="logo">{{ $t('COMPONENT.COMMON.APP_HEADER.LOGO') }}</h1>
-        </router-link>
         <nav class="nav-menu">
           <router-link
             to="/admin/user-management"
             class="nav-item"
             :class="{ active: $route.name === 'UserManagement' }"
           >
-            <i class="fas fa-users"></i>
+            <font-awesome-icon :icon="['fas', 'user-tie']" />
             <span>{{
               $t('COMPONENT.COMMON.APP_HEADER.NAV.USER_MANAGEMENT')
             }}</span>
@@ -21,7 +22,7 @@
             class="nav-item"
             :class="{ active: $route.name === 'OrganizationManagement' }"
           >
-            <i class="fas fa-building"></i>
+            <font-awesome-icon :icon="['fas', 'building']" />
             <span>{{
               $t('COMPONENT.COMMON.APP_HEADER.NAV.ORGANIZATION_MANAGEMENT')
             }}</span>
@@ -31,19 +32,19 @@
             class="nav-item"
             :class="{ active: $route.name === 'DepartmentManagement' }"
           >
-            <i class="fas fa-sitemap"></i>
+            <font-awesome-icon :icon="['fas', 'sitemap']" />
             <span>{{
               $t('COMPONENT.COMMON.APP_HEADER.NAV.DEPARTMENT_MANAGEMENT')
             }}</span>
           </router-link>
-          <router-link
+          <!-- <router-link
             to="/profile"
             class="nav-item"
             :class="{ active: $route.name === 'Profile' }"
           >
             <i class="fas fa-user"></i>
             <span>{{ $t('COMPONENT.COMMON.APP_HEADER.NAV.PROFILE') }}</span>
-          </router-link>
+          </router-link> -->
         </nav>
       </div>
       <div class="header-right">
@@ -63,17 +64,17 @@
           </button>
           <div v-if="isUserMenuOpen" class="user-dropdown">
             <router-link
-              to="/profile"
+              to="/login"
               class="dropdown-item"
               @click="closeUserMenu"
             >
-              <i class="fas fa-user"></i>
+              <font-awesome-icon :icon="['fas', 'comment']" />
               <span>{{
-                $t('COMPONENT.COMMON.APP_HEADER.USER_MENU.PROFILE')
+                $t('COMPONENT.CHAT_VIEW.SIDE_BAR.LABEL.CHANNELS')
               }}</span>
             </router-link>
             <button @click="handleLogout" class="dropdown-item logout-item">
-              <i class="fas fa-sign-out-alt"></i>
+              <font-awesome-icon :icon="['fas', 'right-from-bracket']" />
               <span>{{
                 $t('COMPONENT.COMMON.APP_HEADER.USER_MENU.LOGOUT')
               }}</span>
@@ -155,15 +156,21 @@ onBeforeUnmount(() => {
   gap: 2rem;
 }
 
+.logo-img {
+  height: 40px;
+  width: auto;
+  object-fit: contain;
+}
+
 .logo-link {
   text-decoration: none;
   color: inherit;
 }
 
 .logo {
-  font-size: 1.5rem;
+  font-size: 1.25rem;
+  color: var(--special-text-color);
   font-weight: bold;
-  color: #891c1c;
   margin: 0;
 }
 
@@ -180,7 +187,7 @@ onBeforeUnmount(() => {
   border-radius: 6px;
   text-decoration: none;
   color: var(--text-primary, #333);
-  font-size: 0.95rem;
+  font-size: 0.875rem;
   transition: all 0.2s ease;
 }
 
@@ -228,13 +235,13 @@ onBeforeUnmount(() => {
 }
 
 .user-name {
-  font-size: 0.95rem;
+  font-size: 0.875rem;
   font-weight: 500;
   color: var(--text-primary, #333);
 }
 
 .user-button i {
-  font-size: 0.75rem;
+  font-size: 0.6875rem;
   color: var(--text-secondary, #666);
   transition: transform 0.2s ease;
 }
@@ -267,7 +274,7 @@ onBeforeUnmount(() => {
   text-align: left;
   color: var(--text-primary, #333);
   cursor: pointer;
-  font-size: 0.95rem;
+  font-size: 0.875rem;
   transition: background-color 0.2s ease;
   text-decoration: none;
 }

@@ -23,8 +23,12 @@
         </div>
         <select v-model="roleFilter" class="filter-select">
           <option value="">{{ $t('USER_MANAGEMENT.LABEL.ALL_ROLES') }}</option>
-          <option value="ADMIN">Admin</option>
-          <option value="USER">User</option>
+          <option value="USER">
+            {{ $t('USER_MANAGEMENT.MODAL.ROLE_USER') }}
+          </option>
+          <option value="MANAGER">
+            {{ $t('USER_MANAGEMENT.MODAL.ROLE_MANAGER') }}
+          </option>
         </select>
         <select v-model="departmentFilter" class="filter-select">
           <option value="">
@@ -60,12 +64,22 @@
             <tr v-for="(user, index) in filteredUsers" :key="user.id">
               <td>{{ index + 1 }}</td>
               <td class="flex gap-2 items-center">
-                <img
-                  :src="getURLAvatar(user.avatar)"
-                  :alt="user.name"
-                  class="avatar-img"
-                />
-                <span>{{ user.name }}</span>
+                <UserTooltip
+                  :user="user"
+                  :department-name="getDepartmentName(user.departmentId)"
+                >
+                  <img
+                    :src="getURLAvatar(user.avatar)"
+                    :alt="user.name"
+                    class="avatar-img"
+                  />
+                </UserTooltip>
+                <UserTooltip
+                  :user="user"
+                  :department-name="getDepartmentName(user.departmentId)"
+                >
+                  <span class="user-name">{{ user.name }}</span>
+                </UserTooltip>
               </td>
               <td>{{ user.email }}</td>
               <td>{{ user.phone || $t('USER_MANAGEMENT.LABEL.NA') }}</td>
@@ -90,11 +104,27 @@
                     <font-awesome-icon :icon="['fas', 'edit']" />
                   </button>
                   <button
-                    @click="openDeleteModal(user)"
-                    class="btn-action btn-delete"
-                    :title="$t('USER_MANAGEMENT.BUTTON.DELETE')"
+                    @click="openResetPasswordModal(user)"
+                    class="btn-action btn-reset-password"
+                    :title="$t('USER_MANAGEMENT.BUTTON.RESET_PASSWORD')"
                   >
-                    <font-awesome-icon :icon="['fas', 'ban']" />
+                    <font-awesome-icon :icon="['fas', 'key']" />
+                  </button>
+                  <button
+                    v-if="!user.isDisable"
+                    @click="openDisableModal(user)"
+                    class="btn-action btn-disable"
+                    :title="$t('USER_MANAGEMENT.BUTTON.DISABLE')"
+                  >
+                    <font-awesome-icon :icon="['fas', 'lock']" />
+                  </button>
+                  <button
+                    v-else
+                    @click="openEnableModal(user)"
+                    class="btn-action btn-enable"
+                    :title="$t('USER_MANAGEMENT.BUTTON.ENABLE')"
+                  >
+                    <font-awesome-icon :icon="['fas', 'unlock']" />
                   </button>
                 </div>
               </td>
@@ -119,12 +149,25 @@
         @submit="handleSubmit"
       />
 
-      <!-- Delete Confirmation Modal -->
-      <ModalConfirmDelete
-        :visible="showDeleteModal"
-        :id="selectedUser?.id"
-        @confirm="handleDelete"
-        @cancel="closeDeleteModal"
+      <!-- Enable/Disable Confirmation Modal -->
+      <ModalConfirmEnableDisable
+        v-if="selectedUser"
+        :visible="showEnableDisableModal"
+        :id="selectedUser.id"
+        :is-enable="isEnableAction"
+        :message="enableDisableMessage"
+        @confirm="handleEnableDisable"
+        @cancel="closeEnableDisableModal"
+      />
+
+      <!-- Reset Password Confirmation Modal -->
+      <ModalConfirmResetPassword
+        v-if="selectedUser"
+        :visible="showResetPasswordModal"
+        :id="selectedUser.id"
+        :message="resetPasswordMessage"
+        @confirm="handleResetPassword"
+        @cancel="closeResetPasswordModal"
       />
     </div>
   </div>
@@ -137,21 +180,27 @@ import AppHeader from '@/components/common/AppHeader.vue'
 import { userApi } from '@/axios/api-services/userApi'
 import { useUserStore } from '@/stores/userStore'
 import { useDepartmentStore } from '@/stores/departmentStore'
-import ModalConfirmDelete from '@/components/common/ModalConfirmDelete.vue'
+import ModalConfirmResetPassword from '@/components/common/ModalConfirmResetPassword.vue'
+import ModalConfirmEnableDisable from '@/components/common/ModalConfirmEnableDisable.vue'
 import UserFormModal from '@/components/admin/modals/UserFormModal.vue'
+import UserTooltip from '@/components/common/UserTooltip.vue'
 import defaultAvatarImg from '@/assets/default-avatar.png'
 import { getURLAvatar } from '@/utils/image'
+import { useAuthStore } from '@/stores/authStore'
 import { toast } from 'vue3-toastify'
+import { Password } from '@/config/enum'
 
 const { t } = useI18n()
-
+const authStore = useAuthStore()
 const userStore = useUserStore()
 const departmentStore = useDepartmentStore()
 const users = ref([])
 const departments = ref([])
 const loading = ref(false)
 const showModal = ref(false)
-const showDeleteModal = ref(false)
+const showEnableDisableModal = ref(false)
+const showResetPasswordModal = ref(false)
+const isEnableAction = ref(false) // true = enable, false = disable
 const isEditMode = ref(false)
 const submitting = ref(false)
 const searchQuery = ref('')
@@ -174,7 +223,9 @@ const formData = ref({
 const defaultAvatar = defaultAvatarImg
 
 const filteredUsers = computed(() => {
-  let filtered = users.value
+  let filtered = users.value.filter(
+    (user) => user.id !== authStore.userInfo()?.id
+  )
 
   // Filter by search query
   if (searchQuery.value) {
@@ -207,6 +258,26 @@ const getDepartmentName = (departmentId) => {
   const dept = departments.value.find((d) => d.id === departmentId)
   return dept?.name || null
 }
+
+const resetPasswordMessage = computed(() => {
+  if (selectedUser.value) {
+    const userName = selectedUser.value.name || selectedUser.value.username
+    const password = Password.DEFAULT // Default password - will be shown in confirmation modal
+
+    const confirmText = t('USER_MANAGEMENT.MESSAGE.RESET_PASSWORD_CONFIRM', {
+      name: `<strong>${userName}</strong>`,
+    })
+    const passwordText = t(
+      'USER_MANAGEMENT.MESSAGE.RESET_PASSWORD_CONFIRM_MESSAGE',
+      {
+        password: `<strong>${password}</strong>`,
+      }
+    )
+
+    return `${confirmText}<br />${passwordText}`
+  }
+  return ''
+})
 
 const fetchUsers = async () => {
   loading.value = true
@@ -259,14 +330,70 @@ const closeModal = () => {
   selectedUser.value = null
 }
 
-const openDeleteModal = (user) => {
+const openEnableModal = (user) => {
   selectedUser.value = user
-  showDeleteModal.value = true
+  isEnableAction.value = true
+  showEnableDisableModal.value = true
 }
 
-const closeDeleteModal = () => {
-  showDeleteModal.value = false
+const openDisableModal = (user) => {
+  selectedUser.value = user
+  isEnableAction.value = false
+  showEnableDisableModal.value = true
+}
+
+const closeEnableDisableModal = () => {
+  showEnableDisableModal.value = false
   selectedUser.value = null
+  isEnableAction.value = false
+}
+
+const enableDisableMessage = computed(() => {
+  if (selectedUser.value) {
+    const userName = selectedUser.value.name || selectedUser.value.username
+    const messageKey = isEnableAction.value
+      ? 'COMPONENT.COMMON.MODAL_CONFIRM_ENABLE_DISABLE.LABEL.MESSAGE_ENABLE'
+      : 'COMPONENT.COMMON.MODAL_CONFIRM_ENABLE_DISABLE.LABEL.MESSAGE_DISABLE'
+    const message = t(messageKey)
+    return message.replace(
+      'người dùng này',
+      `người dùng <strong>${userName}</strong>`
+    )
+  }
+  return ''
+})
+
+const openResetPasswordModal = (user) => {
+  selectedUser.value = user
+  showResetPasswordModal.value = true
+}
+
+const closeResetPasswordModal = () => {
+  showResetPasswordModal.value = false
+  selectedUser.value = null
+}
+
+const handleResetPassword = async (id) => {
+  try {
+    const res = await userApi.resetPassword(id, {
+      newPassword: Password.DEFAULT,
+    })
+    if (res.status !== 200) {
+      toast.error(t('USER_MANAGEMENT.MESSAGE.RESET_PASSWORD_ERROR'))
+      closeResetPasswordModal()
+      return
+    }
+    if (res.status == 200 && res.data == false) {
+      toast.error(t('USER_MANAGEMENT.MESSAGE.RESET_PASSWORD_ERROR'))
+      closeResetPasswordModal()
+      return
+    }
+    toast.success(t('USER_MANAGEMENT.MESSAGE.RESET_PASSWORD_SUCCESS'))
+    closeResetPasswordModal()
+  } catch (error) {
+    console.error('Error resetting password:', error)
+    toast.error(t('USER_MANAGEMENT.MESSAGE.RESET_PASSWORD_ERROR'))
+  }
 }
 
 const handleSubmit = async (payload) => {
@@ -286,7 +413,7 @@ const handleSubmit = async (payload) => {
     if (payload.avatarFile) formData.append('avatar', payload.avatarFile)
 
     if (isEditMode.value) {
-      await userApi.updateUser(selectedUser.value.id, formData)
+      const res = await userApi.updateUser(selectedUser.value.id, formData)
       toast.success(t('USER_MANAGEMENT.MESSAGE.UPDATE_SUCCESS'))
       closeModal()
       await fetchUsers()
@@ -304,6 +431,10 @@ const handleSubmit = async (payload) => {
       }
     }
   } catch (error) {
+    if (error.status == 403) {
+      toast.error(t('USER_MANAGEMENT.MESSAGE.UPDATE_USER_ADMIN_CHANNEL_ERROR'))
+      return
+    }
     console.error('Error saving user:', error)
     toast.error(
       error.response?.data?.message ||
@@ -316,16 +447,24 @@ const handleSubmit = async (payload) => {
   }
 }
 
-const handleDelete = async (id) => {
+const handleEnableDisable = async (id) => {
   try {
-    await userApi.deleteUser(id)
-    toast.success(t('USER_MANAGEMENT.MESSAGE.DELETE_SUCCESS'))
-    closeDeleteModal()
+    await userApi.changeStatusUser(id)
+    toast.success(
+      isEnableAction.value
+        ? t('USER_MANAGEMENT.MESSAGE.ENABLE_SUCCESS')
+        : t('USER_MANAGEMENT.MESSAGE.DISABLE_SUCCESS')
+    )
+    closeEnableDisableModal()
     await fetchUsers()
-    await userStore.fetchUsers() // Refresh store
+    await userStore.fetchUsers()
   } catch (error) {
-    console.error('Error deleting user:', error)
-    toast.error(t('USER_MANAGEMENT.MESSAGE.DELETE_ERROR'))
+    console.error('Error enabling/disabling user:', error)
+    toast.error(
+      isEnableAction.value
+        ? t('USER_MANAGEMENT.MESSAGE.ENABLE_ERROR')
+        : t('USER_MANAGEMENT.MESSAGE.DISABLE_ERROR')
+    )
   }
 }
 
@@ -513,6 +652,11 @@ onMounted(() => {
   height: 40px;
   border-radius: 50%;
   object-fit: cover;
+  cursor: pointer;
+}
+
+.user-name {
+  cursor: pointer;
 }
 
 .role-badge {
@@ -523,7 +667,7 @@ onMounted(() => {
   font-weight: 500;
 }
 
-.role-badge.admin {
+.role-badge.manager {
   background-color: #fee2e2;
   color: #991b1b;
 }
@@ -560,12 +704,30 @@ onMounted(() => {
   opacity: 0.8;
 }
 
-.btn-delete {
+.btn-reset-password {
+  background-color: #10b981;
+  color: white;
+}
+
+.btn-reset-password:hover {
+  opacity: 0.8;
+}
+
+.btn-disable {
   background-color: #ef4444;
   color: white;
 }
 
-.btn-delete:hover {
+.btn-disable:hover {
+  opacity: 0.8;
+}
+
+.btn-enable {
+  background-color: #10b981;
+  color: white;
+}
+
+.btn-enable:hover {
   opacity: 0.8;
 }
 

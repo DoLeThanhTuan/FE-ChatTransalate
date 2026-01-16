@@ -13,11 +13,37 @@
       "MODAL_CONFIRM_DELETE": {
         "LABEL": {
           "HEADER": "Confirm Delete",
-          "MESSAGE": "Are you sure you want to delete this?"
+          "MESSAGE": "Are you sure you want to delete this?",
+          "ENABLE": "Are you sure you want to enable this user?",
+          "DISABLE": "Are you sure you want to disable this user?"
         },
         "BUTTON": {
           "BTN_CANCEL": "Cancel",
-          "BTN_DELETE": "Delete"
+          "BTN_DELETE": "Delete",
+          "BTN_CONFIRM": "Confirm"
+        }
+      },
+      "MODAL_CONFIRM_RESET_PASSWORD": {
+        "LABEL": {
+          "HEADER": "Confirm Reset Password",
+          "MESSAGE": "Are you sure you want to reset password for this user?"
+        },
+        "BUTTON": {
+          "BTN_CANCEL": "Cancel",
+          "BTN_RESET": "Reset Password"
+        }
+      },
+      "MODAL_CONFIRM_ENABLE_DISABLE": {
+        "LABEL": {
+          "HEADER_ENABLE": "Confirm Enable",
+          "HEADER_DISABLE": "Confirm Disable",
+          "MESSAGE_ENABLE": "Are you sure you want to enable this user?",
+          "MESSAGE_DISABLE": "Are you sure you want to disable this user?"
+        },
+        "BUTTON": {
+          "BTN_CANCEL": "Cancel",
+          "BTN_ENABLE": "Enable",
+          "BTN_DISABLE": "Disable"
         }
       },
       "APP_HEADER": {
@@ -50,7 +76,7 @@
           "SEARCH_CHANNEL": "Join channel",
           "BTN_TRANSLATE": "Translate"
         },
-        "LOGO": "Smart Chat",
+        "LOGO": "Smart chat",
         "CHANNEL_GROUP": {
           "GENERAL": "General",
           "DEPARTMENT": "Department",
@@ -64,7 +90,8 @@
         "LEAVE_CHANNEL": "Leave Channel",
         "INFO": "Info",
         "BLOCK": "Block",
-        "LOCATION": "Huntsville"
+        "LOCATION": "Huntsville",
+        "BREAK": "Disband the group"
       },
       "MESSAGE_INPUT": {
         "PLACEHOLDER": "Message...",
@@ -96,7 +123,16 @@
         "ERROR_NO_USER": "No user selected",
         "ERROR_LOAD_USER_MESSAGES": "Could not load user messages",
         "ERROR_UPDATE_MESSAGE": "Could not edit message. Please try again.",
-        "TRANSLATE_ERROR": "An error occurred, please try again"
+        "TRANSLATE_ERROR": "An error occurred, please try again",
+        "LEAVE_ERROR_ADMIN": "You are the admin of this chat channel, you cannot leave.",
+        "SYSTEM_MESSAGE": {
+          "CREATE_CHANNEL": "created channel",
+          "JOIN_CHANNEL": "joined channel",
+          "LEAVE_CHANNEL": "left channel",
+          "BREAK_CHANNEL": "disbanded chat channel",
+          "REMOVE_MEMBER": "removed",
+          "ADD_MEMBER": "added"
+        }
       }
     },
     "CHANNEL": {
@@ -174,7 +210,9 @@
       "BUTTON_LOADING": "Logging in...",
       "NO_ACCOUNT": "Don't have an account?",
       "REGISTER_LINK": "Register now",
-      "ERROR": "An error occurred during login"
+      "ERROR": "An error occurred during login",
+      "ERROR_USER_DISABLED": "Account has been disabled",
+      "ERROR_USER_NOT_FOUND": "Invalid email or password"
     },
     "REGISTER": {
       "TITLE": "Register Account",
@@ -237,7 +275,9 @@
     "BUTTON": {
       "CREATE_USER": "Create new user",
       "EDIT": "Edit",
-      "DELETE": "Delete",
+      "ENABLE": "Enable",
+      "DISABLE": "Disable",
+      "RESET_PASSWORD": "Reset Password",
       "UPDATE": "Update",
       "CREATE": "Create",
       "CANCEL": "Cancel"
@@ -278,6 +318,7 @@
       "JOIN_ALL_CHANNEL": "Automatically add to related channels (department, organization)",
       "ROLE_USER": "User",
       "ROLE_ADMIN": "Admin",
+      "ROLE_MANAGER": "Manager",
       "CHANGE_AVATAR": "Change photo",
       "SELECT_AVATAR": "Select photo",
       "THEME_LIGHT": "Light",
@@ -286,12 +327,19 @@
     "MESSAGE": {
       "CREATE_SUCCESS": "User created successfully",
       "UPDATE_SUCCESS": "User updated successfully",
-      "DELETE_SUCCESS": "User deleted successfully",
+      "ENABLE_SUCCESS": "User enabled successfully",
+      "ENABLE_ERROR": "Error enabling user",
+      "DISABLE_SUCCESS": "User disabled successfully",
+      "DISABLE_ERROR": "Error disabling user",
       "CREATE_ERROR": "Could not create user",
       "EXISTS_ERROR": "User already exists in the system",
       "UPDATE_ERROR": "Could not update user",
-      "DELETE_ERROR": "Could not delete user",
-      "FETCH_ERROR": "Could not load user list"
+      "FETCH_ERROR": "Could not load user list",
+      "RESET_PASSWORD_CONFIRM": "Are you sure you want to reset password for user \"{name}\"?",
+      "RESET_PASSWORD_CONFIRM_MESSAGE": "The new password will be: {password}",
+      "RESET_PASSWORD_SUCCESS": "Password reset successfully.",
+      "RESET_PASSWORD_ERROR": "Error resetting password",
+      "UPDATE_USER_ADMIN_CHANNEL_ERROR": "User is still an admin of some channels in the old department."
     },
     "VALIDATION": {
       "NAME_REQUIRED": "Please enter full name",
@@ -349,7 +397,8 @@
       "DELETE_ERROR": "Could not delete department",
       "FETCH_ERROR": "Could not load department list",
       "FETCH_USERS_ERROR": "Could not load employee list",
-      "NO_USERS": "No employees in this department"
+      "NO_USERS": "No employees in this department",
+      "DELETE_ERROR_USED": "This department is in use and cannot be deleted"
     }
   },
   "ORGANIZATION_MANAGEMENT": {
@@ -401,7 +450,8 @@
       "FETCH_ERROR": "Could not load organization list",
       "FETCH_DEPARTMENTS_ERROR": "Could not load department list",
       "NO_DEPARTMENTS": "No departments in this organization",
-      "GENERAL_ERROR": "An error occurred, please try again"
+      "GENERAL_ERROR": "An error occurred, please try again",
+      "DELETE_ERROR_USED": "This organization is active and cannot be deleted"
     }
   },
   "language": {

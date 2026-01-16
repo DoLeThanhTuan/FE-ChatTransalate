@@ -297,7 +297,17 @@ const handleSubmit = async (payload) => {
 
 const handleDelete = async (id) => {
   try {
-    await departmentApi.delete(id)
+    const res = await departmentApi.delete(id)
+    if (res.status !== 200) {
+      toast.error(t('DEPARTMENT_MANAGEMENT.MESSAGE.DELETE_ERROR'))
+      closeDeleteModal()
+      return
+    }
+    if (res.status === 200 && res.data === false) {
+      toast.error(t('DEPARTMENT_MANAGEMENT.MESSAGE.DELETE_ERROR_USED'))
+      closeDeleteModal()
+      return
+    }
     toast.success(t('DEPARTMENT_MANAGEMENT.MESSAGE.DELETE_SUCCESS'))
     closeDeleteModal()
     await fetchDepartments()
